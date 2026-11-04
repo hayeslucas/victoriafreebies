@@ -1,0 +1,279 @@
+[
+  {
+    "id": "1up-single-parent-resource-centre",
+    "area": "Victoria",
+    "checked": "",
+    "conditions": [
+      "new",
+      "gently"
+    ],
+    "drop": "",
+    "how": "direct",
+    "items": [
+      {
+        "status": "contact",
+        "text": "seasonal clothing, shoes, hats, purses, belts"
+      }
+    ],
+    "name": "1Up Single Parent Resource Centre",
+    "note": "A 2021 news story asked for new or gently used seasonal clothing and accessories. Current needs are not confirmed, so call first.",
+    "pickup": "",
+    "source": "Oak Bay News (Nov 2021)"
+  },
+  {
+    "id": "big-brothers-big-sisters-clothing-pickup",
+    "area": "Greater Victoria",
+    "checked": "",
+    "conditions": [],
+    "drop": "",
+    "how": "",
+    "items": [
+      {
+        "status": "accepted",
+        "text": "clothing"
+      }
+    ],
+    "name": "Big Brothers Big Sisters of Victoria (clothing pickup)",
+    "note": "Clothing collections are picked up from your door. Booking steps and accepted items are on their campaign page, so confirm what they take before you book.",
+    "pickup": "Free curbside pickup in Greater Victoria. A donation of $5 or more toward pickup costs is requested.",
+    "source": "CanadaHelps campaign page, Free Neighborhood Clothing Pick-Up"
+  },
+  {
+    "id": "habitat-for-humanity-victoria-restore",
+    "area": "Victoria, Langford",
+    "checked": "2026-11-03",
+    "conditions": [
+      "gently"
+    ],
+    "drop": "walk-in",
+    "how": "sold",
+    "items": [
+      {
+        "status": "accepted",
+        "text": "furniture, couch, sofa, chairs, tables, dining sets, dressers, bed frames, desks"
+      },
+      {
+        "status": "accepted",
+        "text": "appliances, fridge, washer, dryer, stove, microwave, small appliances"
+      },
+      {
+        "status": "accepted",
+        "text": "lamps, light fixtures, mirrors, picture frames, housewares, china, kitchen accessories, area rugs"
+      },
+      {
+        "status": "accepted",
+        "text": "building materials, lumber, flooring, tiles, cabinets, tools"
+      },
+      {
+        "status": "accepted",
+        "text": "books, board games, DVDs, CDs, vinyl, video games, TVs, audio equipment"
+      },
+      {
+        "status": "accepted",
+        "text": "bicycles, sporting goods, outdoor furniture, garden tools, BBQ"
+      }
+    ],
+    "name": "Habitat for Humanity Victoria ReStore",
+    "note": "Drop-off Monday to Saturday 9:30–5, Sunday 11–5, closed on statutory holidays. Staff check every item and may decline it. Items must come from a smoke-free, pet-free home with no rips or stains. Couches must not be floral, and desks must be under 5 ft. Victoria: 721 Vanalman Ave. Westshore: 849 Orono Ave, Langford. Phone 250.386.7867. Not accepted: clothing, computers, medical equipment, box springs. Mattresses are corporate donors only.",
+    "pickup": "Request a pickup through the online form. The fee is not stated, so confirm when you book.",
+    "source": "habitatvictoria.com, What the ReStore Accepts"
+  },
+  {
+    "id": "our-place-society",
+    "area": "Victoria",
+    "checked": "",
+    "conditions": [],
+    "drop": "",
+    "how": "direct",
+    "items": [
+      {
+        "status": "contact",
+        "text": "socks"
+      },
+      {
+        "status": "contact",
+        "text": "new underwear"
+      },
+      {
+        "status": "contact",
+        "text": "men’s jeans, t-shirts, shoes"
+      }
+    ],
+    "name": "Our Place Society",
+    "note": "A 2021 news story listed drop-off at 919 Pandora Ave (any time) and 94 Talcott Rd (weekdays 8–4). Socks could be new or used, but underwear had to be new. That story is five years old, so call before you go.",
+    "pickup": "",
+    "source": "Oak Bay News (Oct 2021)"
+  },
+  {
+    "id": "the-backpack-project",
+    "area": "Victoria",
+    "checked": "",
+    "conditions": [],
+    "drop": "",
+    "how": "direct",
+    "items": [
+      {
+        "status": "contact",
+        "text": "long johns, underwear, socks, warm outerwear"
+      },
+      {
+        "status": "contact",
+        "text": "personal care items"
+      }
+    ],
+    "name": "The Backpack Project",
+    "note": "A 2021 news story listed these needs. Current needs and drop-off details are not confirmed, so contact them first.",
+    "pickup": "",
+    "source": "Oak Bay News (Nov 2021)"
+  },
+  {
+    "id": "mustard-seed-street-church-food-bank",
+    "area": "Victoria",
+    "checked": "",
+    "conditions": [
+      "gently"
+    ],
+    "drop": "",
+    "how": "direct",
+    "items": [
+      {
+        "status": "contact",
+        "text": "clothing, shoes, backpacks"
+      }
+    ],
+    "name": "The Mustard Seed Street Church & Food Bank",
+    "note": "A 2021 news story asked for clean, gently used clothes, shoes and backpacks. Current needs and drop-off details are not confirmed, so call first.",
+    "pickup": "",
+    "source": "Oak Bay News (Nov 2021)"
+  },
+  {
+    "id": "salvation-army-thrift-stores",
+    "area": "Victoria, Saanich, Langford, View Royal, Brentwood Bay",
+    "checked": "",
+    "conditions": [
+      "new",
+      "gently"
+    ],
+    "drop": "",
+    "how": "",
+    "items": [
+      {
+        "status": "accepted",
+        "text": "clothing"
+      },
+      {
+        "status": "accepted",
+        "text": "household items, housewares"
+      },
+      {
+        "status": "accepted",
+        "text": "furniture"
+      }
+    ],
+    "name": "The Salvation Army Thrift Stores",
+    "note": "Takes unworn or gently used items. Stores: 525 Johnson St, 990 Hillside Ave, 1551 Cedar Hill X Rd, 3934 Quadra St, 777 Goldstream Ave (Langford), 305 Island Hwy (View Royal), 7177 West Saanich Rd (Brentwood Bay). The location list is from 2018, so check with the store about hours and what it takes.",
+    "pickup": "",
+    "source": "Salvation Army BC thrift store locations page (2018)"
+  },
+  {
+    "id": "victoria-cool-aid-society",
+    "area": "Victoria",
+    "checked": "2026-11-03",
+    "conditions": [
+      "new",
+      "gently"
+    ],
+    "drop": "walk-in",
+    "how": "direct",
+    "items": [
+      {
+        "status": "requested",
+        "text": "bookcases, end tables, table and floor lamps, house plant stands"
+      },
+      {
+        "status": "requested",
+        "text": "curtains"
+      },
+      {
+        "status": "requested",
+        "text": "dressers, single beds, small shelves"
+      },
+      {
+        "status": "requested",
+        "text": "sheets (single or double), vinyl-covered wipeable pillows"
+      },
+      {
+        "status": "requested",
+        "text": "dinner plates, bowls, coffee mugs"
+      },
+      {
+        "status": "requested",
+        "text": "60 cup coffee urn"
+      },
+      {
+        "status": "requested",
+        "text": "vacuum"
+      },
+      {
+        "status": "requested",
+        "text": "garden tools, clippers, spades, shovels, leaf rake, wheelbarrow, electric hedge trimmer"
+      },
+      {
+        "status": "requested",
+        "text": "shade-loving plants"
+      },
+      {
+        "status": "requested",
+        "text": "dog treats (dehydrated or air-dried liver)"
+      },
+      {
+        "status": "requested",
+        "text": "ceiling-mounted projector screen"
+      },
+      {
+        "status": "requested",
+        "text": "hairdressing supplies, hair clippers, cape, scissors, thinning shears, hair clips"
+      },
+      {
+        "status": "accepted",
+        "text": "clothing, coats, jackets, socks"
+      },
+      {
+        "status": "contact",
+        "text": "other furniture"
+      }
+    ],
+    "name": "Victoria Cool Aid Society",
+    "note": "Clothing is always welcome. Bring it to the REES office or Rock Bay Landing during work hours. Items marked as requested are on Cool Aid’s current wish list and are needed at specific Cool Aid sites (Fairway Woods, Sandy Merriman House, Mount Edwards Court, Johnson Manor, Swift House, Rock Bay Landing and Central Services). Email donate@coolaid.org or call 250.383.1977 before bringing wish-list items or furniture.",
+    "pickup": "",
+    "source": "Cool Aid’s current wish list (provided Nov 3, 2026) and notes from Cool Aid staff"
+  },
+  {
+    "id": "women-in-need-win",
+    "area": "Victoria, Saanich",
+    "checked": "",
+    "conditions": [
+      "gently"
+    ],
+    "drop": "walk-in",
+    "how": "sold",
+    "items": [
+      {
+        "status": "accepted",
+        "text": "clothing, shoes"
+      },
+      {
+        "status": "accepted",
+        "text": "household goods, kitchenware, dishes, linens"
+      },
+      {
+        "status": "contact",
+        "text": "furniture, couches, dining sets, beds"
+      }
+    ],
+    "name": "WIN (Women in Need) Resale Stores",
+    "note": "Stores on Pandora, Cook and Wilson and in Saanich Centre on Quadra, open seven days a week. Clothing must be clean and good quality. A 2019 news story asked for apartment-sized furniture, so call before bringing large items. Donation details are on womeninneed.ca.",
+    "pickup": "",
+    "source": "Oak Bay News (new Saanich shop story) and CTV News (Nov 2019)"
+  }
+]
