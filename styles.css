@@ -72,4 +72,8 @@ nav a.logo{text-decoration:none}
 nav a[aria-current=page]{color:var(--brand)}
 .bigbtn.alt{background:var(--card);color:var(--ink);border:2px solid var(--ink)}
 nav a{white-space:nowrap}
-.steps.four{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.steps.four{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:28px 40px}
+.steps.four .step{display:grid;grid-template-columns:44px 1fr;column-gap:16px;align-items:start;align-content:start}
+.steps.four .step b.n{grid-row:span 2;margin:0}
+.steps.four .step h3{margin:6px 0 4px}
+.steps.four .step p{margin:0}
