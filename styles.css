@@ -76,3 +76,4 @@ nav a{white-space:nowrap}
 .items.clamp{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;margin-bottom:4px}
 .items.clamp.open{display:block;-webkit-line-clamp:unset;line-clamp:unset}
 button.more-link{display:inline-block;background:none;border:0;border-radius:0;padding:4px 0;margin:0 0 10px;color:var(--brand);font:600 17px system-ui,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.items,.instr,.why{white-space:pre-line}
