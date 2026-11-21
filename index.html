@@ -85,7 +85,7 @@ function spot(x){
 function card(x){
   return '<article class="res"><span class="badge b-'+x.type+'">'+LBL[x.type]+'</span>'
    +'<p class="org">'+esc(x.o.name||"")+'</p><h3 class="want">'+esc(x.title)+'</h3>'
-   +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items">'+esc(x.items)+'</p>':'')
+   +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
    +(x.instructions?'<p class="instr">'+esc(x.instructions)+'</p>':'')
@@ -110,6 +110,19 @@ function render(){
   h+=rows.slice(0,st.shown).map(function(r){return card(r.x)}).join("");
   $("out").innerHTML=h;
   $("morewrap").hidden=rows.length<=st.shown;
+  clampItems();
+}
+/* Long item lists show two lines, with a link to show the rest. The link only appears when the text is cut off. */
+function clampItems(){
+  Array.prototype.forEach.call($("out").querySelectorAll(".items.clamp"),function(p){
+    if(p.scrollHeight<=p.clientHeight+2)return;
+    var b=document.createElement("button");b.type="button";b.className="more-link";b.textContent="Show all items";b.setAttribute("aria-expanded","false");
+    b.onclick=function(){var open=p.classList.toggle("open");b.textContent=open?"Show fewer":"Show all items";b.setAttribute("aria-expanded",String(open))};
+    p.parentNode.insertBefore(b,p.nextSibling);
+    /* If the searched word is in this list but not the title, open it so the donor sees why it matched. */
+    var t=words(p.parentNode.querySelector(".want").textContent),iw=words(p.textContent);
+    if(words(st.q).some(function(w){return w.length>2&&iw.indexOf(w)>-1&&t.indexOf(w)<0}))b.onclick();
+  });
 }
 function submit(){st.q=$("q").value.trim();st.shown=12;render();if(st.q){var r=$("rt");if(r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"start"})}}
 function load(d){
