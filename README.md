@@ -18,6 +18,14 @@ Edit listings in Airtable. A listing appears on the site when:
 - **Status** is `Active`, and
 - **Expiry Date** is empty or not yet past.
 
+Each listing's **Drop off?** field decides how donors reach the charity:
+
+- **Drop Off Ready (address and hours)**: the card says "Drop it off at" with the organization's Address and Drop-off Hours.
+- **Phone first**: the card says "Call first" with the organization's Public Phone.
+
+If the chosen detail is missing on the organization (for example Drop Off Ready but no Address), the card falls back
+to the other one ("Call to arrange a drop-off"), so fill in the matching field.
+
 Changes show up within about 10 minutes. Vercel's CDN caches the API response
 (`s-maxage=600`), so Airtable is called about once every 10 minutes no matter how much traffic the site gets.
 

@@ -52,7 +52,7 @@ function syn(w){var o=[];SYNW.forEach(function(g){if(g.indexOf(w)>-1)o=o.concat(
 function score(x,q){
   var qw=words(q).filter(function(w){return ["the","and","for","of","my","some","old","used","new"].indexOf(w)<0});
   if(!words(q).length)return 1;if(!qw.length)return 0;
-  var t=words(x.title+" "+x.items),c=words(x.category),n=words(x.o.name||""),s=0,hit=0;
+  var t=words(x.title+" "+x.items),c=words(x.category),n=words((x.o.name||"")+" "+(x.o.parent||"")),s=0,hit=0;
   qw.forEach(function(w){
     var b=0;
     if(t.indexOf(w)>-1)b=6;
@@ -69,14 +69,23 @@ function score(x,q){
   return s;
 }
 function linkPhones(p){return esc(p).replace(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g,function(m){return '<a href="tel:'+m.replace(/[^0-9+]/g,"")+'">'+m+'</a>'})}
+/* The listing's "Drop off?" field in Airtable decides what the box shows:
+   "ready" = drop it off at the address and hours; "phone" = call first.
+   If the chosen detail is missing, fall back to the other so the donor still has a way to reach them. */
 function spot(x){
-  var o=x.o;
-  if(o.address)return '<div class="spot"><p class="k">Drop it off at</p><p class="big">'+esc(o.address)+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>';
-  if(o.phone)return '<div class="spot"><p class="k">Call first</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
+  var o=x.o,mode=x.dropoff||(o.address?"ready":"phone");
+  var drop=o.address?'<div class="spot"><p class="k">Drop it off at</p><p class="big">'+esc(o.address)+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>':'';
+  if(mode==="ready"){
+    if(drop)return drop;
+    if(o.phone)return '<div class="spot"><p class="k">Call to arrange a drop-off</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
+  }else{
+    if(o.phone)return '<div class="spot"><p class="k">Call first</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
+    if(drop)return drop;
+  }
   return '<div class="spot none"><p class="k">Contact details coming soon</p></div>';
 }
 function card(x){
-  return '<article class="res"><p class="org">'+esc(x.o.name||"")+'</p><h3 class="want">'+esc(x.title)+'</h3>'
+  return '<article class="res"><p class="org">'+esc(x.o.name||"")+(x.o.parent?' · '+esc(x.o.parent):'')+'</p><h3 class="want">'+esc(x.title)+'</h3>'
    +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)

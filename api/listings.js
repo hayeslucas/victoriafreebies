@@ -14,6 +14,7 @@ const LISTINGS = {
   table: "tblco5ktO1b8RHWdT",
   title: "fld3CrfSICeY5ohAE",
   org: "fldkWSeFmAttZzkeq",
+  dropoff: "fldjV2qVZHJQOuNil", // "Drop off?": decides whether the card shows the address or the phone number
   category: "fldw2UAbx1pEpptCo",
   items: "fldJhbzWV0Y4ftROz",
   case: "fld50E7eRJq2Vo82e",
@@ -27,6 +28,7 @@ const ORGS = {
   address: "fldERugbFTWakgFLU",
   hours: "fldn9qsoJgjE793Jn",
   website: "fld8kMmJu0Y9s4RZm",
+  parent: "fldWQp9IZSi1b8cEX", // "Parent Organization", e.g. Swift House -> Victoria Cool Aid Society
 };
 
 // Only listings that are switched on, active, and not past their expiry date.
@@ -57,6 +59,9 @@ async function fetchAll(table, fields, formula) {
 }
 
 const pick = (spec) => Object.entries(spec).filter(([k]) => k !== "table").map(([, id]) => id);
+// "Drop off?" options: "Drop Off Ready (address and hours)" -> "ready", "Phone first" -> "phone".
+// Matched by keyword so small wording changes to the options don't break it. Blank -> "".
+const dropoffMode = (v) => (/phone/i.test(v) ? "phone" : /drop/i.test(v) ? "ready" : "");
 const str = (v) => (v == null ? "" : typeof v === "object" && v.name ? v.name : String(v)).trim();
 
 export async function buildData() {
@@ -75,6 +80,7 @@ export async function buildData() {
       id: r.id,
       title,
       org,
+      dropoff: dropoffMode(str(f[LISTINGS.dropoff])),
       category: str(f[LISTINGS.category]),
       items: str(f[LISTINGS.items]),
       case: str(f[LISTINGS.case]),
@@ -85,12 +91,15 @@ export async function buildData() {
 
   // Only send charities that have a visible listing.
   const used = new Set(listings.map((l) => l.org));
+  const names = Object.fromEntries(orgRecs.map((r) => [r.id, str(r.fields[ORGS.name])]));
   const orgs = {};
   for (const r of orgRecs) {
     if (!used.has(r.id)) continue;
     const f = r.fields;
+    const parentId = (f[ORGS.parent] || [])[0];
     orgs[r.id] = {
       name: str(f[ORGS.name]),
+      parent: parentId && parentId !== r.id ? names[parentId] || "" : "",
       phone: str(f[ORGS.phone]),
       address: str(f[ORGS.address]),
       hours: str(f[ORGS.hours]),
