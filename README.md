@@ -1,16 +1,10 @@
 # Victoria Freebies
 
-- `index.html` — the page and its wording.
-- `charities.json` — the charities and what they want. One block per charity.
+A one-page site: donors search for an item and see which Greater Victoria charities want it.
 
-## Editing a charity
-Each charity looks like this. Keep the quotes, colons and commas exactly as they are.
-- name, area ("Victoria, Langford" style), note (short sentences, each ends with a period)
-- items: each has "text" and "status" (requested, accepted or contact)
-- conditions: any of "new", "gently", "opened"
-- pickup: text, or "" for none
-- how: "direct", "programs", "sold" or ""
-- drop: "walk-in", "appointment" or ""
-- source: where the info came from, checked: date as "2026-11-03"
-
-After editing, paste the whole file into jsonlint.com to check it for typos before you commit.
+- `index.html` is the whole site (no build step).
+- Listings come from the Airtable base "Victoria Donations Directory". They are copied into
+  `index.html` between `<!--VF-DATA-START-->` and `<!--VF-DATA-END-->`.
+- To change a listing, edit it in Airtable, not here. Then copy the updated `index.html` into this repo.
+- Charities submit new listings through the Airtable form:
+  https://airtable.com/appgw8rdpxxxGmWG3/pagYtNiHWxy6HWE64/form
