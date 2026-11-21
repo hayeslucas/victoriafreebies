@@ -15,6 +15,7 @@
 <div class="chips" id="chips"></div>
 <div class="filters">
 <div><label for="cat">Type of item</label><select id="cat"><option value="">All types</option></select></div>
+<div><label class="check"><input type="checkbox" id="droponly"> Drop off without calling</label></div>
 </div>
 </div>
 </div></div></header>
@@ -72,16 +73,16 @@ function linkPhones(p){return esc(p).replace(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d
 /* The listing's "Drop off?" field in Airtable decides what the box shows:
    "ready" = drop it off at the address and hours; "phone" = call first.
    If the chosen detail is missing, fall back to the other so the donor still has a way to reach them. */
-function spot(x){
+function howTo(x){
   var o=x.o,mode=x.dropoff||(o.address?"ready":"phone");
-  var drop=o.address?'<div class="spot"><p class="k">Drop it off at</p><p class="big">'+esc(o.address)+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>':'';
-  if(mode==="ready"){
-    if(drop)return drop;
-    if(o.phone)return '<div class="spot"><p class="k">Call to arrange a drop-off</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
-  }else{
-    if(o.phone)return '<div class="spot"><p class="k">Call first</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
-    if(drop)return drop;
-  }
+  if(mode==="ready")return o.address?"drop":o.phone?"arrange":"none";
+  return o.phone?"call":o.address?"drop":"none";
+}
+function spot(x){
+  var o=x.o,h=howTo(x);
+  if(h==="drop")return '<div class="spot"><p class="k">Drop it off at</p><p class="big">'+esc(o.address)+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>';
+  if(h==="arrange")return '<div class="spot"><p class="k">Call to arrange a drop-off</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
+  if(h==="call")return '<div class="spot"><p class="k">Call first</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
   return '<div class="spot none"><p class="k">Contact details coming soon</p></div>';
 }
 function card(x){
@@ -96,14 +97,25 @@ function card(x){
 var st={q:"",shown:12};
 function render(){
   if(!READY){$("out").innerHTML='<div class="empty"><p>Loading what local charities need…</p></div>';$("morewrap").hidden=true;return}
-  var q=st.q,cat=$("cat").value;
+  var q=st.q,cat=$("cat").value,dropOnly=$("droponly").checked;
   var rows=LIST.map(function(x){return {x:x,s:score(x,q)}}).filter(function(r){
-    if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;return true});
+    if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;return true});
   rows.sort(function(a,b){return (b.s-a.s)||a.x.title.localeCompare(b.x.title)});
   if(!q)rows.sort(function(a,b){return String(a.x.o.name).localeCompare(String(b.x.o.name))||a.x.title.localeCompare(b.x.title)});
   var none=q&&!rows.length,h="";
+  /* Matches exist, but only at places that ask you to call first: say so instead of "nothing". */
+  if(none&&dropOnly){
+    var callRows=LIST.filter(function(x){return score(x,q)>0&&(!cat||x.category===cat)});
+    var nOrgs=callRows.map(function(x){return x.org}).filter(function(v,i,a){return a.indexOf(v)===i}).length;
+    if(callRows.length){
+      $("rt").textContent="No drop-off-ready places for “"+q+"”";
+      $("out").innerHTML='<div class="empty"><p><b>'+nOrgs+' charit'+(nOrgs>1?'ies want':'y wants')+' “'+esc(q)+'”, but '+(nOrgs>1?'they ask':'it asks')+' you to call first.</b></p><p><button type="button" class="alt" id="showcall">Show them</button></p></div>';
+      $("showcall").onclick=function(){$("droponly").checked=false;st.shown=12;render()};
+      $("morewrap").hidden=true;return;
+    }
+  }
   if(none){
-    rows=LIST.map(function(x){return {x:x,s:1}}).filter(function(r){if(cat&&r.x.category!==cat)return false;return true});
+    rows=LIST.map(function(x){return {x:x,s:1}}).filter(function(r){if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;return true});
     rows.sort(function(a,b){return String(a.x.o.name).localeCompare(String(b.x.o.name))||a.x.title.localeCompare(b.x.title)});
     h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p><p class="meta">Know a charity that takes this? <a href="/charities#form">Tell us</a> and we’ll add it.</p></div>';
   }
@@ -153,6 +165,7 @@ $("go").onclick=submit;
 $("q").addEventListener("keydown",function(e){if(e.key==="Enter")submit()});
 var qt;$("q").addEventListener("input",function(){clearTimeout(qt);qt=setTimeout(function(){var v=$("q").value.trim();if(v!==st.q){st.q=v;st.shown=12;render()}},400)});
 $("cat").addEventListener("change",function(){st.shown=12;render()});
+$("droponly").addEventListener("change",function(){st.shown=12;render()});
 $("more").onclick=function(){st.shown+=12;render()};
 try{load(JSON.parse(localStorage.getItem(CACHE_KEY)))}catch(e){}
 render();
