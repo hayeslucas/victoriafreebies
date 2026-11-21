@@ -21,7 +21,7 @@
 </div></div></header>
 
 <main><div class="wrap">
-<section aria-live="polite"><h2 id="rt">What charities need right now</h2><div class="key" aria-label="What the labels mean"><p><span class="badge b-requested">Specifically requested</span>The charity asked for this. Drop it off at the address and hours shown.</p><p><span class="badge b-accepted">Accepted</span>They take this kind of item. Call first at the number shown.</p></div><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
+<section aria-live="polite"><h2 id="rt">What charities need right now</h2><div class="key" aria-label="What the labels mean"><p><span class="badge b-requested">Specifically requested</span>The charity asked for this. Drop it off at the address and hours shown.</p><p><span class="badge b-accepted">Accepted</span>They generally take this kind of item. Call first at the number shown.</p></div><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
 
 <section><h2>Why use Victoria Freebies?</h2><div class="steps"><div class="step"><h3>No wasted trips, no wasted time</h3><p>Know what a charity wants before you head out.</p></div><div class="step"><h3>Give to a good cause</h3><p>Your things go to local charities and the people they support.</p></div><div class="step"><h3>Less waste</h3><p>Good items find a new home instead of the landfill.</p></div></div></section>
 
@@ -43,6 +43,8 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){retur
 /* Listings come from /api/listings (Airtable, cached on Vercel's CDN). The last good copy is kept in this browser so repeat visits show results at once and the page still works if the API is down. */
 var D={orgs:{},listings:[]},LIST=[],READY=false,CACHE_KEY="vf-listings-v1";
 var LBL={requested:"Specifically requested",accepted:"Accepted"};
+/* Shown when hovering or tapping a label. Keep in step with the key above the results. */
+var TIP={requested:"The charity asked for this. Drop it off at the address and hours shown.",accepted:"They generally take this kind of item. Call first at the number shown."};
 
 /* Search: words, synonyms and categories, so "parka" finds "winter jackets" and "couch" finds "furniture". */
 function words(s){return String(s||"").toLowerCase().replace(/[^a-z\s]/g," ").split(/\s+/).filter(function(w){return w.length>1}).map(function(w){return w.length>2?w.replace(/ies$/,"y").replace(/(ch|sh|x|ss)es$/,"$1").replace(/([^s])s$/,"$1"):w})}
@@ -83,7 +85,7 @@ function spot(x){
   return '<div class="spot none"><p class="k">Contact details coming soon</p></div>';
 }
 function card(x){
-  return '<article class="res"><span class="badge b-'+x.type+'">'+LBL[x.type]+'</span>'
+  return '<article class="res"><span class="badge b-'+x.type+' tip" tabindex="0" data-tip="'+esc(TIP[x.type])+'">'+LBL[x.type]+'<span class="sr"> – '+esc(TIP[x.type])+'</span></span>'
    +'<p class="org">'+esc(x.o.name||"")+'</p><h3 class="want">'+esc(x.title)+'</h3>'
    +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')

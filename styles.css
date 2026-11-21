@@ -80,3 +80,8 @@ nav a{white-space:nowrap}
 .items.clamp{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;margin-bottom:4px}
 .items.clamp.open{display:block;-webkit-line-clamp:unset;line-clamp:unset}
 button.more-link{display:inline-block;background:none;border:0;border-radius:0;padding:4px 0;margin:0 0 10px;color:var(--brand);font:600 17px system-ui,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tip{position:relative;cursor:help}
+.tip::after{content:attr(data-tip);position:absolute;left:0;bottom:calc(100% + 8px);width:max-content;max-width:min(280px,80vw);padding:10px 12px;border-radius:10px;background:var(--ink);color:var(--bg);font:500 15px/1.4 system-ui,sans-serif;white-space:normal;box-shadow:0 4px 14px rgb(0 0 0/.18);opacity:0;visibility:hidden;transition:opacity .12s;z-index:5;pointer-events:none}
+.tip:hover::after,.tip:focus::after{opacity:1;visibility:visible}
+.tip:focus{outline-offset:2px}
