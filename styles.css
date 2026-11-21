@@ -70,3 +70,4 @@ body.editing [data-e]:focus{outline:3px solid var(--focus);background:var(--soft
 nav a.logo{margin-left:0;text-decoration:none}
 nav a[aria-current=page]{color:var(--brand)}
 .bigbtn.alt{background:var(--card);color:var(--ink);border:2px solid var(--ink)}
+nav a{white-space:nowrap}

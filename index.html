@@ -5,7 +5,7 @@
 </head><body>
 
 <header><div class="wrap">
-<nav><span class="logo">Victoria Freebies</span><span><a href="#how">How it works</a><a href="/about">Mission &amp; vision</a><a href="#contact">For charities</a></span></nav>
+<nav><span class="logo">Victoria Freebies</span><span><a href="#how">How it works</a><a href="/about">Mission &amp; vision</a><a href="/charities">For charities</a></span></nav>
 <div class="hero">
 <h1>Give your things a second life.</h1>
 <p class="sub">Tell us what you’re ready to let go of. We’ll find the Victoria charity that’s hoping for it right now.</p>
@@ -30,11 +30,9 @@
 <div class="step"><b class="n">2</b><h3>See who wants it</h3><p><b>Specifically requested</b> means the charity asked for it. <b>Accepted</b> means they take that kind of item.</p></div>
 <div class="step"><b class="n">3</b><h3>Drop it off or call</h3><p>For requested items, go to the address and hours shown. For accepted items, call first at the number shown.</p></div></div></section>
 
-<section id="contact"><h2>For charities: add or fix your listing</h2>
-<p>Run a charity in Greater Victoria? Tell us what you need right now, update your drop-off details, or let us know if something here is wrong. Donors who spot an error can use this too.</p>
-<div class="panel cta"><p>Fill out our short form to add a listing or change one. We check every submission before it goes on the site.</p><p><a class="bigbtn" href="https://airtable.com/appgw8rdpxxxGmWG3/pagYtNiHWxy6HWE64/form" target="_blank" rel="noopener">Fill out the form ↗</a></p><p class="hint">The form opens in a new tab. Questions? Email <a href="mailto:hayeslucas24@gmail.com">hayeslucas24@gmail.com</a>.</p></div></section>
+<section id="charities"><div class="panel cta"><h2>Run a charity?</h2><p>Tell donors exactly what you need, and spend less time sorting donations you can’t use.</p><p><a class="bigbtn" href="/charities">Information for charities</a></p></div></section>
 </div></main>
-<footer><div class="wrap">Victoria Freebies is a community project. Spot something out of date? <a href="#contact">Let us know</a>. · <a href="/about">Our mission &amp; vision</a></div></footer>
+<footer><div class="wrap">Victoria Freebies is a community project. Spot something out of date? <a href="/charities#form">Let us know</a>. · <a href="/about">Our mission &amp; vision</a></div></footer>
 
 <script>
 (function(){
@@ -106,7 +104,7 @@ function render(){
   if(none){
     rows=LIST.map(function(x){return {x:x,s:1}}).filter(function(r){if(cat&&r.x.category!==cat)return false;if(reqOnly&&r.x.type!=="requested")return false;return true});
     rows.sort(function(a,b){return ((a.x.type==="requested"?0:1)-(b.x.type==="requested"?0:1))||String(a.x.o.name).localeCompare(String(b.x.o.name))});
-    h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p><p class="meta">Know a charity that takes this? <a href="#contact">Tell us</a> and we’ll add it.</p></div>';
+    h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p><p class="meta">Know a charity that takes this? <a href="/charities#form">Tell us</a> and we’ll add it.</p></div>';
   }
   $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"):"What charities need right now";
   h+=rows.slice(0,st.shown).map(function(r){return card(r.x)}).join("");
