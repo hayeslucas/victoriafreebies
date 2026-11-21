@@ -14,7 +14,6 @@ const LISTINGS = {
   table: "tblco5ktO1b8RHWdT",
   title: "fld3CrfSICeY5ohAE",
   org: "fldkWSeFmAttZzkeq",
-  type: "fldjV2qVZHJQOuNil",
   category: "fldw2UAbx1pEpptCo",
   items: "fldJhbzWV0Y4ftROz",
   case: "fld50E7eRJq2Vo82e",
@@ -37,8 +36,6 @@ const VISIBLE =
 
 // Fresh for 10 minutes; after that the CDN serves the cached copy and refreshes it in the background.
 const CACHE = "public, s-maxage=600, stale-while-revalidate=86400";
-
-const TYPES = { "Specifically Requested": "requested", Accepted: "accepted" };
 
 async function fetchAll(table, fields, formula) {
   const out = [];
@@ -71,15 +68,13 @@ export async function buildData() {
   const listings = [];
   for (const r of listingRecs) {
     const f = r.fields;
-    const type = TYPES[str(f[LISTINGS.type])];
     const org = (f[LISTINGS.org] || [])[0];
     const title = str(f[LISTINGS.title]);
-    if (!type || !org || !title) continue; // incomplete record: leave it off the site
+    if (!org || !title) continue; // incomplete record: leave it off the site
     listings.push({
       id: r.id,
       title,
       org,
-      type,
       category: str(f[LISTINGS.category]),
       items: str(f[LISTINGS.items]),
       case: str(f[LISTINGS.case]),

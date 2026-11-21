@@ -15,20 +15,19 @@
 <div class="chips" id="chips"></div>
 <div class="filters">
 <div><label for="cat">Type of item</label><select id="cat"><option value="">All types</option></select></div>
-<div><label class="check"><input type="checkbox" id="req"> Specifically requested only</label></div>
 </div>
 </div>
 </div></div></header>
 
 <main><div class="wrap">
-<section aria-live="polite"><h2 id="rt">What charities need right now</h2><div class="key" aria-label="What the labels mean"><p><span class="badge b-requested">Specifically requested</span>The charity asked for this. Drop it off at the address and hours shown.</p><p><span class="badge b-accepted">Accepted</span>They generally take this kind of item. Call first at the number shown.</p></div><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
+<section aria-live="polite"><h2 id="rt">What charities need right now</h2><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
 
 <section><h2>Why use Victoria Freebies?</h2><div class="steps"><div class="step"><h3>No wasted trips, no wasted time</h3><p>Know what a charity wants before you head out.</p></div><div class="step"><h3>Give to a good cause</h3><p>Your things go to local charities and the people they support.</p></div><div class="step"><h3>Less waste</h3><p>Good items find a new home instead of the landfill.</p></div></div></section>
 
 <section id="how"><h2>How it works</h2><div class="steps">
 <div class="step"><b class="n">1</b><h3>Search your item</h3><p>Tell us what you have. No account needed.</p></div>
-<div class="step"><b class="n">2</b><h3>See who wants it</h3><p><b>Specifically requested</b> means the charity asked for it. <b>Accepted</b> means they take that kind of item.</p></div>
-<div class="step"><b class="n">3</b><h3>Drop it off or call</h3><p>For requested items, go to the address and hours shown. For accepted items, call first at the number shown.</p></div></div></section>
+<div class="step"><b class="n">2</b><h3>See who wants it</h3><p>Each result shows the charity, what they’re asking for and who your donation helps.</p></div>
+<div class="step"><b class="n">3</b><h3>Drop it off or call</h3><p>Go to the address and hours shown, or call first when the listing gives a phone number.</p></div></div></section>
 
 <section id="charities"><div class="panel cta"><h2>Run a charity?</h2><p>Tell donors exactly what you need, and spend less time sorting donations you can’t use.</p><p><a class="bigbtn" href="/charities">Information for charities</a></p></div></section>
 </div></main>
@@ -42,9 +41,6 @@ var $=function(i){return document.getElementById(i)};
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 /* Listings come from /api/listings (Airtable, cached on Vercel's CDN). The last good copy is kept in this browser so repeat visits show results at once and the page still works if the API is down. */
 var D={orgs:{},listings:[]},LIST=[],READY=false,CACHE_KEY="vf-listings-v1";
-var LBL={requested:"Specifically requested",accepted:"Accepted"};
-/* Shown when hovering or tapping a label. Keep in step with the key above the results. */
-var TIP={requested:"The charity asked for this. Drop it off at the address and hours shown.",accepted:"They generally take this kind of item. Call first at the number shown."};
 
 /* Search: words, synonyms and categories, so "parka" finds "winter jackets" and "couch" finds "furniture". */
 function words(s){return String(s||"").toLowerCase().replace(/[^a-z\s]/g," ").split(/\s+/).filter(function(w){return w.length>1}).map(function(w){return w.length>2?w.replace(/ies$/,"y").replace(/(ch|sh|x|ss)es$/,"$1").replace(/([^s])s$/,"$1"):w})}
@@ -75,18 +71,12 @@ function score(x,q){
 function linkPhones(p){return esc(p).replace(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g,function(m){return '<a href="tel:'+m.replace(/[^0-9+]/g,"")+'">'+m+'</a>'})}
 function spot(x){
   var o=x.o;
-  if(x.type==="requested"){
-    if(o.address)return '<div class="spot"><p class="k">Drop it off at</p><p class="big">'+esc(o.address)+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>';
-    if(o.phone)return '<div class="spot"><p class="k">Call to arrange a drop-off</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
-  }else{
-    if(o.phone)return '<div class="spot"><p class="k">Call first</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
-    if(o.address)return '<div class="spot"><p class="k">Drop it off at</p><p class="big">'+esc(o.address)+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>';
-  }
+  if(o.address)return '<div class="spot"><p class="k">Drop it off at</p><p class="big">'+esc(o.address)+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>';
+  if(o.phone)return '<div class="spot"><p class="k">Call first</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
   return '<div class="spot none"><p class="k">Contact details coming soon</p></div>';
 }
 function card(x){
-  return '<article class="res"><span class="badge b-'+x.type+' tip" tabindex="0" data-tip="'+esc(TIP[x.type])+'">'+LBL[x.type]+'<span class="sr"> – '+esc(TIP[x.type])+'</span></span>'
-   +'<p class="org">'+esc(x.o.name||"")+'</p><h3 class="want">'+esc(x.title)+'</h3>'
+  return '<article class="res"><p class="org">'+esc(x.o.name||"")+'</p><h3 class="want">'+esc(x.title)+'</h3>'
    +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
@@ -97,15 +87,15 @@ function card(x){
 var st={q:"",shown:12};
 function render(){
   if(!READY){$("out").innerHTML='<div class="empty"><p>Loading what local charities need…</p></div>';$("morewrap").hidden=true;return}
-  var q=st.q,cat=$("cat").value,reqOnly=$("req").checked;
+  var q=st.q,cat=$("cat").value;
   var rows=LIST.map(function(x){return {x:x,s:score(x,q)}}).filter(function(r){
-    if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;if(reqOnly&&r.x.type!=="requested")return false;return true});
-  rows.sort(function(a,b){return (b.s-a.s)||((a.x.type==="requested"?0:1)-(b.x.type==="requested"?0:1))||a.x.title.localeCompare(b.x.title)});
-  if(!q)rows.sort(function(a,b){return ((a.x.type==="requested"?0:1)-(b.x.type==="requested"?0:1))||String(a.x.o.name).localeCompare(String(b.x.o.name))});
+    if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;return true});
+  rows.sort(function(a,b){return (b.s-a.s)||a.x.title.localeCompare(b.x.title)});
+  if(!q)rows.sort(function(a,b){return String(a.x.o.name).localeCompare(String(b.x.o.name))||a.x.title.localeCompare(b.x.title)});
   var none=q&&!rows.length,h="";
   if(none){
-    rows=LIST.map(function(x){return {x:x,s:1}}).filter(function(r){if(cat&&r.x.category!==cat)return false;if(reqOnly&&r.x.type!=="requested")return false;return true});
-    rows.sort(function(a,b){return ((a.x.type==="requested"?0:1)-(b.x.type==="requested"?0:1))||String(a.x.o.name).localeCompare(String(b.x.o.name))});
+    rows=LIST.map(function(x){return {x:x,s:1}}).filter(function(r){if(cat&&r.x.category!==cat)return false;return true});
+    rows.sort(function(a,b){return String(a.x.o.name).localeCompare(String(b.x.o.name))||a.x.title.localeCompare(b.x.title)});
     h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p><p class="meta">Know a charity that takes this? <a href="/charities#form">Tell us</a> and we’ll add it.</p></div>';
   }
   $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"):"What charities need right now";
@@ -154,7 +144,6 @@ $("go").onclick=submit;
 $("q").addEventListener("keydown",function(e){if(e.key==="Enter")submit()});
 var qt;$("q").addEventListener("input",function(){clearTimeout(qt);qt=setTimeout(function(){var v=$("q").value.trim();if(v!==st.q){st.q=v;st.shown=12;render()}},400)});
 $("cat").addEventListener("change",function(){st.shown=12;render()});
-$("req").addEventListener("change",function(){st.shown=12;render()});
 $("more").onclick=function(){st.shown+=12;render()};
 try{load(JSON.parse(localStorage.getItem(CACHE_KEY)))}catch(e){}
 render();
