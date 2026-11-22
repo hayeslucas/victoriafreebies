@@ -240,3 +240,9 @@ button.sharebtn:hover{border-color:var(--ink)}
 .oloc{margin-top:22px}.oloc+.oloc,.oloc+.owish{margin-top:30px}.owish .lead{margin-bottom:6px}
 section.oloc,section.owish{padding-block:0}#page{padding-bottom:36px}
 .osite.call{border-left-color:var(--req)}.otable+.osite{margin-top:16px}
+.ojump{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 4px}
+.ojump a{display:inline-flex;gap:6px;align-items:center;padding:6px 12px;border:2px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);text-decoration:none;font:600 15px system-ui,sans-serif}
+.ojump a:hover{border-color:var(--brand)}.ojump span{color:var(--mute);font-weight:700}
+.otable .wtag{display:inline-block;margin-left:4px;padding:1px 7px;border-radius:999px;background:var(--reqbg);color:var(--req);font:700 12px system-ui,sans-serif;vertical-align:1px}
+.otable .wishhead th{color:var(--req)}
+.otable .rowcall{display:block;margin-top:3px;font:600 14px system-ui,sans-serif;color:var(--req)}
