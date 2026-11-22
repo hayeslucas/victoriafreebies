@@ -24,6 +24,7 @@ const LISTINGS = {
 const ORGS = {
   table: "tbl5P54dhVqE7yqZM",
   name: "fld2jjf0sa3qU5NFc",
+  short: "fld2Ze8WffnRgRx9f", // "Preferred Name": short everyday name for tight spots; blank = use Name
   phone: "fldUUNdANQuiEhaRU", // "Public Phone". Never "Contact Phone", which is private.
   address: "fldERugbFTWakgFLU",
   hours: "fldn9qsoJgjE793Jn",
@@ -112,7 +113,9 @@ export async function buildData() {
     const parentId = parentOf(r);
     orgs[r.id] = {
       name: str(f[ORGS.name]),
+      short: str(f[ORGS.short]) || str(f[ORGS.name]),
       parent: parentId ? str(byId[parentId].fields[ORGS.name]) : "",
+      parentShort: parentId ? str(byId[parentId].fields[ORGS.short]) || str(byId[parentId].fields[ORGS.name]) : "",
       parentId,
       phone: str(f[ORGS.phone]),
       address: str(f[ORGS.address]),

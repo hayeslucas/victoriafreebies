@@ -1,6 +1,6 @@
 /* Organization pages: /org/<name>, e.g. /org/our-place-society.
    One page per parent organization (all of Cool Aid's sites share one page), built from /api/listings:
-   the charity's Wish List items first, then everything else it takes, grouped by location and category.
+   everything the charity takes, grouped by location and category, then its Wish List items at the bottom.
    /org on its own lists every charity. */
 (function () {
   "use strict";
@@ -46,7 +46,7 @@
     var mine = top ? all.filter(function (x) { return VF.topId(x.org, orgs) === top; }) : [];
     if (!top || !mine.length) { if (!fromCache) notFound(); return; }
     D = d;
-    var t = orgs[top], name = t.name;
+    var t = orgs[top], name = t.name, nick = VF.short(t);
 
     /* Locations: the charity itself first, then its sites alphabetically. */
     var locs = [];
@@ -56,7 +56,7 @@
     mine.forEach(function (x) { uniq[base(x.id)] = 1; });
     var n = Object.keys(uniq).length;
 
-    document.title = name + " · Victoria Freebies";
+    document.title = nick + " · Victoria Freebies";
     $("oname").textContent = name;
     $("osub").textContent = n + " thing" + (n > 1 ? "s" : "") + " they’re asking for right now" + (multi ? ", across " + locs.length + " locations." : ".") + " Bringing one? See what else you could bring along.";
     $("oactions").innerHTML =
@@ -65,23 +65,13 @@
       '<button type="button" class="alt" id="sharepage">' + VF.SHARE_ICON + "Share this page</button>";
 
     var h = "";
-    /* Wish List items first, each with its own drop-off box (they may be at different sites). */
+    /* Everyday items by location: where to go once, then the list. */
     var wish = mine.filter(function (x) { return x.wish; });
-    if (wish.length) {
-      h += '<section class="owish"><h2>Specifically requested <span class="new">WISH LIST</span></h2><p class="lead">Asked for by name, for a specific person or program. Needed right now.</p><div class="results">' +
-        wish.map(function (x) {
-          return '<article class="res" id="item-' + esc(base(x.id)) + '">' + (multi ? '<p class="org">' + esc(x.o.name) + "</p>" : "") +
-            '<h3 class="want">' + esc(x.title) + "</h3>" + details(x) + (x.case ? '<p class="why">♥ ' + esc(x.case) + "</p>" : "") + VF.spot(x) +
-            '<p class="cardfoot">' + shareBtn(x) + "</p></article>";
-        }).join("") + "</div></section>";
-    }
-
-    /* Then everything else, by location: where to go once, then the list. */
     locs.forEach(function (loc) {
       var here = mine.filter(function (x) { return x.org === loc && !x.wish; });
-      if (!here.length) return; // everything at this site is already in the Wish List section
+      if (!here.length) return; // everything at this site is in the Wish List section below
       var o = orgs[loc], ref = here.filter(function (x) { return VF.howTo(x) === "drop"; })[0] || here[0] || mine.filter(function (x) { return x.org === loc; })[0];
-      h += '<section class="oloc"><h2>' + (multi ? esc(o.name) : wish.length ? "Also accepted anytime" : "What they accept") + "</h2>";
+      h += '<section class="oloc"><h2>' + (multi ? esc(VF.short(o)) : "What they accept") + "</h2>";
       h += VF.spot(ref);
       if (o.phone && VF.howTo(ref) === "drop") h += '<p class="ophone">Questions? Call ' + VF.linkPhones(o.phone) + "</p>";
 
@@ -97,13 +87,23 @@
       });
       h += "</section>";
     });
+    /* Wish List at the bottom, each item with its own drop-off box (they may be at different sites). */
+    if (wish.length) {
+      h += '<section class="owish"><h2>Wish List</h2><p class="lead">Specifically requested: asked for by name, for a specific person or program, and needed right now.</p><div class="results">' +
+        wish.map(function (x) {
+          return '<article class="res" id="item-' + esc(base(x.id)) + '">' + (multi ? '<p class="org">' + esc(VF.short(x.o)) + "</p>" : "") +
+            '<h3 class="want">' + esc(x.title) + "</h3>" + details(x) + (x.case ? '<p class="why">♥ ' + esc(x.case) + "</p>" : "") + VF.spot(x) +
+            '<p class="cardfoot">' + shareBtn(x) + "</p></article>";
+        }).join("") + "</div></section>";
+    }
+
     $("page").innerHTML = h;
 
-    $("sharepage").onclick = function () { VF.share(this, name + " on Victoria Freebies", "Here’s everything " + name + " is asking for right now:", location.pathname); };
+    $("sharepage").onclick = function () { VF.share(this, nick + " on Victoria Freebies", "Here’s everything " + nick + " is asking for right now:", location.pathname); };
     $("page").onclick = function (e) {
       var b = e.target.closest && e.target.closest("button[data-share]"); if (!b) return;
       var x = mine.filter(function (l) { return l.id === b.getAttribute("data-share"); })[0]; if (!x) return;
-      VF.share(b, x.title + " for " + x.o.name, x.o.name + " is asking for " + x.title.toLowerCase() + ". Can you help?", location.pathname + "#item-" + base(x.id));
+      VF.share(b, x.title + " for " + VF.short(x.o), VF.short(x.o) + " is asking for " + x.title.toLowerCase() + ". Can you help?", location.pathname + "#item-" + base(x.id));
     };
 
     /* Arriving from a shared link or an "also takes" link to one item: bring it into view and highlight it. */

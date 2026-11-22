@@ -85,7 +85,7 @@ function wanted(items){return String(items||"").split(/(?<=[.;])\s+/).filter(fun
 function score(x,q){
   var qw=words(q).filter(function(w){return STOP.indexOf(w)<0});
   if(!words(q).length)return 1;if(!qw.length)return 0;
-  var t=words(x.title+" "+wanted(x.items)),c=words(x.category),n=words((x.o.name||"")+" "+(x.o.parent||"")),s=0,hit=0;
+  var t=words(x.title+" "+wanted(x.items)),c=words(x.category),n=words([x.o.name,x.o.short,x.o.parent,x.o.parentShort].join(" ")),s=0,hit=0;
   qw.forEach(function(w){
     var b=0;
     if(t.indexOf(w)>-1)b=6;
@@ -119,8 +119,8 @@ function scoreOf(x,q){
 var COUNT={};
 function base(id){return String(id).split("-")[0]}
 function card(x){
-  var orgs=D.orgs||{},top=VF.topId(x.org,orgs),url=VF.orgUrl(x.org,orgs),topName=(orgs[top]||{}).name||x.o.name||"",more=(COUNT[top]||1)-1;
-  return '<article class="res">'+(x.wish?'<p class="wishtag">Specifically requested</p>':'')+'<p class="org"><a href="'+esc(url)+'">'+esc(x.o.name||"")+(x.o.parent?' · '+esc(x.o.parent):'')+'</a></p><h3 class="want">'+esc(x.title)+'</h3>'
+  var orgs=D.orgs||{},top=VF.topId(x.org,orgs),url=VF.orgUrl(x.org,orgs),topName=VF.short(orgs[top]||x.o),more=(COUNT[top]||1)-1;
+  return '<article class="res">'+(x.wish?'<p class="wishtag">Specifically requested</p>':'')+'<p class="org"><a href="'+esc(url)+'">'+esc(VF.where(x.o))+'</a></p><h3 class="want">'+esc(x.title)+'</h3>'
    +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
@@ -290,7 +290,7 @@ function fetchListings(){
 $("out").addEventListener("click",function(e){
   var b=e.target.closest&&e.target.closest("button[data-share]");if(!b)return;
   var x=LIST.filter(function(l){return l.id===b.getAttribute("data-share")})[0];if(!x)return;
-  VF.share(b,x.title+" for "+(x.o.name||""),(x.o.name||"A local charity")+" is asking for "+x.title.toLowerCase()+". Can you help?",VF.orgUrl(x.org,D.orgs||{})+"#item-"+base(x.id));
+  VF.share(b,x.title+" for "+VF.short(x.o),(VF.short(x.o)||"A local charity")+" is asking for "+x.title.toLowerCase()+". Can you help?",VF.orgUrl(x.org,D.orgs||{})+"#item-"+base(x.id));
 });
 $("go").onclick=submit;
 $("q").addEventListener("keydown",function(e){if(e.key==="Enter")submit()});
