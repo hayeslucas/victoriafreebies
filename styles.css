@@ -152,7 +152,12 @@ button.more-link{display:inline-block;background:none;border:0;border-radius:0;p
 .new{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:999px;background:var(--req);color:#fff;font:800 10px/1.2 system-ui,sans-serif;letter-spacing:.06em;vertical-align:2px}
 .navlinks .new{margin-left:5px;vertical-align:5px;font-size:9px;padding:2px 5px}
 .wishtag{display:inline-block;margin:0 0 8px;padding:3px 10px;border-radius:999px;background:var(--reqbg);color:var(--req);font:700 14px system-ui,sans-serif;letter-spacing:.02em}
-.wishintro{margin:-4px 0 18px;font:18px/1.45 system-ui,sans-serif;color:var(--mute)}
+.wishintro{margin:-4px 0 20px;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:14px;font:17px/1.45 system-ui,sans-serif}
+.wishintro .lead{margin:0 0 10px;font-size:18px}
+.wishintro .lead .new{margin:0 6px 0 0;vertical-align:2px}
+.wishpoints{margin:0;padding:0 0 0 20px;color:var(--mute)}
+.wishpoints li{margin:6px 0}.wishpoints b{color:var(--ink)}
+.linkbtn{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--brand);text-decoration:underline;cursor:pointer}
 @media (max-width:560px){.navlinks a{padding:8px 9px;font-size:15px}.navlinks .ico{display:none}}
 @media (max-width:360px){.navlinks a{padding:7px 6px;font-size:14px}.navlinks .new{display:none}}
 /* ---- Category buttons (replace the "Type of item" dropdown) ---- */

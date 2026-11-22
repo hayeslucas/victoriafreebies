@@ -24,7 +24,14 @@
 </div></div></header>
 
 <main><div class="wrap">
-<section aria-live="polite"><h2 id="rt">What charities need right now</h2><p class="wishintro" id="wishintro" hidden>Specific items local charities have asked for right now. These change often, so check back.</p><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
+<section aria-live="polite"><h2 id="rt">What charities need right now</h2><div class="wishintro" id="wishintro" hidden>
+<p class="lead"><span class="new">NEW</span> The Wish List shows specific things local charities need right now, like bed sheets for people moving into housing or dinner plates for a seniors’ residence.</p>
+<ul class="wishpoints">
+<li><b>A specific need.</b> An exact item, often with how many, for a particular program or group of people. In search, they’re tagged “Specifically requested”.</li>
+<li><b>Gone once it’s filled.</b> Charities take items down when they have enough, so the list changes often. Check back.</li>
+<li><b>Everything else is still welcome.</b> Charities also take many things anytime. <button type="button" class="linkbtn" id="wishall">See all listings</button></li>
+</ul>
+</div><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
 
 <section><h2>Why use Victoria Freebies?</h2><div class="steps"><div class="step"><h3>No wasted trips, no wasted time</h3><p>Know what a charity wants before you head out.</p></div><div class="step"><h3>Give to a good cause</h3><p>Your things go to local charities and the people they support.</p></div><div class="step"><h3>Less waste</h3><p>Good items find a new home instead of the landfill.</p></div></div></section>
 
@@ -281,6 +288,7 @@ function setWishPage(on){
     var me=a.getAttribute("href")===(on?"/wish-list":"/");if(me)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
   document.dispatchEvent(new Event("navchange"));
 }
+$("wishall").onclick=function(){$("wishonly").click()};
 $("wishonly").addEventListener("change",function(){st.shown=12;setWishPage(this.checked);render()});
 if(/^\/wish-list\/?$/.test(location.pathname)){$("wishonly").checked=true;setWishPage(true);WISH_ARRIVAL=true}
 $("more").onclick=function(){st.shown+=12;render()};
