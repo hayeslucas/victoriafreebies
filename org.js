@@ -25,7 +25,7 @@
     document.title = "Local charities · Victoria Freebies";
     $("oname").textContent = "Local charities";
     $("osub").textContent = "Every charity on Victoria Freebies, and how many needs each has posted right now.";
-    $("page").innerHTML = '<p class="orgcta">Run a charity? <a href="/charities">Post your requests <span aria-hidden="true">→</span></a></p><ul class="orglist">' + ids.map(function (id) {
+    $("page").innerHTML = '<p class="orgcta">Are you a charity? <a href="/charities">Post your needs <span aria-hidden="true">→</span></a></p><ul class="orglist">' + ids.map(function (id) {
       return '<li><a href="/org/' + VF.slug(orgs[id].name) + '"><b>' + esc(orgs[id].name) + "</b><span>" + count[id] + " need" + (count[id] > 1 ? "s" : "") + "</span></a></li>";
     }).join("") + "</ul>";
   }
