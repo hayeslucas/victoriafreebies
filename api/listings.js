@@ -73,11 +73,12 @@ export async function buildData() {
   const listings = [];
   for (const r of listingRecs) {
     const f = r.fields;
-    const org = (f[LISTINGS.org] || [])[0];
+    const orgIds = f[LISTINGS.org] || [];
     const title = str(f[LISTINGS.title]);
-    if (!org || !title) continue; // incomplete record: leave it off the site
-    listings.push({
-      id: r.id,
+    if (!orgIds.length || !title) continue; // incomplete record: leave it off the site
+    // A listing linked to several organizations (e.g. two thrift stores) becomes one card per organization.
+    for (const org of orgIds) listings.push({
+      id: orgIds.length > 1 ? `${r.id}-${org}` : r.id,
       title,
       org,
       dropoff: dropoffMode(str(f[LISTINGS.dropoff])),
