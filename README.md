@@ -51,10 +51,11 @@ categories, `BROAD` says which titles count as catch-alls, e.g. a thrift store's
 the search wasn't about pets. If a new kind of item doesn't find the catch-all listings it should, add it to `CATOF`.
 
 **Organization pages** (`/org/<name>`, built by `org.js` from the same API data): one page per parent
-organization (all of Cool Aid's sites share `/org/victoria-cool-aid-society`), with its Wish List items first, then
-everything else by location and category, plus a **Donate money** button (Organizations → **Donate Link**) and its
+organization (all of Cool Aid's sites share `/org/victoria-cool-aid-society`), with everything it takes by location and
+category, then its Wish List items at the bottom, plus a **Donate money** button (Organizations → **Donate Link**) and its
 **Website**. `/org` lists every charity. Card names and "also takes N other things" link here; Wish List items have a
-Share button that links to the item on this page. The page address comes from the organization's name, so renaming
+Share button that links to the item on this page. **Preferred Name** (e.g. "Cool Aid") is used where space is tight:
+card lines and footers, share messages, tab titles. The full Name stays on the page heading. The page address comes from the organization's name, so renaming
 an organization in Airtable changes its link.
 
 **Keeping wording in sync (important):** a request travels Form → Submission Intake → (approved) →
@@ -76,7 +77,7 @@ Charities submit new listings through the Airtable form:
 https://airtable.com/appgw8rdpxxxGmWG3/pagYtNiHWxy6HWE64/form
 
 Only these organization fields are sent to the site: name, **Public Phone**, address, drop-off hours,
-website, **Drop-off Instructions** and **Donate Link**. Contact name, email and Contact Phone stay private.
+website, **Drop-off Instructions**, **Donate Link** and **Preferred Name**. Contact name, email and Contact Phone stay private.
 
 ## Setup on Vercel
 

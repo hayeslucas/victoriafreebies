@@ -52,5 +52,10 @@
   }
   var SHARE_ICON = '<svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 13V3M6 7l4-4 4 4M4 11v5h12v-5"/></svg>';
 
-  window.VF = { esc: esc, mapsUrl: mapsUrl, linkPhones: linkPhones, addressLink: addressLink, howTo: howTo, spot: spot, topId: topId, slug: slug, orgUrl: orgUrl, share: share, SHARE_ICON: SHARE_ICON };
+  /* Short everyday name ("Cool Aid") where space is tight; the full name stays on the organization page heading. */
+  function short(o) { return (o && (o.short || o.name)) || ""; }
+  /* "Mount Edwards · Cool Aid" for a site, just "Our Place" for a charity on its own. */
+  function where(o) { return short(o) + (o && o.parent ? " · " + (o.parentShort || o.parent) : ""); }
+
+  window.VF = { short: short, where: where, esc: esc, mapsUrl: mapsUrl, linkPhones: linkPhones, addressLink: addressLink, howTo: howTo, spot: spot, topId: topId, slug: slug, orgUrl: orgUrl, share: share, SHARE_ICON: SHARE_ICON };
 })();
