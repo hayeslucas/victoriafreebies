@@ -15,7 +15,6 @@
     var orgs = d.orgs || {};
     return d.listings.filter(function (x) { return !x.expires || x.expires >= today(); }).map(function (x) { x.o = orgs[x.org] || {}; return x; });
   }
-  function catOrder(a, b) { return (a === "Other") - (b === "Other") || a.localeCompare(b); }
   function details(x) { return x.items && x.items.toLowerCase() !== x.title.toLowerCase() ? '<p class="items">' + esc(x.items) + "</p>" : ""; }
   function shareBtn(x) { return '<button type="button" class="sharebtn" data-share="' + esc(x.id) + '">' + VF.SHARE_ICON + "Share</button>"; }
 
@@ -75,37 +74,31 @@
               : (addr ? "<p><b>Drop off</b> " + addr + "</p>" : "") + (o.phone ? "<p><b>Phone</b> " + VF.linkPhones(o.phone) + "</p>" : "")) +
         (o.notes ? '<p class="notes">' + esc(o.notes) + "</p>" : "") + "</div>";
     }
-    function common(list) { var c = {}, best = "", n = 0; list.forEach(function (x) { if (x.case) { c[x.case] = (c[x.case] || 0) + 1; if (c[x.case] > n) { n = c[x.case]; best = x.case; } } }); return n > 1 ? best : ""; }
+    /* The "who it helps" line goes above the table only when every item there shares it. */
+    function common(list) { var c = list[0] && list[0].case; return list.length > 1 && c && list.every(function (x) { return x.case === c; }) ? c : ""; }
     function byTitle(a, b) { return a.title.localeCompare(b.title); }
-    function row(x, o, shared, callNote, cols) {
+    function row(x, o, shared, callNote, cols, tag) {
       var d = details(x).replace('<p class="items">', "").replace("</p>", "");
-      return '<tr id="item-' + esc(base(x.id)) + '"' + (x.wish ? ' class="wishrow"' : "") + '><th scope="row">' + esc(x.title) + (x.wish ? ' <span class="wtag">Wish List</span>' : "") + "</th><td>" + d +
+      return '<tr id="item-' + esc(base(x.id)) + '"' + (x.wish ? ' class="wishrow"' : "") + '><th scope="row">' + esc(x.title) + (x.wish && tag ? ' <span class="wtag">Wish List</span>' : "") + "</th><td>" + d +
         (x.case && x.case !== shared ? '<span class="rowwhy">♥ ' + esc(x.case) + "</span>" : "") +
         (callNote ? '<span class="rowcall">Call first: ' + VF.linkPhones(o.phone) + "</span>" : "") + "</td>" +
         (cols === 3 ? '<td class="act">' + (x.wish ? shareBtn(x) : "") + "</td>" : "") + "</tr>";
     }
     var sites = locs.map(function (loc) { return { o: orgs[loc], id: loc, list: mine.filter(function (x) { return x.org === loc; }) }; })
-      .sort(function (a, b) { return b.list.length - a.list.length || a.o.name.localeCompare(b.o.name); });
+      .sort(function (a, b) { return a.list.every(isCall) - b.list.every(isCall) || b.list.length - a.list.length || a.o.name.localeCompare(b.o.name); }); // drop-off sites first
     var h = "";
     if (multi) h += '<nav class="ojump" aria-label="Sites">' + sites.map(function (st) {
       return '<a href="#site-' + esc(st.id) + '">' + esc(VF.short(st.o)) + " <span>" + st.list.length + "</span></a>";
     }).join("") + "</nav>";
     sites.forEach(function (st) {
       var o = st.o, list = st.list, allCall = list.every(isCall), shared = common(list), cols = list.some(function (x) { return x.wish; }) ? 3 : 2;
-      var every = list.filter(function (x) { return !x.wish; }), wish = list.filter(function (x) { return x.wish; }), cats = [];
-      every.forEach(function (x) { if (cats.indexOf(x.category) < 0) cats.push(x.category); });
-      h += '<section class="oloc" id="site-' + esc(st.id) + '"><h2>' + (multi ? esc(VF.short(o)) : "What they need") + ' <span class="cnt">' + list.length + " need" + (list.length > 1 ? "s" : "") + "</span></h2>" +
+      var allWish = list.every(function (x) { return x.wish; });
+      h += '<section class="oloc" id="site-' + esc(st.id) + '"><h2>' + (multi ? esc(VF.short(o)) : "What they need") + ' <span class="cnt">' + list.length + " need" + (list.length > 1 ? "s" : "") + (allWish ? ' · <span class="wtag">all Wish List</span>' : "") + "</span></h2>" +
         where(o, allCall) + (shared ? '<p class="why">♥ ' + esc(shared) + "</p>" : "") +
         '<table class="otable"><thead><tr><th scope="col">Item</th><th scope="col">Details</th>' + (cols === 3 ? '<th scope="col"><span class="sr">Share</span></th>' : "") + "</tr></thead><tbody>";
-      var groupsShown = cats.length + (wish.length ? 1 : 0) > 1;
-      cats.sort(catOrder).forEach(function (c) {
-        if (groupsShown) h += '<tr class="ocatrow"><th colspan="' + cols + '" scope="rowgroup">' + esc(c || "Other") + "</th></tr>";
-        every.filter(function (x) { return x.category === c; }).sort(byTitle).forEach(function (x) { h += row(x, o, shared, !allCall && isCall(x), cols); });
-      });
-      if (wish.length) {
-        if (groupsShown) h += '<tr class="ocatrow wishhead"><th colspan="' + cols + '" scope="rowgroup">Wish List · specifically requested</th></tr>';
-        wish.sort(byTitle).forEach(function (x) { h += row(x, o, shared, !allCall && isCall(x), cols); });
-      }
+      /* Drop-off-ready items first, then call-first; everyday before Wish List; then A to Z. */
+      list.slice().sort(function (a, b) { return isCall(a) - isCall(b) || a.wish - b.wish || byTitle(a, b); })
+        .forEach(function (x) { h += row(x, o, shared, !allCall && isCall(x), cols, !allWish); });
       h += "</tbody></table></section>";
     });
 
