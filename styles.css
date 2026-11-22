@@ -162,3 +162,10 @@ button.more-link{display:inline-block;background:none;border:0;border-radius:0;p
 @media (hover:hover){.cats button.chip:hover:not([aria-pressed=true]){border-color:var(--brand);color:var(--brand)}}
 .cats button.chip:active{transform:scale(.96)}
 @media (prefers-reduced-motion:reduce){.cats button.chip{transition:none}}
+/* For charities: two forms side by side (new request / update a request) */
+.formpick{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:20px;margin-top:8px}
+.formpick>div{display:flex;flex-direction:column;align-items:center}
+.formpick h3{margin:0 0 6px}
+.formpick p{margin:0 0 8px}
+.formpick p:last-child{margin-top:auto}
+.formpick .bigbtn{border:2px solid var(--brand)}.formpick .bigbtn.alt{border-color:var(--ink)}
