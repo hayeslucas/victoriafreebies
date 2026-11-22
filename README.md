@@ -28,17 +28,19 @@ to the other one ("Call to arrange a drop-off"), so fill in the matching field.
 
 **Writing listings:** one listing = one kind of item a donor would search for.
 - **Title:** the item, plural, 1–4 words ("Tents and tarps", not "Camping gear is always needed").
-- **Item details:** optional. Only what the title doesn't already say: which kinds, sizes, condition, quantity.
-  Leave it blank if it would just repeat the title. Condition is one of **New only** · **New or gently used** ·
-  **Any condition**; quantity goes at the end as "(about 10)". Never other kinds of items: if you find yourself
-  listing other things, split it into another listing.
+- **Item details:** optional. Only what the title doesn't already say: which kinds, sizes, condition, quantity,
+  and what's *not* wanted. Leave it blank if it would just repeat the title. Condition is one of **New only** ·
+  **New or gently used** · **Any condition**; quantity goes at the end as "(about 10)". Put exclusions in their own
+  sentence starting with "No" or "Not accepted" ("No pillows."): search skips those sentences, so a search for
+  "pillows" won't find a listing that turns pillows away. Never other kinds of items: if you find yourself listing
+  other things, split it into another listing.
 - **Who will this help?** One full sentence that starts with who benefits and says how
   ("Women staying at Sandy Merriman House need…"), not a fragment ("Womens shelter in need").
-- **Anything else:** rules for this item only ("Unopened only", "No pillows", "Wholesale quantities only").
-  Don't repeat the address or hours (the card shows them), the Wish List (the tag shows it), or the charity's
-  standing rules.
-- **Organizations → Drop-off Notes:** standing rules for everything a charity accepts (where to park, "no
-  pickups", "staff check items"). Written once, shown in the drop-off box of every one of its listings.
+- **Organizations → Drop-off Instructions:** standing rules for everything a charity accepts (where to park, which
+  door, "no pickups"). Shown in the drop-off box of every one of its listings. Charities set it with the form's
+  "Drop-off instructions" question; on approval the automation copies it to the organization (blank = keep).
+  Don't repeat the address or hours here; the card shows them.
+- The listing field **Public Instructions (retired)** is no longer shown on the site and can be deleted.
 - Split when the parts would be searched for separately, have different rules, or belong in different
   categories. Broad listings are fine when the charity really takes the whole category (e.g. a thrift store's
   "Clothing"). Wish List = a specific quantity for a specific purpose; anything always accepted is Ongoing.
@@ -62,7 +64,7 @@ Charities submit new listings through the Airtable form:
 https://airtable.com/appgw8rdpxxxGmWG3/pagYtNiHWxy6HWE64/form
 
 Only these organization fields are sent to the site: name, **Public Phone**, address, drop-off hours,
-website and **Drop-off Notes**. Contact name, email and Contact Phone stay private.
+website and **Drop-off Instructions**. Contact name, email and Contact Phone stay private.
 
 ## Setup on Vercel
 

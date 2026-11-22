@@ -60,10 +60,13 @@ var SYNW=SYN.map(words);
 var NAMESTOP=["victoria","society","the","and","of","for","house","centre","program","store","thrift"];
 function syn(w){var o=[];SYNW.forEach(function(g){if(g.indexOf(w)>-1)o=o.concat(g)});return o}
 /* Each word the donor typed scores its best match: exact word 6, same family (parka -> jacket) 4, item type 3, charity name 5. Listings that match every word get a bonus. */
+/* Item details can include what a charity does NOT take ("No pillows."). Leave those sentences out of search,
+   so searching "pillows" doesn't find a listing that turns pillows away. */
+function wanted(items){return String(items||"").split(/(?<=[.;])\s+/).filter(function(p){return !/^(no|not)\b/i.test(p)}).join(" ")}
 function score(x,q){
   var qw=words(q).filter(function(w){return ["the","and","for","of","my","some","old","used","new"].indexOf(w)<0});
   if(!words(q).length)return 1;if(!qw.length)return 0;
-  var t=words(x.title+" "+x.items),c=words(x.category),n=words((x.o.name||"")+" "+(x.o.parent||"")),s=0,hit=0;
+  var t=words(x.title+" "+wanted(x.items)),c=words(x.category),n=words((x.o.name||"")+" "+(x.o.parent||"")),s=0,hit=0;
   qw.forEach(function(w){
     var b=0;
     if(t.indexOf(w)>-1)b=6;
@@ -90,7 +93,7 @@ function howTo(x){
   if(mode==="ready")return o.address?"drop":o.phone?"arrange":"none";
   return o.phone?"call":o.address?"drop":"none";
 }
-/* "Drop-off Notes" on the organization: standing rules shown under every one of its listings. */
+/* "Drop-off Instructions" on the organization: standing rules shown under every one of its listings. */
 function spot(x){var o=x.o,b=spotBox(x);return o.notes&&b.indexOf("spot none")<0?b.replace(/<\/div>$/,'<p class="notes">'+esc(o.notes)+'</p></div>'):b}
 function spotBox(x){
   var o=x.o,h=howTo(x);
@@ -109,7 +112,6 @@ function card(x){
    +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
-   +(x.instructions?'<p class="instr">'+esc(x.instructions)+'</p>':'')
    +(x.o.website?'<p class="site"><a href="'+esc(x.o.website)+'" target="_blank" rel="noopener">Visit their website ↗</a></p>':'')
    +'</article>';
 }
