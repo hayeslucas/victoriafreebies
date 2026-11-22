@@ -30,6 +30,7 @@ const ORGS = {
   website: "fld8kMmJu0Y9s4RZm",
   parent: "fldWQp9IZSi1b8cEX", // "Parent Organization", e.g. Swift House -> Victoria Cool Aid Society
   notes: "fldDYgz4NJJM44ziv", // "Drop-off Instructions": standing rules shown in the drop-off box of every listing for this organization
+  donate: "fldHUMhogSdDRKrcP", // "Donate Link": the charity's page for giving money, shown on its organization page
 };
 
 // Only listings that are switched on, active, and not past their expiry date.
@@ -94,22 +95,31 @@ export async function buildData() {
     });
   }
 
-  // Only send charities that have a visible listing.
+  // Only send charities that have a visible listing, plus their parent organizations
+  // (organization pages are per parent, e.g. one page for all of Cool Aid's sites).
   const used = new Set(listings.map((l) => l.org));
-  const names = Object.fromEntries(orgRecs.map((r) => [r.id, str(r.fields[ORGS.name])]));
+  const byId = Object.fromEntries(orgRecs.map((r) => [r.id, r]));
+  const parentOf = (r) => {
+    const p = (r.fields[ORGS.parent] || [])[0];
+    return p && p !== r.id && byId[p] ? p : "";
+  };
+  const send = new Set(used);
+  for (const id of used) if (byId[id] && parentOf(byId[id])) send.add(parentOf(byId[id]));
   const orgs = {};
   for (const r of orgRecs) {
-    if (!used.has(r.id)) continue;
+    if (!send.has(r.id)) continue;
     const f = r.fields;
-    const parentId = (f[ORGS.parent] || [])[0];
+    const parentId = parentOf(r);
     orgs[r.id] = {
       name: str(f[ORGS.name]),
-      parent: parentId && parentId !== r.id ? names[parentId] || "" : "",
+      parent: parentId ? str(byId[parentId].fields[ORGS.name]) : "",
+      parentId,
       phone: str(f[ORGS.phone]),
       address: str(f[ORGS.address]),
       hours: str(f[ORGS.hours]),
       website: str(f[ORGS.website]),
       notes: str(f[ORGS.notes]),
+      donate: str(f[ORGS.donate]),
     };
   }
 

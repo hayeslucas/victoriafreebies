@@ -44,12 +44,13 @@
 </div></main>
 <footer><div class="wrap">Victoria Freebies is a community project. Spot something out of date? <a href="/charities#form">Let us know</a>. · <a href="/about">Our mission &amp; vision</a></div></footer>
 
+<script src="/cards.js"></script>
 <script>
 (function(){
 "use strict";
 var PRISTINE=document.body.innerHTML;
 var $=function(i){return document.getElementById(i)};
-function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+var esc=VF.esc,howTo=VF.howTo,spot=VF.spot; // shared with organization pages (cards.js)
 /* Listings come from /api/listings (Airtable, cached on Vercel's CDN). The last good copy is kept in this browser so repeat visits show results at once and the page still works if the API is down. */
 var D={orgs:{},listings:[]},LIST=[],READY=false,CACHE_KEY="vf-listings-v1";
 
@@ -114,37 +115,17 @@ function scoreOf(x,q){
   }
   return SCORES.by[x.id]||0;
 }
-var APPLE=/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
-function mapsUrl(a){return APPLE?"https://maps.apple.com/?q="+encodeURIComponent(a):"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(a)}
-function linkPhones(p){return esc(p).replace(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g,function(m){return '<a href="tel:'+m.replace(/[^0-9+]/g,"")+'">'+m+'</a>'})}
-/* The listing's "Drop off?" field in Airtable decides what the box shows:
-   "ready" = drop it off at the address and hours; "phone" = call first.
-   If the chosen detail is missing, fall back to the other so the donor still has a way to reach them. */
-function howTo(x){
-  var o=x.o,mode=x.dropoff||(o.address?"ready":"phone");
-  if(mode==="ready")return o.address?"drop":o.phone?"arrange":"none";
-  return o.phone?"call":o.address?"drop":"none";
-}
-/* "Drop-off Instructions" on the organization: standing rules shown under every one of its listings. */
-function spot(x){var o=x.o,b=spotBox(x);return o.notes&&b.indexOf("spot none")<0?b.replace(/<\/div>$/,'<p class="notes">'+esc(o.notes)+'</p></div>'):b}
-function spotBox(x){
-  var o=x.o,h=howTo(x);
-  if(h==="drop"){
-    /* Addresses with a street number link to maps (Apple Maps on Apple devices, Google Maps elsewhere);
-       hovering shows "Open in Maps". Text like "Multiple Locations" stays plain. */
-    var mappable=/\d/.test(o.address),maps=mappable?mapsUrl(o.address):"";
-    return '<div class="spot"><p class="k">Drop it off at</p><p class="big">'+(mappable?'<a class="maplink" data-tip="Open in Maps ↗" href="'+esc(maps)+'" target="_blank" rel="noopener">'+esc(o.address)+'<span class="sr"> (opens in Maps)</span></a>':esc(o.address))+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>';
-  }
-  if(h==="arrange")return '<div class="spot"><p class="k">Call to arrange a drop-off</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
-  if(h==="call")return '<div class="spot"><p class="k">Call first</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
-  return '<div class="spot none"><p class="k">Contact details coming soon</p></div>';
-}
+/* How many other things each charity (parent organization) accepts, for the "also takes" link on cards. */
+var COUNT={};
+function base(id){return String(id).split("-")[0]}
 function card(x){
-  return '<article class="res">'+(x.wish?'<p class="wishtag">Specifically requested</p>':'')+'<p class="org">'+esc(x.o.name||"")+(x.o.parent?' · '+esc(x.o.parent):'')+'</p><h3 class="want">'+esc(x.title)+'</h3>'
+  var orgs=D.orgs||{},top=VF.topId(x.org,orgs),url=VF.orgUrl(x.org,orgs),topName=(orgs[top]||{}).name||x.o.name||"",more=(COUNT[top]||1)-1;
+  return '<article class="res">'+(x.wish?'<p class="wishtag">Specifically requested</p>':'')+'<p class="org"><a href="'+esc(url)+'">'+esc(x.o.name||"")+(x.o.parent?' · '+esc(x.o.parent):'')+'</a></p><h3 class="want">'+esc(x.title)+'</h3>'
    +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
-   +(x.o.website?'<p class="site"><a href="'+esc(x.o.website)+'" target="_blank" rel="noopener">Visit their website ↗</a></p>':'')
+   +'<p class="cardfoot">'+(more>0?'<a class="also" href="'+esc(url)+'">'+esc(topName)+' also takes '+more+' other thing'+(more>1?'s':'')+' <span aria-hidden="true">→</span></a>':'<a class="also" href="'+esc(url)+'">More about '+esc(topName)+' <span aria-hidden="true">→</span></a>')
+   +(x.wish?'<button type="button" class="sharebtn" data-share="'+esc(x.id)+'">'+VF.SHARE_ICON+'Share</button>':'')+'</p>'
    +'</article>';
 }
 var st={q:"",shown:12,cat:""};
@@ -273,6 +254,7 @@ function load(d){
   cats.sort(function(a,b){return (a==="Other")-(b==="Other")||(COMMON[b]||3)-(COMMON[a]||3)||a.localeCompare(b)});
   if(cats.indexOf(st.cat)<0)st.cat="";
   $("cats").innerHTML=[""].concat(cats).map(function(c){return '<button type="button" class="chip" data-cat="'+esc(c)+'" aria-pressed="'+(c===st.cat)+'">'+(c?esc(c):"All")+'</button>'}).join("");
+  COUNT={};var seen={};LIST.forEach(function(x){var t=VF.topId(x.org,orgs),k=t+'|'+base(x.id);if(!seen[k]){seen[k]=1;COUNT[t]=(COUNT[t]||0)+1}});
   READY=true;render();
   /* Arriving at /wish-list from the top bar: jump straight to the list (only the first time it loads). */
   if(WISH_ARRIVAL){WISH_ARRIVAL=false;var r=$("rt");if(r&&r.scrollIntoView)r.scrollIntoView({block:"start"})}
@@ -304,6 +286,12 @@ function fetchListings(){
   }
   tick();
 })();
+/* Share a Wish List item: links to the item on its charity's page. */
+$("out").addEventListener("click",function(e){
+  var b=e.target.closest&&e.target.closest("button[data-share]");if(!b)return;
+  var x=LIST.filter(function(l){return l.id===b.getAttribute("data-share")})[0];if(!x)return;
+  VF.share(b,x.title+" for "+(x.o.name||""),(x.o.name||"A local charity")+" is asking for "+x.title.toLowerCase()+". Can you help?",VF.orgUrl(x.org,D.orgs||{})+"#item-"+base(x.id));
+});
 $("go").onclick=submit;
 $("q").addEventListener("keydown",function(e){if(e.key==="Enter")submit()});
 var qt;$("q").addEventListener("input",function(){clearTimeout(qt);qt=setTimeout(function(){var v=$("q").value.trim();if(v!==st.q){st.q=v;st.shown=12;render()}},400)});
