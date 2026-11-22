@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="/styles.css">
 </head><body>
 
-<div class="topbar" id="topbar"><nav class="wrap" aria-label="Main"><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="9"/><path d="M16 24s-7.5-4.6-7.5-9.6A4.1 4.1 0 0 1 16 12a4.1 4.1 0 0 1 7.5 2.4C23.5 19.4 16 24 16 24z"/></svg><span>Victoria Freebies</span></a><div class="navlinks"><span class="navpill" aria-hidden="true"></span><a href="/" aria-current="page"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4.5 4.5"/></svg>Search</a><a href="/wish-list">Wish List<span class="new" aria-label="new">NEW</span></a><a href="/about"><span class="full">Mission &amp; vision</span><span class="short">Mission</span></a><a href="/charities"><span class="full">For charities</span><span class="short">Charities</span></a></div></nav></div>
+<div class="topbar" id="topbar"><nav class="wrap" aria-label="Main"><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="9"/><path d="M16 24s-7.5-4.6-7.5-9.6A4.1 4.1 0 0 1 16 12a4.1 4.1 0 0 1 7.5 2.4C23.5 19.4 16 24 16 24z"/></svg><span>Victoria Freebies</span></a><div class="navlinks"><span class="navpill" aria-hidden="true"></span><a href="/" aria-current="page"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4.5 4.5"/></svg>Search</a><a href="/wish-list">Wish List<span class="new" aria-label="new">NEW</span></a><a href="/org">Charities</a><a href="/about">About</a></div></nav></div>
 <header><div class="wrap">
 <div class="hero">
 <p class="place"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.6 6-10A6 6 0 0 0 4 8c0 4.4 6 10 6 10z"/><circle cx="10" cy="8" r="2.2"/></svg>Victoria, BC</p>
@@ -42,7 +42,7 @@
 
 <section id="charities"><div class="panel cta"><h2>Run a charity?</h2><p>Tell donors exactly what you need, and spend less time sorting donations you can’t use.</p><p><a class="bigbtn" href="/charities">Information for charities</a></p></div></section>
 </div></main>
-<footer><div class="wrap">Victoria Freebies is a community project. Spot something out of date? <a href="/charities#form">Let us know</a>. · <a href="/about">Our mission &amp; vision</a></div></footer>
+<footer><div class="wrap">Victoria Freebies is a community project. Spot something out of date? <a href="/charities#form">Let us know</a>. · <a href="/charities">For charities</a> · <a href="/about">About</a></div></footer>
 
 <script src="/cards.js"></script>
 <script>
@@ -115,7 +115,7 @@ function scoreOf(x,q){
   }
   return SCORES.by[x.id]||0;
 }
-/* How many other things each charity (parent organization) accepts, for the "also takes" link on cards. */
+/* How many needs each charity (parent organization) has, for the "has N other needs" link on cards. */
 var COUNT={};
 function base(id){return String(id).split("-")[0]}
 function card(x){
@@ -124,8 +124,8 @@ function card(x){
    +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
-   +'<p class="cardfoot">'+(more>0?'<a class="also" href="'+esc(url)+'">'+esc(topName)+' also takes '+more+' other thing'+(more>1?'s':'')+' <span aria-hidden="true">→</span></a>':'<a class="also" href="'+esc(url)+'">More about '+esc(topName)+' <span aria-hidden="true">→</span></a>')
-   +(x.wish?'<button type="button" class="sharebtn" data-share="'+esc(x.id)+'">'+VF.SHARE_ICON+'Share</button>':'')+'</p>'
+   +'<p class="cardfoot">'+(more>0?'<a class="also" href="'+esc(url)+'">'+esc(topName)+' has '+more+' other need'+(more>1?'s':'')+' <span aria-hidden="true">→</span></a>':'<a class="also" href="'+esc(url)+'">More about '+esc(topName)+' <span aria-hidden="true">→</span></a>')
+   +'<span class="sharewrap"><button type="button" class="sharebtn" data-share="'+esc(x.id)+'" aria-haspopup="menu" aria-expanded="false">'+VF.SHARE_ICON+'Share</button></span></p>'
    +'</article>';
 }
 var st={q:"",shown:12,cat:""};
@@ -286,7 +286,7 @@ function fetchListings(){
   }
   tick();
 })();
-/* Share a Wish List item: links to the item on its charity's page. */
+/* Share any listing: links to the item on its charity's page, where it is highlighted. */
 $("out").addEventListener("click",function(e){
   var b=e.target.closest&&e.target.closest("button[data-share]");if(!b)return;
   var x=LIST.filter(function(l){return l.id===b.getAttribute("data-share")})[0];if(!x)return;

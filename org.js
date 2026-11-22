@@ -15,20 +15,18 @@
     var orgs = d.orgs || {};
     return d.listings.filter(function (x) { return !x.expires || x.expires >= today(); }).map(function (x) { x.o = orgs[x.org] || {}; return x; });
   }
-  function catOrder(a, b) { return (a === "Other") - (b === "Other") || a.localeCompare(b); }
   function details(x) { return x.items && x.items.toLowerCase() !== x.title.toLowerCase() ? '<p class="items">' + esc(x.items) + "</p>" : ""; }
-  function shareBtn(x) { return '<button type="button" class="sharebtn" data-share="' + esc(x.id) + '">' + VF.SHARE_ICON + "Share</button>"; }
 
   /* Every charity, for /org on its own. */
   function directory(d) {
     var orgs = d.orgs || {}, count = {}, seen = {};
     live(d).forEach(function (x) { var t = VF.topId(x.org, orgs), k = t + "|" + base(x.id); if (!seen[k]) { seen[k] = 1; count[t] = (count[t] || 0) + 1; } });
-    var ids = Object.keys(count).sort(function (a, b) { return orgs[a].name.localeCompare(orgs[b].name); });
+    var ids = Object.keys(count).sort(function (a, b) { return count[b] - count[a] || orgs[a].name.localeCompare(orgs[b].name); }); // most needs first
     document.title = "Local charities · Victoria Freebies";
     $("oname").textContent = "Local charities";
-    $("osub").textContent = "Every charity on Victoria Freebies, and how many things each is asking for right now.";
-    $("page").innerHTML = '<ul class="orglist">' + ids.map(function (id) {
-      return '<li><a href="/org/' + VF.slug(orgs[id].name) + '"><b>' + esc(orgs[id].name) + "</b><span>" + count[id] + " thing" + (count[id] > 1 ? "s" : "") + "</span></a></li>";
+    $("osub").textContent = "Every charity on Victoria Freebies, and how many needs each has posted right now.";
+    $("page").innerHTML = '<p class="orgcta">Run a charity? <a href="/charities">Post your requests <span aria-hidden="true">→</span></a></p><ul class="orglist">' + ids.map(function (id) {
+      return '<li><a href="/org/' + VF.slug(orgs[id].name) + '"><b>' + esc(orgs[id].name) + "</b><span>" + count[id] + " need" + (count[id] > 1 ? "s" : "") + "</span></a></li>";
     }).join("") + "</ul>";
   }
 
@@ -58,53 +56,65 @@
 
     document.title = nick + " · Victoria Freebies";
     $("oname").textContent = name;
-    $("osub").textContent = n + " thing" + (n > 1 ? "s" : "") + " they’re asking for right now" + (multi ? ", across " + locs.length + " locations." : ".") + " Bringing one? See what else you could bring along.";
+    $("osub").textContent = n + " need" + (n > 1 ? "s" : "") + " right now" + (multi ? ", across " + locs.length + " locations." : ".") + " Bringing one? See what else you could bring along.";
     $("oactions").innerHTML =
       (t.donate ? '<a class="bigbtn" href="' + esc(t.donate) + '" target="_blank" rel="noopener">Donate money <span aria-hidden="true">↗</span></a>' : "") +
       (t.website ? '<a class="bigbtn alt" href="' + esc(t.website) + '" target="_blank" rel="noopener">Website <span aria-hidden="true">↗</span></a>' : "") +
-      '<button type="button" class="alt" id="sharepage">' + VF.SHARE_ICON + "Share this page</button>";
+      '<span class="sharewrap"><button type="button" class="alt" id="sharepage" aria-haspopup="menu" aria-expanded="false">' + VF.SHARE_ICON + "Share this page</button></span>";
 
-    var h = "";
-    /* Everyday items by location: where to go once, then the list. */
-    var wish = mine.filter(function (x) { return x.wish; });
-    locs.forEach(function (loc) {
-      var here = mine.filter(function (x) { return x.org === loc && !x.wish; });
-      if (!here.length) return; // everything at this site is in the Wish List section below
-      var o = orgs[loc], ref = here.filter(function (x) { return VF.howTo(x) === "drop"; })[0] || here[0] || mine.filter(function (x) { return x.org === loc; })[0];
-      h += '<section class="oloc"><h2>' + (multi ? esc(VF.short(o)) : "What they accept") + "</h2>";
-      h += VF.spot(ref);
-      if (o.phone && VF.howTo(ref) === "drop") h += '<p class="ophone">Questions? Call ' + VF.linkPhones(o.phone) + "</p>";
-
-      var cats = [];
-      here.forEach(function (x) { if (cats.indexOf(x.category) < 0) cats.push(x.category); });
-      cats.sort(catOrder).forEach(function (c) {
-        var items = here.filter(function (x) { return x.category === c; }).sort(function (a, b) { return a.title.localeCompare(b.title); });
-        h += (cats.length > 1 ? '<h3 class="ocat">' + esc(c || "Other") + "</h3>" : "") + '<ul class="oitems">' + items.map(function (x) {
-          var callFirst = VF.howTo(x) === "call" && VF.howTo(ref) !== "call";
-          return '<li id="item-' + esc(base(x.id)) + '"><b>' + esc(x.title) + "</b>" + details(x) + (x.case ? '<p class="why">♥ ' + esc(x.case) + "</p>" : "") +
-            (callFirst ? '<p class="callnote">Call first for this one: ' + VF.linkPhones(o.phone) + "</p>" : "") + "</li>";
-        }).join("") + "</ul>";
-      });
-      h += "</section>";
-    });
-    /* Wish List at the bottom, each item with its own drop-off box (they may be at different sites). */
-    if (wish.length) {
-      h += '<section class="owish"><h2>Wish List</h2><p class="lead">Specifically requested: asked for by name, for a specific person or program, and needed right now.</p><div class="results">' +
-        wish.map(function (x) {
-          return '<article class="res" id="item-' + esc(base(x.id)) + '">' + (multi ? '<p class="org">' + esc(VF.short(x.o)) + "</p>" : "") +
-            '<h3 class="want">' + esc(x.title) + "</h3>" + details(x) + (x.case ? '<p class="why">♥ ' + esc(x.case) + "</p>" : "") + VF.spot(x) +
-            '<p class="cardfoot">' + shareBtn(x) + "</p></article>";
-        }).join("") + "</div></section>";
+    /* One section per site, with everything that site needs together, so a donor heading to one place
+       sees it all in one spot. Sites with the most needs first; a charity with several sites gets a jump list.
+       Same rule as the cards: a "Call first" listing shows the phone number, never the address. */
+    function isCall(x) { return VF.howTo(x) === "call"; }
+    function where(o, call) {
+      var addr = o.address ? VF.addressLink(o.address) + (o.hours ? ' <span class="ohrs">· ' + esc(o.hours) + "</span>" : "") : "";
+      return '<div class="osite' + (call ? " call" : "") + '">' +
+        (call ? '<p><b class="callfirst">Call first</b> ' + VF.linkPhones(o.phone) + "</p>"
+              : (addr ? "<p><b>Drop off</b> " + addr + "</p>" : "") + (o.phone ? "<p><b>Phone</b> " + VF.linkPhones(o.phone) + "</p>" : "")) +
+        (o.notes ? '<p class="notes">' + esc(o.notes) + "</p>" : "") + "</div>";
     }
+    /* The "who it helps" line goes above the table only when every item there shares it. */
+    function common(list) { var c = list[0] && list[0].case; return list.length > 1 && c && list.every(function (x) { return x.case === c; }) ? c : ""; }
+    function byTitle(a, b) { return a.title.localeCompare(b.title); }
+    function row(x, o, shared, callNote, tag) {
+      var d = details(x).replace('<p class="items">', "").replace("</p>", "");
+      return '<tr id="item-' + esc(base(x.id)) + '"' + (x.wish ? ' class="wishrow"' : "") + '><th scope="row">' + esc(x.title) + (x.wish && tag ? ' <span class="wtag">Wish List</span>' : "") + "</th><td>" + d +
+        (x.case && x.case !== shared ? '<span class="rowwhy">♥ ' + esc(x.case) + "</span>" : "") +
+        (callNote ? '<span class="rowcall">Call first: ' + VF.linkPhones(o.phone) + "</span>" : "") + "</td>" +
+        "</tr>";
+    }
+    var sites = locs.map(function (loc) { return { o: orgs[loc], id: loc, list: mine.filter(function (x) { return x.org === loc; }) }; })
+      .sort(function (a, b) {
+        // "Page Order" in Airtable first (lowest number first), then drop-off sites before call-first ones, then most needs.
+        var oa = a.o.order == null ? Infinity : a.o.order, ob = b.o.order == null ? Infinity : b.o.order;
+        return (oa - ob || 0) || a.list.every(isCall) - b.list.every(isCall) || b.list.length - a.list.length || a.o.name.localeCompare(b.o.name);
+      });
+    var h = "";
+    if (multi) h += '<nav class="ojump" aria-label="Sites">' + sites.map(function (st) {
+      return '<a href="#site-' + esc(st.id) + '">' + esc(VF.short(st.o)) + " <span>" + st.list.length + "</span></a>";
+    }).join("") + "</nav>";
+    sites.forEach(function (st) {
+      var o = st.o, list = st.list, allCall = list.every(isCall), shared = common(list);
+      var allWish = list.every(function (x) { return x.wish; });
+      h += '<section class="oloc" id="site-' + esc(st.id) + '"><h2>' + (multi ? esc(VF.short(o)) : "What they need") + ' <span class="cnt">' + list.length + " need" + (list.length > 1 ? "s" : "") + (allWish ? ' <span class="wtag">from Wish List</span>' : "") + "</span>" +
+        (multi ? ' <span class="sharewrap"><button type="button" class="sharebtn" data-site="' + esc(st.id) + '" aria-haspopup="menu" aria-expanded="false">' + VF.SHARE_ICON + "Share</button></span>" : "") + "</h2>" +
+        where(o, allCall) + (shared ? '<p class="why">♥ ' + esc(shared) + "</p>" : "") +
+        '<table class="otable"><thead><tr><th scope="col">Item</th><th scope="col">Details</th></tr></thead><tbody>';
+      /* Drop-off-ready items first, then call-first; everyday before Wish List; then A to Z. */
+      list.slice().sort(function (a, b) { return isCall(a) - isCall(b) || a.wish - b.wish || byTitle(a, b); })
+        .forEach(function (x) { h += row(x, o, shared, !allCall && isCall(x), !allWish); });
+      h += "</tbody></table></section>";
+    });
 
     $("page").innerHTML = h;
 
-    $("sharepage").onclick = function () { VF.share(this, nick + " on Victoria Freebies", "Here’s everything " + nick + " is asking for right now:", location.pathname); };
+    /* Share one site of a parent organization, e.g. Mount Edwards on Cool Aid's page. */
     $("page").onclick = function (e) {
-      var b = e.target.closest && e.target.closest("button[data-share]"); if (!b) return;
-      var x = mine.filter(function (l) { return l.id === b.getAttribute("data-share"); })[0]; if (!x) return;
-      VF.share(b, x.title + " for " + VF.short(x.o), VF.short(x.o) + " is asking for " + x.title.toLowerCase() + ". Can you help?", location.pathname + "#item-" + base(x.id));
+      var b = e.target.closest && e.target.closest("button[data-site]"); if (!b) return;
+      var o = orgs[b.getAttribute("data-site")], n = mine.filter(function (x) { return x.org === b.getAttribute("data-site"); }).length;
+      VF.share(b, VF.short(o) + " (" + nick + ") on Victoria Freebies", VF.short(o) + " (" + nick + ") has " + n + " need" + (n > 1 ? "s" : "") + " right now:", location.pathname + "#site-" + b.getAttribute("data-site"));
     };
+    $("sharepage").onclick = function () { VF.share(this, nick + " on Victoria Freebies", "Here’s everything " + nick + " needs right now:", location.pathname); };
 
     /* Arriving from a shared link or an "also takes" link to one item: bring it into view and highlight it. */
     var el = location.hash && document.getElementById(location.hash.slice(1));
