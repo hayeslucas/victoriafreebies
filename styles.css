@@ -181,7 +181,7 @@ button.more-link{display:inline-block;background:none;border:0;border-radius:0;p
 .cardfoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 0}
 .cardfoot:empty{display:none}
 .also{font:600 17px system-ui,sans-serif;color:var(--brand)}
-button.sharebtn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;font:700 16px system-ui,sans-serif;border-radius:999px;background:var(--card);color:var(--ink);border:2px solid var(--line);margin-left:auto}
+button.sharebtn{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;font:700 14px system-ui,sans-serif;border-radius:999px;background:var(--card);color:var(--ink);border:2px solid var(--line);margin-left:auto}
 button.sharebtn:hover{border-color:var(--ink)}
 .ico{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
@@ -252,3 +252,9 @@ section.oloc,section.owish{padding-block:0}#page{padding-bottom:36px}
 .cardfoot .sharemenu{left:auto;right:0}
 .sharemenu a,.sharemenu button{display:block;text-align:left;padding:9px 12px;border-radius:8px;border:0;background:none;color:var(--ink);font:600 16px system-ui,sans-serif;text-decoration:none;cursor:pointer}
 .sharemenu a:hover,.sharemenu button:hover,.sharemenu a:focus-visible,.sharemenu button:focus-visible{background:var(--soft)}
+.sharebtn .ico{width:15px;height:15px}
+.oloc h2 .sharewrap{vertical-align:5px;margin-left:6px}.oloc h2 .sharemenu{font-size:16px}
+.oloc h2{display:flex;flex-wrap:wrap;align-items:center;column-gap:10px;row-gap:4px}
+.oloc h2 .cnt{margin-left:0;vertical-align:0;white-space:nowrap}
+.oloc h2 .sharewrap{margin-left:auto;vertical-align:0}
+.oloc h2 .sharemenu{left:auto;right:0}

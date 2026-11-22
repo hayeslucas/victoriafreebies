@@ -96,7 +96,8 @@
     sites.forEach(function (st) {
       var o = st.o, list = st.list, allCall = list.every(isCall), shared = common(list);
       var allWish = list.every(function (x) { return x.wish; });
-      h += '<section class="oloc" id="site-' + esc(st.id) + '"><h2>' + (multi ? esc(VF.short(o)) : "What they need") + ' <span class="cnt">' + list.length + " need" + (list.length > 1 ? "s" : "") + (allWish ? ' <span class="wtag">from Wish List</span>' : "") + "</span></h2>" +
+      h += '<section class="oloc" id="site-' + esc(st.id) + '"><h2>' + (multi ? esc(VF.short(o)) : "What they need") + ' <span class="cnt">' + list.length + " need" + (list.length > 1 ? "s" : "") + (allWish ? ' <span class="wtag">from Wish List</span>' : "") + "</span>" +
+        (multi ? ' <span class="sharewrap"><button type="button" class="sharebtn" data-site="' + esc(st.id) + '" aria-haspopup="menu" aria-expanded="false">' + VF.SHARE_ICON + "Share</button></span>" : "") + "</h2>" +
         where(o, allCall) + (shared ? '<p class="why">♥ ' + esc(shared) + "</p>" : "") +
         '<table class="otable"><thead><tr><th scope="col">Item</th><th scope="col">Details</th></tr></thead><tbody>';
       /* Drop-off-ready items first, then call-first; everyday before Wish List; then A to Z. */
@@ -107,6 +108,12 @@
 
     $("page").innerHTML = h;
 
+    /* Share one site of a parent organization, e.g. Mount Edwards on Cool Aid's page. */
+    $("page").onclick = function (e) {
+      var b = e.target.closest && e.target.closest("button[data-site]"); if (!b) return;
+      var o = orgs[b.getAttribute("data-site")], n = mine.filter(function (x) { return x.org === b.getAttribute("data-site"); }).length;
+      VF.share(b, VF.short(o) + " (" + nick + ") on Victoria Freebies", VF.short(o) + " (" + nick + ") has " + n + " need" + (n > 1 ? "s" : "") + " right now:", location.pathname + "#site-" + b.getAttribute("data-site"));
+    };
     $("sharepage").onclick = function () { VF.share(this, nick + " on Victoria Freebies", "Here’s everything " + nick + " needs right now:", location.pathname); };
 
     /* Arriving from a shared link or an "also takes" link to one item: bring it into view and highlight it. */
