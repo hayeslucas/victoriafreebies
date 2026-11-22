@@ -51,8 +51,8 @@ categories, `BROAD` says which titles count as catch-alls, e.g. a thrift store's
 the search wasn't about pets. If a new kind of item doesn't find the catch-all listings it should, add it to `CATOF`.
 
 **Organization pages** (`/org/<name>`, built by `org.js` from the same API data): one page per parent
-organization (all of Cool Aid's sites share `/org/victoria-cool-aid-society`), with one section per site (most needs first, drop-off sites
-before call-first ones), each a compact table with drop-off-ready items first and Wish List items tagged, plus a **Donate money** button (Organizations → **Donate Link**) and its
+organization (all of Cool Aid's sites share `/org/victoria-cool-aid-society`), with one section per site (Organizations → **Page Order** first, e.g. REES 1 and Rock Bay
+Landing 2 on Cool Aid's page; then drop-off sites before call-first ones, then most needs), each a compact table with drop-off-ready items first and Wish List items tagged, plus a **Donate money** button (Organizations → **Donate Link**) and its
 **Website**. `/org` lists every charity and is the top bar's **Charities** link (top bar: Search · Wish List · Charities · About; "For charities" is in the footer and at the top of `/org`). Card names and "has N other needs" link here; Wish List items have a
 Share button that links to the item on this page. **Preferred Name** (e.g. "Cool Aid") is used where space is tight:
 card lines and footers, share messages, tab titles. The full Name stays on the page heading. The page address comes from the organization's name, so renaming

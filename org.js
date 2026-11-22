@@ -85,7 +85,11 @@
         (cols === 3 ? '<td class="act">' + (x.wish ? shareBtn(x) : "") + "</td>" : "") + "</tr>";
     }
     var sites = locs.map(function (loc) { return { o: orgs[loc], id: loc, list: mine.filter(function (x) { return x.org === loc; }) }; })
-      .sort(function (a, b) { return a.list.every(isCall) - b.list.every(isCall) || b.list.length - a.list.length || a.o.name.localeCompare(b.o.name); }); // drop-off sites first
+      .sort(function (a, b) {
+        // "Page Order" in Airtable first (lowest number first), then drop-off sites before call-first ones, then most needs.
+        var oa = a.o.order == null ? Infinity : a.o.order, ob = b.o.order == null ? Infinity : b.o.order;
+        return (oa - ob || 0) || a.list.every(isCall) - b.list.every(isCall) || b.list.length - a.list.length || a.o.name.localeCompare(b.o.name);
+      });
     var h = "";
     if (multi) h += '<nav class="ojump" aria-label="Sites">' + sites.map(function (st) {
       return '<a href="#site-' + esc(st.id) + '">' + esc(VF.short(st.o)) + " <span>" + st.list.length + "</span></a>";
