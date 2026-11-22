@@ -93,7 +93,7 @@
     sites.forEach(function (st) {
       var o = st.o, list = st.list, allCall = list.every(isCall), shared = common(list), cols = list.some(function (x) { return x.wish; }) ? 3 : 2;
       var allWish = list.every(function (x) { return x.wish; });
-      h += '<section class="oloc" id="site-' + esc(st.id) + '"><h2>' + (multi ? esc(VF.short(o)) : "What they need") + ' <span class="cnt">' + list.length + " need" + (list.length > 1 ? "s" : "") + (allWish ? ' · <span class="wtag">all Wish List</span>' : "") + "</span></h2>" +
+      h += '<section class="oloc" id="site-' + esc(st.id) + '"><h2>' + (multi ? esc(VF.short(o)) : "What they need") + ' <span class="cnt">' + list.length + " need" + (list.length > 1 ? "s" : "") + (allWish ? ' <span class="wtag">from Wish List</span>' : "") + "</span></h2>" +
         where(o, allCall) + (shared ? '<p class="why">♥ ' + esc(shared) + "</p>" : "") +
         '<table class="otable"><thead><tr><th scope="col">Item</th><th scope="col">Details</th>' + (cols === 3 ? '<th scope="col"><span class="sr">Share</span></th>' : "") + "</tr></thead><tbody>";
       /* Drop-off-ready items first, then call-first; everyday before Wish List; then A to Z. */
