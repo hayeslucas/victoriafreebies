@@ -28,10 +28,17 @@ to the other one ("Call to arrange a drop-off"), so fill in the matching field.
 
 **Writing listings:** one listing = one kind of item a donor would search for.
 - **Title:** the item, plural, 1–4 words ("Tents and tarps", not "Camping gear is always needed").
-- **Item details:** specifics of that item only: sizes, condition, quantity. Never other kinds of items.
-  If you find yourself listing other things, split it into another listing.
-- **Who will this help?** One sentence about who benefits.
-- **Anything else:** rules for this item only ("New only", "Wholesale quantities only").
+- **Item details:** optional. Only what the title doesn't already say: which kinds, sizes, condition, quantity.
+  Leave it blank if it would just repeat the title. Condition is one of **New only** · **New or gently used** ·
+  **Any condition**; quantity goes at the end as "(about 10)". Never other kinds of items: if you find yourself
+  listing other things, split it into another listing.
+- **Who will this help?** One full sentence that starts with who benefits and says how
+  ("Women staying at Sandy Merriman House need…"), not a fragment ("Womens shelter in need").
+- **Anything else:** rules for this item only ("Unopened only", "No pillows", "Wholesale quantities only").
+  Don't repeat the address or hours (the card shows them), the Wish List (the tag shows it), or the charity's
+  standing rules.
+- **Organizations → Drop-off Notes:** standing rules for everything a charity accepts (where to park, "no
+  pickups", "staff check items"). Written once, shown in the drop-off box of every one of its listings.
 - Split when the parts would be searched for separately, have different rules, or belong in different
   categories. Broad listings are fine when the charity really takes the whole category (e.g. a thrift store's
   "Clothing"). Wish List = a specific quantity for a specific purpose; anything always accepted is Ongoing.
@@ -54,8 +61,8 @@ Changes show up within about 10 minutes. Vercel's CDN caches the API response
 Charities submit new listings through the Airtable form:
 https://airtable.com/appgw8rdpxxxGmWG3/pagYtNiHWxy6HWE64/form
 
-Only these organization fields are sent to the site: name, **Public Phone**, address, drop-off hours
-and website. Contact name, email and Contact Phone stay private.
+Only these organization fields are sent to the site: name, **Public Phone**, address, drop-off hours,
+website and **Drop-off Notes**. Contact name, email and Contact Phone stay private.
 
 ## Setup on Vercel
 

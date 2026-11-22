@@ -83,7 +83,9 @@ function howTo(x){
   if(mode==="ready")return o.address?"drop":o.phone?"arrange":"none";
   return o.phone?"call":o.address?"drop":"none";
 }
-function spot(x){
+/* "Drop-off Notes" on the organization: standing rules shown under every one of its listings. */
+function spot(x){var o=x.o,b=spotBox(x);return o.notes&&b.indexOf("spot none")<0?b.replace(/<\/div>$/,'<p class="notes">'+esc(o.notes)+'</p></div>'):b}
+function spotBox(x){
   var o=x.o,h=howTo(x);
   if(h==="drop"){
     /* Addresses with a street number link to maps (Apple Maps on Apple devices, Google Maps elsewhere);

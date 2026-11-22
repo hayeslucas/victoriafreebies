@@ -30,6 +30,7 @@ const ORGS = {
   hours: "fldn9qsoJgjE793Jn",
   website: "fld8kMmJu0Y9s4RZm",
   parent: "fldWQp9IZSi1b8cEX", // "Parent Organization", e.g. Swift House -> Victoria Cool Aid Society
+  notes: "fldDYgz4NJJM44ziv", // "Drop-off Notes": standing rules shown in the drop-off box of every listing for this organization
 };
 
 // Only listings that are switched on, active, and not past their expiry date.
@@ -110,6 +111,7 @@ export async function buildData() {
       address: str(f[ORGS.address]),
       hours: str(f[ORGS.hours]),
       website: str(f[ORGS.website]),
+      notes: str(f[ORGS.notes]),
     };
   }
 
