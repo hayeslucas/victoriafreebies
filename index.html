@@ -14,9 +14,9 @@
 <div class="panel" style="margin-top:8px">
 <label for="q">Search an item</label>
 <div class="row"><input id="q" type="search" placeholder="For example: winter coat, couch, towels" autocomplete="off" enterkeyhint="search"><button id="go" type="button">Search</button></div>
-<div class="chips" id="chips"></div>
+<p class="lbl" id="catlbl">Type of item</p>
+<div class="chips cats" id="cats" role="group" aria-labelledby="catlbl"></div>
 <div class="filters">
-<div><label for="cat">Type of item</label><select id="cat"><option value="">All types</option></select></div>
 <div><label class="check"><input type="checkbox" id="droponly"> Drop-off ready</label></div>
 <div><label class="check"><input type="checkbox" id="wishonly"> Wish List <span class="new">NEW</span></label></div>
 </div>
@@ -104,7 +104,7 @@ function card(x){
    +(x.o.website?'<p class="site"><a href="'+esc(x.o.website)+'" target="_blank" rel="noopener">Visit their website ↗</a></p>':'')
    +'</article>';
 }
-var st={q:"",shown:12};
+var st={q:"",shown:12,cat:""};
 /* Before a search: show things most people have at home first, with variety.
    - Charities take turns: one listing from each, then a second from each, ... (a charity's sites,
      e.g. Cool Aid's houses, count as one charity).
@@ -146,7 +146,7 @@ var WISH_ARRIVAL=false;
 var REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches,lastKey="",lastShown=0;
 function render(){
   if(!READY){$("out").innerHTML='<div class="empty"><p>Loading what local charities need…</p></div>';$("morewrap").hidden=true;return}
-  var q=st.q,cat=$("cat").value,dropOnly=$("droponly").checked,wishOnly=$("wishonly").checked;
+  var q=st.q,cat=st.cat,dropOnly=$("droponly").checked,wishOnly=$("wishonly").checked;
   var rows=LIST.map(function(x){return {x:x,s:score(x,q)}}).filter(function(r){
     if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;if(wishOnly&&!r.x.wish)return false;return true});
   rows.sort(function(a,b){return (b.s-a.s)||a.x.title.localeCompare(b.x.title)});
@@ -209,9 +209,10 @@ function load(d){
   var today=new Date().toISOString().slice(0,10),orgs=d.orgs||{};
   D=d;LIST=d.listings.filter(function(x){return !x.expires||x.expires>=today}).map(function(x){x.o=orgs[x.org]||{};return x});
   var cats=[];LIST.forEach(function(x){if(x.category&&cats.indexOf(x.category)<0)cats.push(x.category)});cats.sort();
-  var sel=$("cat").value;
-  $("cat").innerHTML='<option value="">All types</option>'+cats.map(function(c){return '<option>'+esc(c)+'</option>'}).join("");
-  if(cats.indexOf(sel)>-1)$("cat").value=sel;
+  /* Category buttons, built from the categories in Airtable: most common first, "Other" last. */
+  cats.sort(function(a,b){return (a==="Other")-(b==="Other")||(COMMON[b]||3)-(COMMON[a]||3)||a.localeCompare(b)});
+  if(cats.indexOf(st.cat)<0)st.cat="";
+  $("cats").innerHTML=[""].concat(cats).map(function(c){return '<button type="button" class="chip" data-cat="'+esc(c)+'" aria-pressed="'+(c===st.cat)+'">'+(c?esc(c):"All")+'</button>'}).join("");
   READY=true;render();
   /* Arriving at /wish-list from the top bar: jump straight to the list (only the first time it loads). */
   if(WISH_ARRIVAL){WISH_ARRIVAL=false;var r=$("rt");if(r&&r.scrollIntoView)r.scrollIntoView({block:"start"})}
@@ -229,7 +230,6 @@ function fetchListings(){
     try{localStorage.setItem(CACHE_KEY,JSON.stringify(d))}catch(e){}
   }).catch(failed);
 }
-["Blankets","Winter coats","Socks","Furniture","Canned food","Pet food","Toys","Books"].forEach(function(t){var b=document.createElement("button");b.className="chip";b.type="button";b.textContent=t;b.onclick=function(){$("q").value=t;submit()};$("chips").appendChild(b)});
 /* The search box types and erases examples until the donor clicks into it or types. Static text if they prefer reduced motion. */
 (function(){
   var q=$("q"),STATIC="For example: winter coat, couch, towels",ex=["winter coat","couch","dog food","towels","toothpaste","sleeping bag","books","dinner plates"],i=0,n=0,del=false;
@@ -247,7 +247,12 @@ function fetchListings(){
 $("go").onclick=submit;
 $("q").addEventListener("keydown",function(e){if(e.key==="Enter")submit()});
 var qt;$("q").addEventListener("input",function(){clearTimeout(qt);qt=setTimeout(function(){var v=$("q").value.trim();if(v!==st.q){st.q=v;st.shown=12;render()}},400)});
-$("cat").addEventListener("change",function(){st.shown=12;render()});
+$("cats").addEventListener("click",function(e){
+  var b=e.target.closest&&e.target.closest("button[data-cat]");if(!b)return;
+  st.cat=b.getAttribute("data-cat");st.shown=12;
+  Array.prototype.forEach.call(this.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",String(x===b))});
+  render();
+});
 $("droponly").addEventListener("change",function(){st.shown=12;render()});
 /* The Wish List has its own address (/wish-list) so it can be linked from the top bar and shared.
    Ticking the box switches the address and the highlighted top-bar link; unticking goes back to Search. */
