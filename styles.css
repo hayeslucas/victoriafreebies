@@ -239,3 +239,4 @@ button.sharebtn:hover{border-color:var(--ink)}
 }
 .oloc{margin-top:22px}.oloc+.oloc,.oloc+.owish{margin-top:30px}.owish .lead{margin-bottom:6px}
 section.oloc,section.owish{padding-block:0}#page{padding-bottom:36px}
+.osite.call{border-left-color:var(--req)}.otable+.osite{margin-top:16px}

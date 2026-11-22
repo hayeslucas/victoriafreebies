@@ -65,20 +65,37 @@
       '<button type="button" class="alt" id="sharepage">' + VF.SHARE_ICON + "Share this page</button>";
 
     /* Dense, spreadsheet-style lists so donors can scan everything they could bring.
-       Each location gets one compact "where to go" block, then a table: item | details. */
-    function where(o, here) {
-      var call = here.length && here.every(function (x) { return VF.howTo(x) === "call"; });
+       Same rule as the cards: a "Call first" listing shows the phone number, never the address.
+       So each location splits into a drop-off group (address, hours) and a call-first group (phone),
+       each with one compact "where to go" box and a table: item | details. */
+    function isCall(x) { return VF.howTo(x) === "call"; }
+    function where(o, call) {
       var addr = o.address ? VF.addressLink(o.address) + (o.hours ? ' <span class="ohrs">· ' + esc(o.hours) + "</span>" : "") : "";
-      return '<div class="osite">' +
-        (call ? '<p><b class="callfirst">Call first</b> ' + VF.linkPhones(o.phone) + "</p>" + (addr ? "<p><b>Address</b> " + addr + "</p>" : "")
+      return '<div class="osite' + (call ? " call" : "") + '">' +
+        (call ? '<p><b class="callfirst">Call first</b> ' + VF.linkPhones(o.phone) + "</p>"
               : (addr ? "<p><b>Drop off</b> " + addr + "</p>" : "") + (o.phone ? "<p><b>Phone</b> " + VF.linkPhones(o.phone) + "</p>" : "")) +
         (o.notes ? '<p class="notes">' + esc(o.notes) + "</p>" : "") + "</div>";
     }
     function common(list) { var c = {}, best = "", n = 0; list.forEach(function (x) { if (x.case) { c[x.case] = (c[x.case] || 0) + 1; if (c[x.case] > n) { n = c[x.case]; best = x.case; } } }); return n > 1 ? best : ""; }
-    function row(x, shared, callNote, share) {
+    function row(x, shared, share) {
       var d = details(x).replace('<p class="items">', "").replace("</p>", "");
-      return '<tr id="item-' + esc(base(x.id)) + '"><th scope="row">' + esc(x.title) + (callNote ? ' <span class="pill">Call first</span>' : "") + "</th><td>" + d +
+      return '<tr id="item-' + esc(base(x.id)) + '"><th scope="row">' + esc(x.title) + "</th><td>" + d +
         (x.case && x.case !== shared ? '<span class="rowwhy">♥ ' + esc(x.case) + "</span>" : "") + "</td>" + (share ? '<td class="act">' + shareBtn(x) + "</td>" : "") + "</tr>";
+    }
+    function byTitle(a, b) { return a.title.localeCompare(b.title); }
+    /* One group: its box, then its table (with category rows when there's more than one category). */
+    function group(o, list, call, shared, share) {
+      var cats = [], cols = share ? 3 : 2, t = where(o, call) + '<table class="otable' + (share ? " wish" : "") + '"><thead><tr><th scope="col">Item</th><th scope="col">Details</th>' + (share ? '<th scope="col"><span class="sr">Share</span></th>' : "") + "</tr></thead><tbody>";
+      list.forEach(function (x) { if (cats.indexOf(x.category) < 0) cats.push(x.category); });
+      cats.sort(catOrder).forEach(function (c) {
+        if (cats.length > 1) t += '<tr class="ocatrow"><th colspan="' + cols + '" scope="rowgroup">' + esc(c || "Other") + "</th></tr>";
+        list.filter(function (x) { return x.category === c; }).sort(byTitle).forEach(function (x) { t += row(x, shared, share); });
+      });
+      return t + "</tbody></table>";
+    }
+    function groups(o, list, shared, share) {
+      var drop = list.filter(function (x) { return !isCall(x); }), call = list.filter(isCall);
+      return (drop.length ? group(o, drop, false, shared, share) : "") + (call.length ? group(o, call, true, shared, share) : "");
     }
 
     var h = "";
@@ -86,29 +103,17 @@
     locs.forEach(function (loc) {
       var here = mine.filter(function (x) { return x.org === loc && !x.wish; });
       if (!here.length) return; // everything at this site is in the Wish List section below
-      var o = orgs[loc], allCall = here.every(function (x) { return VF.howTo(x) === "call"; }), shared = common(here);
-      h += '<section class="oloc"><h2>' + (multi ? esc(VF.short(o)) : "What they accept") + ' <span class="cnt">' + here.length + " need" + (here.length > 1 ? "s" : "") + "</span></h2>" + where(o, here);
-      if (shared) h += '<p class="why">♥ ' + esc(shared) + "</p>";
-      var cats = [];
-      here.forEach(function (x) { if (cats.indexOf(x.category) < 0) cats.push(x.category); });
-      h += '<table class="otable"><thead><tr><th scope="col">Item</th><th scope="col">Details</th></tr></thead><tbody>';
-      cats.sort(catOrder).forEach(function (c) {
-        if (cats.length > 1) h += '<tr class="ocatrow"><th colspan="2" scope="rowgroup">' + esc(c || "Other") + "</th></tr>";
-        here.filter(function (x) { return x.category === c; }).sort(function (a, b) { return a.title.localeCompare(b.title); })
-          .forEach(function (x) { h += row(x, shared, !allCall && VF.howTo(x) === "call", false); });
-      });
-      h += "</tbody></table></section>";
+      var o = orgs[loc], shared = common(here);
+      h += '<section class="oloc"><h2>' + (multi ? esc(VF.short(o)) : "What they accept") + ' <span class="cnt">' + here.length + " need" + (here.length > 1 ? "s" : "") + "</span></h2>" +
+        (shared ? '<p class="why">♥ ' + esc(shared) + "</p>" : "") + groups(o, here, shared, false) + "</section>";
     });
-    /* Wish List at the bottom: same table, grouped by site, each with a Share button. */
+    /* Wish List at the bottom: same tables, grouped by site, each row with a Share button. */
     if (wish.length) {
       h += '<section class="owish"><h2>Wish List <span class="cnt">' + wish.length + " need" + (wish.length > 1 ? "s" : "") + '</span></h2><p class="lead">Specifically requested: asked for by name, for a specific person or program, and needed right now.</p>';
       locs.forEach(function (loc) {
         var here = wish.filter(function (x) { return x.org === loc; });
         if (!here.length) return;
-        var o = orgs[loc], allCall = here.every(function (x) { return VF.howTo(x) === "call"; });
-        h += (multi ? '<h3 class="osubh">' + esc(VF.short(o)) + "</h3>" : "") + where(o, here) +
-          '<table class="otable wish"><thead><tr><th scope="col">Item</th><th scope="col">Details</th><th scope="col"><span class="sr">Share</span></th></tr></thead><tbody>' +
-          here.sort(function (a, b) { return a.title.localeCompare(b.title); }).map(function (x) { return row(x, "", !allCall && VF.howTo(x) === "call", true); }).join("") + "</tbody></table>";
+        h += (multi ? '<h3 class="osubh">' + esc(VF.short(orgs[loc])) + "</h3>" : "") + groups(orgs[loc], here, "", true);
       });
       h += "</section>";
     }
