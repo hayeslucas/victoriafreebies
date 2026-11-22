@@ -26,6 +26,14 @@ Each listing's **Drop off?** field decides how donors reach the charity:
 If the chosen detail is missing on the organization (for example Drop Off Ready but no Address), the card falls back
 to the other one ("Call to arrange a drop-off"), so fill in the matching field.
 
+**Keeping wording in sync (important):** a request travels Form → Submission Intake → (approved) →
+automation → Donation Listings → website. The approval automation copies select options **by name**, so these
+fields must have *identical* option names in Submission Intake and Donation Listings:
+"Drop off?", "Specifically Requested?" (What kind of request) and "Category". If you reword an option, reword it
+in both tables. The website reads options by keyword, so it keeps working as long as the call-first option
+contains "Call", the drop-off option contains "Drop" and the wish-list option contains "Wish". Category names
+appear on the site's category buttons exactly as written.
+
 **Wish List:** listings whose **Specifically Requested?** field includes "Specifically Requested" get a
 "Specifically requested" tag and appear on the Wish List (`/wish-list`, linked from the top bar). Listings marked
 "General" appear in search as usual.
