@@ -14,7 +14,8 @@ const LISTINGS = {
   table: "tblco5ktO1b8RHWdT",
   title: "fld3CrfSICeY5ohAE",
   org: "fldkWSeFmAttZzkeq",
-  type: "fldjV2qVZHJQOuNil",
+  dropoff: "fldjV2qVZHJQOuNil", // "Drop off?": decides whether the card shows the address or the phone number
+  wish: "fldZyRvKY1UQN0a6s", // "Specifically Requested?": "Specifically Requested" puts the listing on the Wish List
   category: "fldw2UAbx1pEpptCo",
   items: "fldJhbzWV0Y4ftROz",
   case: "fld50E7eRJq2Vo82e",
@@ -28,6 +29,7 @@ const ORGS = {
   address: "fldERugbFTWakgFLU",
   hours: "fldn9qsoJgjE793Jn",
   website: "fld8kMmJu0Y9s4RZm",
+  parent: "fldWQp9IZSi1b8cEX", // "Parent Organization", e.g. Swift House -> Victoria Cool Aid Society
 };
 
 // Only listings that are switched on, active, and not past their expiry date.
@@ -37,8 +39,6 @@ const VISIBLE =
 
 // Fresh for 10 minutes; after that the CDN serves the cached copy and refreshes it in the background.
 const CACHE = "public, s-maxage=600, stale-while-revalidate=86400";
-
-const TYPES = { "Specifically Requested": "requested", Accepted: "accepted" };
 
 async function fetchAll(table, fields, formula) {
   const out = [];
@@ -60,6 +60,11 @@ async function fetchAll(table, fields, formula) {
 }
 
 const pick = (spec) => Object.entries(spec).filter(([k]) => k !== "table").map(([, id]) => id);
+// "Drop off?" options are matched by keyword, so the wording can change freely as long as
+// the call-first option contains "Call" (or "phone") and the drop-off option contains "Drop". Blank -> "".
+const dropoffMode = (v) => (/\bcall\b|phone/i.test(v) ? "phone" : /drop/i.test(v) ? "ready" : "");
+// "Specifically Requested?" options: the Wish List option must contain "Wish" (or "Specific"); anything else is a general listing.
+const isWish = (v) => /wish|specific/i.test(v);
 const str = (v) => (v == null ? "" : typeof v === "object" && v.name ? v.name : String(v)).trim();
 
 export async function buildData() {
@@ -71,15 +76,17 @@ export async function buildData() {
   const listings = [];
   for (const r of listingRecs) {
     const f = r.fields;
-    const type = TYPES[str(f[LISTINGS.type])];
-    const org = (f[LISTINGS.org] || [])[0];
+    const orgIds = f[LISTINGS.org] || [];
     const title = str(f[LISTINGS.title]);
-    if (!type || !org || !title) continue; // incomplete record: leave it off the site
-    listings.push({
-      id: r.id,
+    if (!orgIds.length || !title) continue; // incomplete record: leave it off the site
+    // A listing linked to several organizations (e.g. two thrift stores) becomes one card per organization.
+    for (const org of orgIds) listings.push({
+      id: orgIds.length > 1 ? `${r.id}-${org}` : r.id,
+      added: r.createdTime || "", // when the listing was created in Airtable; used to show newer listings first
       title,
       org,
-      type,
+      dropoff: dropoffMode(str(f[LISTINGS.dropoff])),
+      wish: (f[LISTINGS.wish] || []).some((v) => isWish(str(v))),
       category: str(f[LISTINGS.category]),
       items: str(f[LISTINGS.items]),
       case: str(f[LISTINGS.case]),
@@ -90,12 +97,15 @@ export async function buildData() {
 
   // Only send charities that have a visible listing.
   const used = new Set(listings.map((l) => l.org));
+  const names = Object.fromEntries(orgRecs.map((r) => [r.id, str(r.fields[ORGS.name])]));
   const orgs = {};
   for (const r of orgRecs) {
     if (!used.has(r.id)) continue;
     const f = r.fields;
+    const parentId = (f[ORGS.parent] || [])[0];
     orgs[r.id] = {
       name: str(f[ORGS.name]),
+      parent: parentId && parentId !== r.id ? names[parentId] || "" : "",
       phone: str(f[ORGS.phone]),
       address: str(f[ORGS.address]),
       hours: str(f[ORGS.hours]),

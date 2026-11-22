@@ -1,119 +1,41 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Victoria Freebies</title>
-<style>
-:root{--bg:#fbf8f2;--card:#fff;--ink:#1d2b2a;--mute:#4a5a58;--brand:#0b5d57;--brand-ink:#fff;--line:#c9d3d0;--soft:#e4f1ef;--req:#9a3b00;--reqbg:#fde9d9;--acc:#0b5d57;--accbg:#d9f0ea;--focus:#e08a00}
-@media(prefers-color-scheme:dark){:root{--bg:#11191a;--card:#1a2627;--ink:#f1f5f4;--mute:#b7c6c3;--brand:#5fd0c4;--brand-ink:#08201e;--line:#3a4d4b;--soft:#1f3433;--req:#ffb27a;--reqbg:#44260f;--acc:#7fe0d2;--accbg:#143a36;--focus:#ffb84d;color-scheme:dark}}
-*{box-sizing:border-box}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--ink);font:20px/1.55 Georgia,"Times New Roman",serif;padding-bottom:env(safe-area-inset-bottom,0px)}
-[hidden]{display:none!important}
-.wrap{max-width:900px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
-header{background:var(--soft);border-bottom:2px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-block:14px}
-.logo{font:700 24px system-ui,sans-serif;color:var(--brand)}
-nav a{font:600 18px system-ui,sans-serif;color:var(--ink);margin-left:18px}
-.hero{padding-block:28px 36px}
-h1{font:700 clamp(30px,6vw,44px)/1.15 system-ui,sans-serif;margin:0 0 12px;text-wrap:balance}
-h2{font:700 30px/1.2 system-ui,sans-serif;margin:0 0 12px;text-wrap:balance}
-h3{font:700 22px system-ui,sans-serif;margin:0}
-p{margin:0 0 14px}
-.sub{color:var(--mute);font-size:21px}
-label,.lbl{font:600 19px system-ui,sans-serif;display:block;margin-bottom:6px}
-input[type=search],input[type=text],select,textarea{width:100%;font:20px system-ui,sans-serif;padding:14px 16px;border:2px solid var(--ink);border-radius:12px;background:var(--card);color:var(--ink);min-width:0}
-textarea{resize:vertical;min-height:130px;line-height:1.4}
-.cta{text-align:center}.bigbtn{display:inline-block;font:700 22px system-ui,sans-serif;border-radius:12px;padding:18px 30px;background:var(--brand);color:var(--brand-ink);text-decoration:none;margin:6px 0}.bigbtn:hover,.bigbtn:focus{filter:brightness(1.1)}
-button{font:700 20px system-ui,sans-serif;cursor:pointer;border-radius:12px;padding:16px 26px;border:2px solid var(--brand);background:var(--brand);color:var(--brand-ink)}
-button.alt{background:var(--card);color:var(--ink);border-color:var(--ink)}
-button.chip{padding:10px 18px;font-size:18px;background:var(--card);color:var(--ink);border:2px solid var(--line)}
-:focus-visible{outline:4px solid var(--focus);outline-offset:2px}
-.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1 1 220px}.row>button{flex:0 0 auto}
-.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.panel{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:20px;margin-top:20px}
-.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:16px;align-items:end}
-.check{display:flex;align-items:center;gap:12px;font:600 19px system-ui,sans-serif;cursor:pointer;margin:0}
-.check input{width:28px;height:28px;accent-color:var(--brand);flex:0 0 auto}
-.res{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
-.badge{display:inline-block;font:700 16px system-ui,sans-serif;padding:4px 12px;border-radius:999px;margin:0 8px 8px 0}
-.b-requested{background:var(--accbg);color:var(--acc)}.b-accepted{background:var(--reqbg);color:var(--req)}
-.meta{color:var(--mute);font-size:18px}
-.org{font:600 18px system-ui,sans-serif;color:var(--mute);margin:0 0 4px}
-.want{font:700 26px/1.25 system-ui,sans-serif;margin:4px 0 6px;text-wrap:balance}
-.items{font:19px/1.45 system-ui,sans-serif;margin:0 0 10px}
-.why{font:600 18px/1.4 system-ui,sans-serif;color:var(--brand);margin:0 0 10px}
-.instr{font:17px/1.45 system-ui,sans-serif;color:var(--mute);margin:10px 0 0}
-.spot{background:var(--soft);border:2px solid var(--brand);border-left-width:10px;border-radius:14px;padding:14px 18px;margin:14px 0 6px;font:19px/1.4 system-ui,sans-serif}
-.spot .k{font:700 14px system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--brand);margin:0 0 4px}
-.spot .big{font:700 24px/1.3 system-ui,sans-serif;margin:0;overflow-wrap:anywhere}
-.spot .big a{color:var(--ink);text-decoration:none;border-bottom:3px solid var(--brand)}
-.spot .hrs{font:600 20px system-ui,sans-serif;margin:4px 0 0}
-.spot.none{border-color:var(--line);background:var(--card)}.spot.none .k{color:var(--mute)}
-.site{margin:8px 0 0;font:600 18px system-ui,sans-serif}
-.key{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px 24px;margin:0 0 18px;font:17px/1.45 system-ui,sans-serif;color:var(--mute)}
-.key p{margin:0}.key .badge{margin:0 8px 0 0;font-size:14px;padding:2px 10px;vertical-align:1px}
-.empty{background:var(--card);border:2px dashed var(--line);border-radius:16px;padding:24px;text-align:center;margin-bottom:18px;grid-column:1/-1}
-.more{text-align:center;margin:8px 0 0}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
-.step b.n{display:flex;width:44px;height:44px;border-radius:50%;background:var(--brand);color:var(--brand-ink);align-items:center;justify-content:center;font:700 22px system-ui,sans-serif;margin-bottom:8px}
-section{padding-block:36px}
-.dream{border-left:6px solid var(--brand);padding:4px 0 4px 16px;margin:12px 0}
-.tag{font:700 14px system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--brand)}
-footer{border-top:2px solid var(--line);padding-block:24px 40px;color:var(--mute);font:17px system-ui,sans-serif}
-a{color:var(--brand)}
-.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.form .full{grid-column:1/-1}
-.hint{font:16px system-ui,sans-serif;color:var(--mute);margin:4px 0 0}
-.msg{font:600 18px system-ui,sans-serif;min-height:1.6em;margin:12px 0 0}
-.ebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px));background:var(--bg)}
-.ebar p{margin:0;font:13px system-ui,sans-serif;color:var(--mute)}
-.ebar button{padding:5px 10px;font:600 13px system-ui,sans-serif;border-width:1px;border-radius:8px}
-body.editing .ebar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:2px solid var(--brand);padding-top:10px}
-body.editing .ebar p{font-size:15px}body.editing .ebar button{padding:10px 16px;font-size:16px}
-body.editing [data-e]{outline:2px dashed var(--brand);outline-offset:3px;cursor:text}
-body.editing [data-e]:focus{outline:3px solid var(--focus);background:var(--soft)}
-</style></head><body>
+<title>Victoria Freebies · Donate to local charities in Victoria, BC</title>
+<meta name="description" content="Search an item to see which Victoria, BC charities need it right now, and where to drop it off.">
+<link rel="stylesheet" href="/styles.css">
+</head><body>
 
+<div class="topbar" id="topbar"><nav class="wrap" aria-label="Main"><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="9"/><path d="M16 24s-7.5-4.6-7.5-9.6A4.1 4.1 0 0 1 16 12a4.1 4.1 0 0 1 7.5 2.4C23.5 19.4 16 24 16 24z"/></svg><span>Victoria Freebies</span></a><div class="navlinks"><span class="navpill" aria-hidden="true"></span><a href="/" aria-current="page"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4.5 4.5"/></svg>Search</a><a href="/wish-list">Wish List<span class="new" aria-label="new">NEW</span></a><a href="/about"><span class="full">Mission &amp; vision</span><span class="short">Mission</span></a><a href="/charities"><span class="full">For charities</span><span class="short">Charities</span></a></div></nav></div>
 <header><div class="wrap">
-<nav><span class="logo">Victoria Freebies</span><span><a href="#how">How it works</a><a href="#about">About &amp; vision</a><a href="#contact">For charities</a></span></nav>
 <div class="hero">
-<h1>Give your things a second life.</h1>
-<p class="sub">Tell us what you’re ready to let go of. We’ll find the Victoria charity that’s hoping for it right now.</p>
+<p class="place"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.6 6-10A6 6 0 0 0 4 8c0 4.4 6 10 6 10z"/><circle cx="10" cy="8" r="2.2"/></svg>Victoria, BC</p>
+<h1>Got something to donate? Find out exactly who needs it.</h1>
+<p class="sub">Search an item to see which Victoria charities are asking for it right now, who you’re helping, and where to drop it off.</p>
 <div class="panel" style="margin-top:8px">
-<label for="q">What would you like to donate?</label>
+<label for="q">Search an item</label>
 <div class="row"><input id="q" type="search" placeholder="For example: winter coat, couch, towels" autocomplete="off" enterkeyhint="search"><button id="go" type="button">Search</button></div>
-<div class="chips" id="chips"></div>
+<p class="lbl" id="catlbl">Type of item</p>
+<div class="chips cats" id="cats" role="group" aria-labelledby="catlbl"></div>
 <div class="filters">
-<div><label for="cat">Type of item</label><select id="cat"><option value="">All types</option></select></div>
-<div><label class="check"><input type="checkbox" id="req"> Specifically requested only</label></div>
+<div><label class="check"><input type="checkbox" id="droponly"> Drop-off ready</label></div>
+<div><label class="check"><input type="checkbox" id="wishonly"> Wish List <span class="new">NEW</span></label></div>
 </div>
 </div>
 </div></div></header>
 
 <main><div class="wrap">
-<section aria-live="polite"><h2 id="rt">What charities need right now</h2><div class="key" aria-label="What the labels mean"><p><span class="badge b-requested">Specifically requested</span>The charity asked for this. Drop it off at the address and hours shown.</p><p><span class="badge b-accepted">Accepted</span>They take this kind of item. Call first at the number shown.</p></div><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
+<section aria-live="polite"><h2 id="rt">What charities need right now</h2><p class="wishintro" id="wishintro" hidden>Specific items local charities have asked for right now. These change often, so check back.</p><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
 
 <section><h2>Why use Victoria Freebies?</h2><div class="steps"><div class="step"><h3>No wasted trips, no wasted time</h3><p>Know what a charity wants before you head out.</p></div><div class="step"><h3>Give to a good cause</h3><p>Your things go to local charities and the people they support.</p></div><div class="step"><h3>Less waste</h3><p>Good items find a new home instead of the landfill.</p></div></div></section>
 
 <section id="how"><h2>How it works</h2><div class="steps">
 <div class="step"><b class="n">1</b><h3>Search your item</h3><p>Tell us what you have. No account needed.</p></div>
-<div class="step"><b class="n">2</b><h3>See who wants it</h3><p><b>Specifically requested</b> means the charity asked for it. <b>Accepted</b> means they take that kind of item.</p></div>
-<div class="step"><b class="n">3</b><h3>Drop it off or call</h3><p>For requested items, go to the address and hours shown. For accepted items, call first at the number shown.</p></div></div></section>
+<div class="step"><b class="n">2</b><h3>See who wants it</h3><p>Each result shows the charity, what they’re asking for and who your donation helps.</p></div>
+<div class="step"><b class="n">3</b><h3>Drop it off or call</h3><p>Go to the address and hours shown, or call first when the listing gives a phone number.</p></div></div></section>
 
-<section id="about"><h2>Our vision</h2>
-<p>Victoria Freebies makes giving easier. People give their items to people in need, and this guide removes the guesswork for donors and the extra sorting for charities.</p>
-<h3 style="margin-top:20px">Goals</h3>
-<ul><li>One simple place to check where an item can be donated</li><li>Fewer unwanted drop-offs for charities</li><li>Clear, current information for every listing</li></ul>
-<h3 style="margin-top:20px">Timeline</h3>
-<div class="dream"><span class="tag">Start small</span><p><b>Now:</b> a searchable guide to local charities’ wishlists and donation rules. Some are posted online, others confirmed by contacting charities directly.</p></div>
-<div class="dream"><span class="tag">Slowly grow</span><p>Add more charities, more areas and more item categories, guided by community feedback.</p></div>
-<div class="dream"><span class="tag">The dream</span><p>Let individuals post requests for items they need, so neighbours can help neighbours in one trusted place.</p></div>
-<p>Run a charity, or want to give feedback? <a href="#contact">Get in touch below</a>. We’d love to hear from you.</p></section>
-
-<section id="contact"><h2>For charities: add or fix your listing</h2>
-<p>Run a charity in Greater Victoria? Tell us what you need right now, update your drop-off details, or let us know if something here is wrong. Donors who spot an error can use this too.</p>
-<div class="panel cta"><p>Fill out our short form to add a listing or change one. We check every submission before it goes on the site.</p><p><a class="bigbtn" href="https://airtable.com/appgw8rdpxxxGmWG3/pagYtNiHWxy6HWE64/form" target="_blank" rel="noopener">Fill out the form ↗</a></p><p class="hint">The form opens in a new tab. Questions? Email <a href="mailto:hayeslucas24@gmail.com">hayeslucas24@gmail.com</a>.</p></div></section>
+<section id="charities"><div class="panel cta"><h2>Run a charity?</h2><p>Tell donors exactly what you need, and spend less time sorting donations you can’t use.</p><p><a class="bigbtn" href="/charities">Information for charities</a></p></div></section>
 </div></main>
-<footer><div class="wrap">Victoria Freebies is a community project. Spot something out of date? <a href="#contact">Let us know</a>.</div></footer>
+<footer><div class="wrap">Victoria Freebies is a community project. Spot something out of date? <a href="/charities#form">Let us know</a>. · <a href="/about">Our mission &amp; vision</a></div></footer>
 
 <script>
 (function(){
@@ -123,7 +45,6 @@ var $=function(i){return document.getElementById(i)};
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 /* Listings come from /api/listings (Airtable, cached on Vercel's CDN). The last good copy is kept in this browser so repeat visits show results at once and the page still works if the API is down. */
 var D={orgs:{},listings:[]},LIST=[],READY=false,CACHE_KEY="vf-listings-v1";
-var LBL={requested:"Specifically requested",accepted:"Accepted"};
 
 /* Search: words, synonyms and categories, so "parka" finds "winter jackets" and "couch" finds "furniture". */
 function words(s){return String(s||"").toLowerCase().replace(/[^a-z\s]/g," ").split(/\s+/).filter(function(w){return w.length>1}).map(function(w){return w.length>2?w.replace(/ies$/,"y").replace(/(ch|sh|x|ss)es$/,"$1").replace(/([^s])s$/,"$1"):w})}
@@ -135,7 +56,7 @@ function syn(w){var o=[];SYNW.forEach(function(g){if(g.indexOf(w)>-1)o=o.concat(
 function score(x,q){
   var qw=words(q).filter(function(w){return ["the","and","for","of","my","some","old","used","new"].indexOf(w)<0});
   if(!words(q).length)return 1;if(!qw.length)return 0;
-  var t=words(x.title+" "+x.items),c=words(x.category),n=words(x.o.name||""),s=0,hit=0;
+  var t=words(x.title+" "+x.items),c=words(x.category),n=words((x.o.name||"")+" "+(x.o.parent||"")),s=0,hit=0;
   qw.forEach(function(w){
     var b=0;
     if(t.indexOf(w)>-1)b=6;
@@ -151,46 +72,136 @@ function score(x,q){
   if(s&&x.category==="Pet Supplies"&&!qw.some(function(w){return syn("pet").indexOf(w)>-1||w==="pet"}))s-=3;
   return s;
 }
+var APPLE=/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+function mapsUrl(a){return APPLE?"https://maps.apple.com/?q="+encodeURIComponent(a):"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(a)}
 function linkPhones(p){return esc(p).replace(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g,function(m){return '<a href="tel:'+m.replace(/[^0-9+]/g,"")+'">'+m+'</a>'})}
+/* The listing's "Drop off?" field in Airtable decides what the box shows:
+   "ready" = drop it off at the address and hours; "phone" = call first.
+   If the chosen detail is missing, fall back to the other so the donor still has a way to reach them. */
+function howTo(x){
+  var o=x.o,mode=x.dropoff||(o.address?"ready":"phone");
+  if(mode==="ready")return o.address?"drop":o.phone?"arrange":"none";
+  return o.phone?"call":o.address?"drop":"none";
+}
 function spot(x){
-  var o=x.o;
-  if(x.type==="requested"){
-    if(o.address)return '<div class="spot"><p class="k">Drop it off at</p><p class="big">'+esc(o.address)+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>';
-    if(o.phone)return '<div class="spot"><p class="k">Call to arrange a drop-off</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
-  }else{
-    if(o.phone)return '<div class="spot"><p class="k">Call first</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
-    if(o.address)return '<div class="spot"><p class="k">Drop it off at</p><p class="big">'+esc(o.address)+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>';
+  var o=x.o,h=howTo(x);
+  if(h==="drop"){
+    /* Addresses with a street number link to maps (Apple Maps on Apple devices, Google Maps elsewhere);
+       hovering shows "Open in Maps". Text like "Multiple Locations" stays plain. */
+    var mappable=/\d/.test(o.address),maps=mappable?mapsUrl(o.address):"";
+    return '<div class="spot"><p class="k">Drop it off at</p><p class="big">'+(mappable?'<a class="maplink" data-tip="Open in Maps ↗" href="'+esc(maps)+'" target="_blank" rel="noopener">'+esc(o.address)+'<span class="sr"> (opens in Maps)</span></a>':esc(o.address))+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>';
   }
+  if(h==="arrange")return '<div class="spot"><p class="k">Call to arrange a drop-off</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
+  if(h==="call")return '<div class="spot"><p class="k">Call first</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
   return '<div class="spot none"><p class="k">Contact details coming soon</p></div>';
 }
 function card(x){
-  return '<article class="res"><span class="badge b-'+x.type+'">'+LBL[x.type]+'</span>'
-   +'<p class="org">'+esc(x.o.name||"")+'</p><h3 class="want">'+esc(x.title)+'</h3>'
-   +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items">'+esc(x.items)+'</p>':'')
+  return '<article class="res">'+(x.wish?'<p class="wishtag">Specifically requested</p>':'')+'<p class="org">'+esc(x.o.name||"")+(x.o.parent?' · '+esc(x.o.parent):'')+'</p><h3 class="want">'+esc(x.title)+'</h3>'
+   +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
    +(x.instructions?'<p class="instr">'+esc(x.instructions)+'</p>':'')
    +(x.o.website?'<p class="site"><a href="'+esc(x.o.website)+'" target="_blank" rel="noopener">Visit their website ↗</a></p>':'')
    +'</article>';
 }
-var st={q:"",shown:12};
+var st={q:"",shown:12,cat:""};
+/* Before a search: show things most people have at home first, with variety.
+   - Charities take turns: one listing from each, then a second from each, ... (a charity's sites,
+     e.g. Cool Aid's houses, count as one charity).
+   - Each charity leads with its most "common" listing: one many donors could give.
+   - Within each round, the same type of item never appears twice in a row.
+   Tune COMMON to change which types come first (higher = earlier). */
+var COMMON={"Clothing":10,"Household":9,"Baby & Kids":8,"Family & Kids":8,"Electronics":7,"Furniture":6,"Hygiene":5,"Food":5,"Pet Supplies":4,"Camping Gear":4,"Other":3};
+function commonness(x){
+  var s=COMMON[x.category]||3,it=String(x.items||"");
+  s+=Math.min(it.split(/[;,\n]/).length,5)*0.4;                       // broad lists: more donors have something on them
+  if(/\bgently used\b|\bused\b|\bany\b/i.test(it))s+=1;            // "gently used clothing" is easy to give
+  if(/\(\s*1\s*\)|\(about \d+|\b\d+-cup\b/i.test(it))s-=3;           // one very specific thing, e.g. a 60-cup coffee urn
+  return s;
+}
+function mixByCharity(rows){
+  var groups={},order=[];
+  rows.forEach(function(r){var k=r.x.o.parent||r.x.o.name||r.x.org;if(!groups[k]){groups[k]=[];order.push(k)}groups[k].push(r)});
+  var out=[],recent=[],round={};
+  while(out.length<rows.length){
+    /* Each slot: among charities that haven't had a turn this round, take the listing that is most common,
+       docked for repeating a type shown in the last few cards (and heavily for the type right before it). */
+    var pick=null,best=-1e9;
+    order.forEach(function(k){
+      if(round[k])return;
+      groups[k].forEach(function(r,i){
+        var c=r.x.category,rep=recent.filter(function(v){return v===c}).length;
+        var sc=commonness(r.x)-3*rep-(recent[recent.length-1]===c?6:0)+(r.x.added?Date.parse(r.x.added)/1e13:0);
+        if(sc>best){best=sc;pick={k:k,i:i}}
+      });
+    });
+    if(!pick){round={};continue}                                         // every charity has had a turn: next round
+    var r=groups[pick.k].splice(pick.i,1)[0];out.push(r);
+    round[pick.k]=1;if(!groups[pick.k].length)order.splice(order.indexOf(pick.k),1);
+    recent.push(r.x.category);if(recent.length>5)recent.shift();
+  }
+  return out;
+}
+var WISH_ARRIVAL=false;
+var REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches,lastKey="",lastShown=0;
 function render(){
   if(!READY){$("out").innerHTML='<div class="empty"><p>Loading what local charities need…</p></div>';$("morewrap").hidden=true;return}
-  var q=st.q,cat=$("cat").value,reqOnly=$("req").checked;
+  var q=st.q,cat=st.cat,dropOnly=$("droponly").checked,wishOnly=$("wishonly").checked;
   var rows=LIST.map(function(x){return {x:x,s:score(x,q)}}).filter(function(r){
-    if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;if(reqOnly&&r.x.type!=="requested")return false;return true});
-  rows.sort(function(a,b){return (b.s-a.s)||((a.x.type==="requested"?0:1)-(b.x.type==="requested"?0:1))||a.x.title.localeCompare(b.x.title)});
-  if(!q)rows.sort(function(a,b){return ((a.x.type==="requested"?0:1)-(b.x.type==="requested"?0:1))||String(a.x.o.name).localeCompare(String(b.x.o.name))});
+    if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;if(wishOnly&&!r.x.wish)return false;return true});
+  rows.sort(function(a,b){return (b.s-a.s)||a.x.title.localeCompare(b.x.title)});
+  if(!q)rows=mixByCharity(rows);
   var none=q&&!rows.length,h="";
-  if(none){
-    rows=LIST.map(function(x){return {x:x,s:1}}).filter(function(r){if(cat&&r.x.category!==cat)return false;if(reqOnly&&r.x.type!=="requested")return false;return true});
-    rows.sort(function(a,b){return ((a.x.type==="requested"?0:1)-(b.x.type==="requested"?0:1))||String(a.x.o.name).localeCompare(String(b.x.o.name))});
-    h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p><p class="meta">Know a charity that takes this? <a href="#contact">Tell us</a> and we’ll add it.</p></div>';
+  /* Matches exist, but only at places that ask you to call first: say so instead of "nothing". */
+  if(none&&dropOnly){
+    var callRows=LIST.filter(function(x){return score(x,q)>0&&(!cat||x.category===cat)&&(!wishOnly||x.wish)});
+    var nOrgs=callRows.map(function(x){return x.org}).filter(function(v,i,a){return a.indexOf(v)===i}).length;
+    if(callRows.length){
+      $("rt").textContent="Call ahead for “"+q+"”";
+      $("out").innerHTML='<div class="empty"><p><b>'+nOrgs+' charit'+(nOrgs>1?'ies want':'y wants')+' “'+esc(q)+'”, but '+(nOrgs>1?'they ask':'it asks')+' you to call first.</b></p><p><button type="button" class="alt" id="showcall">Show them</button></p></div>';
+      $("showcall").onclick=function(){$("droponly").checked=false;st.shown=12;render()};
+      $("morewrap").hidden=true;return;
+    }
   }
-  $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"):"What charities need right now";
+  if(none){
+    rows=LIST.map(function(x){return {x:x,s:1}}).filter(function(r){if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;if(wishOnly&&!r.x.wish)return false;return true});
+    rows=mixByCharity(rows);
+    h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p><p class="meta">Know a charity that takes this? <a href="/charities#form">Tell us</a> and we’ll add it.</p></div>';
+  }
+  $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"):(wishOnly?"Wish List":"What charities need right now");
+  $("wishintro").hidden=!wishOnly;
   h+=rows.slice(0,st.shown).map(function(r){return card(r.x)}).join("");
   $("out").innerHTML=h;
+  /* Cards slide up and fade in one after another when the results change. "Show more" only animates the new ones. */
+  var key=q+"|"+cat+"|"+dropOnly+"|"+wishOnly,from=(key===lastKey&&st.shown>lastShown)?lastShown:0;
+  if(!REDUCED&&(key!==lastKey||from)){Array.prototype.forEach.call($("out").querySelectorAll(".res,.empty"),function(c,i){if(i<from)return;c.style.animationDelay=Math.min(i-from,10)*45+"ms";c.classList.add("rise")})}
+  lastKey=key;lastShown=st.shown;
   $("morewrap").hidden=rows.length<=st.shown;
+  clampItems();
+}
+/* Long item lists show two lines, with a link to show the rest. The link only appears when the text is cut off. */
+function clampItems(){
+  Array.prototype.forEach.call($("out").querySelectorAll(".items.clamp"),function(p){
+    if(p.scrollHeight<=p.clientHeight+2)return;
+    var b=document.createElement("button");b.type="button";b.className="more-link";b.textContent="Show all items";b.setAttribute("aria-expanded","false");
+    b.onclick=function(ev){
+      var opening=!p.classList.contains("open");
+      b.textContent=opening?"Show fewer":"Show all items";b.setAttribute("aria-expanded",String(opening));
+      if(!ev||REDUCED){p.classList.toggle("open",opening);return}
+      /* Slide between the two-line and full height: measure both, animate, then hand control back to CSS. */
+      var from=p.offsetHeight;
+      p.classList.toggle("open",opening);
+      var to=opening?p.scrollHeight:p.offsetHeight;
+      p.classList.add("open");
+      p.style.height=from+"px";void p.offsetHeight;
+      p.classList.add("sliding");p.style.height=to+"px";
+      clearTimeout(p._t);p._t=setTimeout(function(){p.classList.remove("sliding");p.style.height="";p.classList.toggle("open",opening)},300);
+    };
+    p.parentNode.insertBefore(b,p.nextSibling);
+    /* If the searched word is in this list but not the title, open it so the donor sees why it matched. */
+    var t=words(p.parentNode.querySelector(".want").textContent),iw=words(p.textContent);
+    if(words(st.q).some(function(w){return w.length>2&&iw.indexOf(w)>-1&&t.indexOf(w)<0}))b.onclick();
+  });
 }
 function submit(){st.q=$("q").value.trim();st.shown=12;render();if(st.q){var r=$("rt");if(r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"start"})}}
 function load(d){
@@ -198,10 +209,14 @@ function load(d){
   var today=new Date().toISOString().slice(0,10),orgs=d.orgs||{};
   D=d;LIST=d.listings.filter(function(x){return !x.expires||x.expires>=today}).map(function(x){x.o=orgs[x.org]||{};return x});
   var cats=[];LIST.forEach(function(x){if(x.category&&cats.indexOf(x.category)<0)cats.push(x.category)});cats.sort();
-  var sel=$("cat").value;
-  $("cat").innerHTML='<option value="">All types</option>'+cats.map(function(c){return '<option>'+esc(c)+'</option>'}).join("");
-  if(cats.indexOf(sel)>-1)$("cat").value=sel;
-  READY=true;render();return true;
+  /* Category buttons, built from the categories in Airtable: most common first, "Other" last. */
+  cats.sort(function(a,b){return (a==="Other")-(b==="Other")||(COMMON[b]||3)-(COMMON[a]||3)||a.localeCompare(b)});
+  if(cats.indexOf(st.cat)<0)st.cat="";
+  $("cats").innerHTML=[""].concat(cats).map(function(c){return '<button type="button" class="chip" data-cat="'+esc(c)+'" aria-pressed="'+(c===st.cat)+'">'+(c?esc(c):"All")+'</button>'}).join("");
+  READY=true;render();
+  /* Arriving at /wish-list from the top bar: jump straight to the list (only the first time it loads). */
+  if(WISH_ARRIVAL){WISH_ARRIVAL=false;var r=$("rt");if(r&&r.scrollIntoView)r.scrollIntoView({block:"start"})}
+  return true;
 }
 function failed(){
   if(READY)return;
@@ -215,12 +230,40 @@ function fetchListings(){
     try{localStorage.setItem(CACHE_KEY,JSON.stringify(d))}catch(e){}
   }).catch(failed);
 }
-["Blankets","Winter coats","Socks","Furniture","Canned food","Pet food","Toys","Books"].forEach(function(t){var b=document.createElement("button");b.className="chip";b.type="button";b.textContent=t;b.onclick=function(){$("q").value=t;submit()};$("chips").appendChild(b)});
+/* The search box types and erases examples until the donor clicks into it or types. Static text if they prefer reduced motion. */
+(function(){
+  var q=$("q"),STATIC="For example: winter coat, couch, towels",ex=["winter coat","couch","dog food","towels","toothpaste","sleeping bag","books","dinner plates"],i=0,n=0,del=false;
+  if(REDUCED)return;
+  function tick(){
+    if(document.activeElement===q||q.value){q.placeholder=STATIC;setTimeout(tick,800);return}
+    var w=ex[i];n+=del?-1:1;q.placeholder="Try “"+w.slice(0,n)+"”";
+    var wait=del?40:85;
+    if(!del&&n===w.length){del=true;wait=1500}
+    else if(del&&n===0){del=false;i=(i+1)%ex.length;wait=350}
+    setTimeout(tick,wait);
+  }
+  tick();
+})();
 $("go").onclick=submit;
 $("q").addEventListener("keydown",function(e){if(e.key==="Enter")submit()});
 var qt;$("q").addEventListener("input",function(){clearTimeout(qt);qt=setTimeout(function(){var v=$("q").value.trim();if(v!==st.q){st.q=v;st.shown=12;render()}},400)});
-$("cat").addEventListener("change",function(){st.shown=12;render()});
-$("req").addEventListener("change",function(){st.shown=12;render()});
+$("cats").addEventListener("click",function(e){
+  var b=e.target.closest&&e.target.closest("button[data-cat]");if(!b)return;
+  st.cat=b.getAttribute("data-cat");st.shown=12;
+  Array.prototype.forEach.call(this.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",String(x===b))});
+  render();
+});
+$("droponly").addEventListener("change",function(){st.shown=12;render()});
+/* The Wish List has its own address (/wish-list) so it can be linked from the top bar and shared.
+   Ticking the box switches the address and the highlighted top-bar link; unticking goes back to Search. */
+function setWishPage(on){
+  try{history.replaceState(null,"",on?"/wish-list":"/")}catch(e){}
+  Array.prototype.forEach.call(document.querySelectorAll(".navlinks a"),function(a){
+    var me=a.getAttribute("href")===(on?"/wish-list":"/");if(me)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  document.dispatchEvent(new Event("navchange"));
+}
+$("wishonly").addEventListener("change",function(){st.shown=12;setWishPage(this.checked);render()});
+if(/^\/wish-list\/?$/.test(location.pathname)){$("wishonly").checked=true;setWishPage(true);WISH_ARRIVAL=true}
 $("more").onclick=function(){st.shown+=12;render()};
 try{load(JSON.parse(localStorage.getItem(CACHE_KEY)))}catch(e){}
 render();
@@ -261,4 +304,5 @@ var c=window.claude;
 if(c&&c.use){c.use("user").then(async function(u){var ok=false;if(u){try{ok=!!(await u.canEdit())}catch(e){}}if(ok)setupEdit()}).catch(function(){})}
 })();
 </script>
+<script src="/nav.js" defer></script>
 </body></html>
