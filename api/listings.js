@@ -60,9 +60,11 @@ async function fetchAll(table, fields, formula) {
 }
 
 const pick = (spec) => Object.entries(spec).filter(([k]) => k !== "table").map(([, id]) => id);
-// "Drop off?" options: "Drop Off Ready (address and hours)" -> "ready", "Phone first" -> "phone".
-// Matched by keyword so small wording changes to the options don't break it. Blank -> "".
-const dropoffMode = (v) => (/phone/i.test(v) ? "phone" : /drop/i.test(v) ? "ready" : "");
+// "Drop off?" options are matched by keyword, so the wording can change freely as long as
+// the call-first option contains "Call" (or "phone") and the drop-off option contains "Drop". Blank -> "".
+const dropoffMode = (v) => (/\bcall\b|phone/i.test(v) ? "phone" : /drop/i.test(v) ? "ready" : "");
+// "Specifically Requested?" options: the Wish List option must contain "Wish" (or "Specific"); anything else is a general listing.
+const isWish = (v) => /wish|specific/i.test(v);
 const str = (v) => (v == null ? "" : typeof v === "object" && v.name ? v.name : String(v)).trim();
 
 export async function buildData() {
@@ -84,7 +86,7 @@ export async function buildData() {
       title,
       org,
       dropoff: dropoffMode(str(f[LISTINGS.dropoff])),
-      wish: (f[LISTINGS.wish] || []).some((v) => /specific/i.test(str(v))),
+      wish: (f[LISTINGS.wish] || []).some((v) => isWish(str(v))),
       category: str(f[LISTINGS.category]),
       items: str(f[LISTINGS.items]),
       case: str(f[LISTINGS.case]),

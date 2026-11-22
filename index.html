@@ -111,7 +111,7 @@ var st={q:"",shown:12,cat:""};
    - Each charity leads with its most "common" listing: one many donors could give.
    - Within each round, the same type of item never appears twice in a row.
    Tune COMMON to change which types come first (higher = earlier). */
-var COMMON={"Clothing":10,"Household":9,"Baby & Kids":8,"Electronics":7,"Furniture":6,"Hygiene":5,"Food":5,"Pet Supplies":4,"Camping Gear":4,"Other":3};
+var COMMON={"Clothing":10,"Household":9,"Baby & Kids":8,"Family & Kids":8,"Electronics":7,"Furniture":6,"Hygiene":5,"Food":5,"Pet Supplies":4,"Camping Gear":4,"Other":3};
 function commonness(x){
   var s=COMMON[x.category]||3,it=String(x.items||"");
   s+=Math.min(it.split(/[;,\n]/).length,5)*0.4;                       // broad lists: more donors have something on them
