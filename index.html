@@ -125,7 +125,7 @@ function card(x){
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
    +'<p class="cardfoot">'+(more>0?'<a class="also" href="'+esc(url)+'">'+esc(topName)+' has '+more+' other need'+(more>1?'s':'')+' <span aria-hidden="true">→</span></a>':'<a class="also" href="'+esc(url)+'">More about '+esc(topName)+' <span aria-hidden="true">→</span></a>')
-   +(x.wish?'<button type="button" class="sharebtn" data-share="'+esc(x.id)+'">'+VF.SHARE_ICON+'Share</button>':'')+'</p>'
+   +(x.wish?'<span class="sharewrap"><button type="button" class="sharebtn" data-share="'+esc(x.id)+'" aria-haspopup="menu" aria-expanded="false">'+VF.SHARE_ICON+'Share</button></span>':'')+'</p>'
    +'</article>';
 }
 var st={q:"",shown:12,cat:""};

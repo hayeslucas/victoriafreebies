@@ -16,7 +16,6 @@
     return d.listings.filter(function (x) { return !x.expires || x.expires >= today(); }).map(function (x) { x.o = orgs[x.org] || {}; return x; });
   }
   function details(x) { return x.items && x.items.toLowerCase() !== x.title.toLowerCase() ? '<p class="items">' + esc(x.items) + "</p>" : ""; }
-  function shareBtn(x) { return '<button type="button" class="sharebtn" data-share="' + esc(x.id) + '">' + VF.SHARE_ICON + "Share</button>"; }
 
   /* Every charity, for /org on its own. */
   function directory(d) {
@@ -61,7 +60,7 @@
     $("oactions").innerHTML =
       (t.donate ? '<a class="bigbtn" href="' + esc(t.donate) + '" target="_blank" rel="noopener">Donate money <span aria-hidden="true">↗</span></a>' : "") +
       (t.website ? '<a class="bigbtn alt" href="' + esc(t.website) + '" target="_blank" rel="noopener">Website <span aria-hidden="true">↗</span></a>' : "") +
-      '<button type="button" class="alt" id="sharepage">' + VF.SHARE_ICON + "Share this page</button>";
+      '<span class="sharewrap"><button type="button" class="alt" id="sharepage" aria-haspopup="menu" aria-expanded="false">' + VF.SHARE_ICON + "Share this page</button></span>";
 
     /* One section per site, with everything that site needs together, so a donor heading to one place
        sees it all in one spot. Sites with the most needs first; a charity with several sites gets a jump list.
@@ -77,12 +76,12 @@
     /* The "who it helps" line goes above the table only when every item there shares it. */
     function common(list) { var c = list[0] && list[0].case; return list.length > 1 && c && list.every(function (x) { return x.case === c; }) ? c : ""; }
     function byTitle(a, b) { return a.title.localeCompare(b.title); }
-    function row(x, o, shared, callNote, cols, tag) {
+    function row(x, o, shared, callNote, tag) {
       var d = details(x).replace('<p class="items">', "").replace("</p>", "");
       return '<tr id="item-' + esc(base(x.id)) + '"' + (x.wish ? ' class="wishrow"' : "") + '><th scope="row">' + esc(x.title) + (x.wish && tag ? ' <span class="wtag">Wish List</span>' : "") + "</th><td>" + d +
         (x.case && x.case !== shared ? '<span class="rowwhy">♥ ' + esc(x.case) + "</span>" : "") +
         (callNote ? '<span class="rowcall">Call first: ' + VF.linkPhones(o.phone) + "</span>" : "") + "</td>" +
-        (cols === 3 ? '<td class="act">' + (x.wish ? shareBtn(x) : "") + "</td>" : "") + "</tr>";
+        "</tr>";
     }
     var sites = locs.map(function (loc) { return { o: orgs[loc], id: loc, list: mine.filter(function (x) { return x.org === loc; }) }; })
       .sort(function (a, b) {
@@ -95,25 +94,20 @@
       return '<a href="#site-' + esc(st.id) + '">' + esc(VF.short(st.o)) + " <span>" + st.list.length + "</span></a>";
     }).join("") + "</nav>";
     sites.forEach(function (st) {
-      var o = st.o, list = st.list, allCall = list.every(isCall), shared = common(list), cols = list.some(function (x) { return x.wish; }) ? 3 : 2;
+      var o = st.o, list = st.list, allCall = list.every(isCall), shared = common(list);
       var allWish = list.every(function (x) { return x.wish; });
       h += '<section class="oloc" id="site-' + esc(st.id) + '"><h2>' + (multi ? esc(VF.short(o)) : "What they need") + ' <span class="cnt">' + list.length + " need" + (list.length > 1 ? "s" : "") + (allWish ? ' <span class="wtag">from Wish List</span>' : "") + "</span></h2>" +
         where(o, allCall) + (shared ? '<p class="why">♥ ' + esc(shared) + "</p>" : "") +
-        '<table class="otable"><thead><tr><th scope="col">Item</th><th scope="col">Details</th>' + (cols === 3 ? '<th scope="col"><span class="sr">Share</span></th>' : "") + "</tr></thead><tbody>";
+        '<table class="otable"><thead><tr><th scope="col">Item</th><th scope="col">Details</th></tr></thead><tbody>';
       /* Drop-off-ready items first, then call-first; everyday before Wish List; then A to Z. */
       list.slice().sort(function (a, b) { return isCall(a) - isCall(b) || a.wish - b.wish || byTitle(a, b); })
-        .forEach(function (x) { h += row(x, o, shared, !allCall && isCall(x), cols, !allWish); });
+        .forEach(function (x) { h += row(x, o, shared, !allCall && isCall(x), !allWish); });
       h += "</tbody></table></section>";
     });
 
     $("page").innerHTML = h;
 
     $("sharepage").onclick = function () { VF.share(this, nick + " on Victoria Freebies", "Here’s everything " + nick + " needs right now:", location.pathname); };
-    $("page").onclick = function (e) {
-      var b = e.target.closest && e.target.closest("button[data-share]"); if (!b) return;
-      var x = mine.filter(function (l) { return l.id === b.getAttribute("data-share"); })[0]; if (!x) return;
-      VF.share(b, x.title + " for " + VF.short(x.o), VF.short(x.o) + " is asking for " + x.title.toLowerCase() + ". Can you help?", location.pathname + "#item-" + base(x.id));
-    };
 
     /* Arriving from a shared link or an "also takes" link to one item: bring it into view and highlight it. */
     var el = location.hash && document.getElementById(location.hash.slice(1));

@@ -36,19 +36,46 @@
   function slug(name) { return String(name || "").toLowerCase().replace(/\([^)]*\)/g, " ").replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""); }
   function orgUrl(orgId, orgs) { var t = orgs[topId(orgId, orgs)] || {}; return "/org/" + slug(t.name); }
 
-  /* Share: the phone's share sheet where there is one, otherwise copy the link. */
-  function share(btn, title, text, url) {
-    var full = location.origin + url;
-    function said(msg) { var old = btn.getAttribute("data-label") || btn.textContent; btn.setAttribute("data-label", old); btn.textContent = msg; setTimeout(function () { btn.textContent = old; }, 1800); }
-    if (navigator.share) { navigator.share({ title: title, text: text, url: full }).catch(function () {}); return; }
+  /* Share: a small menu with Facebook, X, WhatsApp, Email and Copy link, plus the phone's own share sheet
+     ("More…", which reaches Instagram, Messages and other apps) where the browser has one. */
+  function copy(full, done) {
     function fallback() {
       var t = document.createElement("textarea"); t.value = full; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0";
       document.body.appendChild(t); t.select();
-      try { document.execCommand("copy"); said("Link copied"); } catch (e) { prompt("Copy this link:", full); }
+      try { document.execCommand("copy"); done(); } catch (e) { prompt("Copy this link:", full); }
       document.body.removeChild(t);
     }
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(full).then(function () { said("Link copied"); }, fallback);
-    else fallback();
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(full).then(done, fallback); else fallback();
+  }
+  var openMenu = null;
+  function closeMenu() { if (openMenu) { openMenu.btn.setAttribute("aria-expanded", "false"); openMenu.el.remove(); openMenu = null; } }
+  document.addEventListener("click", function (e) { if (openMenu && !openMenu.el.contains(e.target) && e.target !== openMenu.btn && !openMenu.btn.contains(e.target)) closeMenu(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && openMenu) { var b = openMenu.btn; closeMenu(); b.focus(); } });
+  function share(btn, title, text, url) {
+    if (openMenu && openMenu.btn === btn) { closeMenu(); return; }
+    closeMenu();
+    var full = location.origin + url, u = encodeURIComponent(full), t = encodeURIComponent(text);
+    var links = [
+      ["Facebook", "https://www.facebook.com/sharer/sharer.php?u=" + u],
+      ["X (Twitter)", "https://twitter.com/intent/tweet?text=" + t + "&url=" + u],
+      ["WhatsApp", "https://wa.me/?text=" + encodeURIComponent(text + " " + full)],
+      ["Bluesky", "https://bsky.app/intent/compose?text=" + encodeURIComponent(text + " " + full)],
+      ["Email", "mailto:?subject=" + encodeURIComponent(title) + "&body=" + encodeURIComponent(text + "\n\n" + full)]
+    ];
+    var el = document.createElement("div");
+    el.className = "sharemenu"; el.setAttribute("role", "menu");
+    el.innerHTML = links.map(function (l) { return '<a role="menuitem" href="' + esc(l[1]) + '"' + (l[0] === "Email" ? "" : ' target="_blank" rel="noopener"') + ">" + esc(l[0]) + "</a>"; }).join("") +
+      '<button type="button" role="menuitem" data-act="copy">Copy link</button>' +
+      (navigator.share ? '<button type="button" role="menuitem" data-act="more">More…</button>' : "");
+    el.addEventListener("click", function (e) {
+      var a = e.target.closest("[data-act]"); if (!a) { setTimeout(closeMenu, 0); return; }
+      if (a.getAttribute("data-act") === "copy") copy(full, function () { a.textContent = "Link copied ✓"; setTimeout(closeMenu, 1200); });
+      else { closeMenu(); navigator.share({ title: title, text: text, url: full }).catch(function () {}); }
+    });
+    btn.insertAdjacentElement("afterend", el);
+    btn.setAttribute("aria-expanded", "true");
+    openMenu = { btn: btn, el: el };
+    var first = el.querySelector("a,button"); if (first) first.focus();
   }
   var SHARE_ICON = '<svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 13V3M6 7l4-4 4 4M4 11v5h12v-5"/></svg>';
 
