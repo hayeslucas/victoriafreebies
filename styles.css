@@ -258,3 +258,40 @@ section.oloc,section.owish{padding-block:0}#page{padding-bottom:36px}
 .oloc h2 .cnt{margin-left:0;vertical-align:0;white-space:nowrap}
 .oloc h2 .sharewrap{margin-left:auto;vertical-align:0}
 .oloc h2 .sharemenu{left:auto;right:0}
+
+/* Home page: "Run a charity?" pill that opens to the charity forms */
+@property --fcang{syntax:"<angle>";inherits:false;initial-value:0deg}
+header{position:relative}
+.fc{position:relative;max-width:900px;margin:-18px auto 26px;padding:0 max(20px,env(safe-area-inset-left,0px));z-index:5}
+.fc-pill{position:relative;display:inline-flex;align-items:center;gap:10px;padding:10px 18px 10px 14px;border-radius:999px;font:700 16px system-ui,sans-serif;color:var(--ink);background:var(--card);border:2px solid transparent;
+  background-image:linear-gradient(var(--card),var(--card)),conic-gradient(from var(--fcang),var(--brand),#7fd3c8,var(--req),var(--brand));background-origin:border-box;background-clip:padding-box,border-box;
+  box-shadow:0 6px 20px rgb(0 0 0/.07);animation:fcspin 6s linear infinite;transition:transform .2s ease,box-shadow .2s ease}
+.fc-pill:hover,.fc-pill:focus-visible{transform:translateY(-2px);box-shadow:0 10px 26px rgb(0 0 0/.12)}
+@keyframes fcspin{to{--fcang:360deg}}
+.fc-dot{width:10px;height:10px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 0 color-mix(in srgb,var(--brand) 60%,transparent);animation:fcpulse 2s ease-out infinite}
+@keyframes fcpulse{70%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.fc-arr{display:inline-block;color:var(--brand);transition:transform .25s ease}
+.fc.open .fc-arr{transform:rotate(90deg)}
+.fc-more{display:grid;grid-template-rows:0fr;opacity:0;transform:translateY(-6px);transition:grid-template-rows .35s ease,opacity .25s ease,transform .35s ease;pointer-events:none}
+.fc.open .fc-more{grid-template-rows:1fr;opacity:1;transform:none;pointer-events:auto}
+.fc-in{overflow:hidden;min-height:0}
+.fc-in{display:flex;flex-direction:column;gap:8px;max-width:320px}
+.fc-in p{margin:0 0 4px;padding:14px 16px 0;font:16px/1.45 system-ui,sans-serif;color:var(--mute)}
+.fc-in{background:var(--card);border:2px solid var(--line);border-radius:16px;box-shadow:0 14px 34px rgb(0 0 0/.12);margin-top:10px}
+.fc-in a{margin:0 16px;text-decoration:none;font:700 16px system-ui,sans-serif;border-radius:10px;padding:10px 12px;text-align:center}
+.fc-go{background:var(--brand);color:var(--brand-ink)}
+.fc-up{border:2px solid var(--ink);color:var(--ink)}
+.fc-learn{color:var(--brand);padding:4px 12px 14px !important}
+.fc-go:hover,.fc-up:hover{filter:brightness(1.08)}
+/* Wide screens: float in the empty space beside the headline, and open on hover too. */
+@media (min-width:1440px){
+  .fc{position:absolute;top:110px;left:calc(50% + 450px + (50% - 450px - 250px) / 2);margin:0;padding:0;width:250px}
+  .fc-more{position:absolute;top:100%;left:0;width:250px}
+}
+@media (hover:hover) and (min-width:1440px){
+  .fc:hover .fc-more,.fc:focus-within .fc-more{grid-template-rows:1fr;opacity:1;transform:none;pointer-events:auto}
+  .fc:hover .fc-arr,.fc:focus-within .fc-arr{transform:rotate(90deg)}
+}
+@media (max-width:1439px){.fc-more{position:absolute;top:100%;left:max(20px,env(safe-area-inset-left,0px));width:min(320px,calc(100% - 40px))}}
+@media (prefers-reduced-motion:reduce){.fc-pill,.fc-dot{animation:none}.fc-more,.fc-arr,.fc-pill{transition:none}}
+@media (max-width:767px){.fc{display:none}} /* phones: charities use the top bar instead */

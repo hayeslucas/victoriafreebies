@@ -21,7 +21,17 @@
 <div><label class="check"><input type="checkbox" id="wishonly"> Wish List <span class="new">NEW</span></label></div>
 </div>
 </div>
-</div></div></header>
+</div>
+<aside class="fc" id="fc" aria-label="For charities">
+<button type="button" class="fc-pill" id="fcpill" aria-expanded="false" aria-controls="fcmore"><span class="fc-dot" aria-hidden="true"></span>Run a charity?<span class="fc-arr" aria-hidden="true">→</span></button>
+<div class="fc-more" id="fcmore"><div class="fc-in">
+<p>Tell Victoria donors exactly what you need, and spend less time sorting what you can’t use. It takes a few minutes.</p>
+<a class="fc-go" href="https://airtable.com/appgw8rdpxxxGmWG3/pagYtNiHWxy6HWE64/form" target="_blank" rel="noopener">Post a request <span aria-hidden="true">↗</span></a>
+<a class="fc-up" href="https://airtable.com/appgw8rdpxxxGmWG3/pagHqujgGW1WxH8uR/form" target="_blank" rel="noopener">Update a request <span aria-hidden="true">↗</span></a>
+<a class="fc-learn" href="/charities">How it works →</a>
+</div></div>
+</aside>
+</div></header>
 
 <main><div class="wrap">
 <section aria-live="polite"><h2 id="rt">What charities need right now</h2><div class="wishintro" id="wishintro" hidden>
@@ -292,6 +302,12 @@ $("out").addEventListener("click",function(e){
   var x=LIST.filter(function(l){return l.id===b.getAttribute("data-share")})[0];if(!x)return;
   VF.share(b,x.title+" for "+VF.short(x.o),(VF.short(x.o)||"A local charity")+" is asking for "+x.title.toLowerCase()+". Can you help?",VF.orgUrl(x.org,D.orgs||{})+"#item-"+base(x.id));
 });
+/* "Run a charity?" pill: opens on hover or focus on computers (CSS), and on tap everywhere. */
+(function(){var fc=$("fc"),b=$("fcpill");if(!fc)return;
+  b.addEventListener("click",function(){var o=!fc.classList.contains("open");fc.classList.toggle("open",o);b.setAttribute("aria-expanded",String(o))});
+  document.addEventListener("click",function(e){if(!fc.contains(e.target)&&fc.classList.contains("open")){fc.classList.remove("open");b.setAttribute("aria-expanded","false")}});
+  fc.addEventListener("keydown",function(e){if(e.key==="Escape"){fc.classList.remove("open");b.setAttribute("aria-expanded","false");b.focus()}});
+})();
 $("go").onclick=submit;
 $("q").addEventListener("keydown",function(e){if(e.key==="Enter")submit()});
 var qt;$("q").addEventListener("input",function(){clearTimeout(qt);qt=setTimeout(function(){var v=$("q").value.trim();if(v!==st.q){st.q=v;st.shown=12;render()}},400)});
