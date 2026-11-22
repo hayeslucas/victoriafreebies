@@ -53,7 +53,7 @@ the search wasn't about pets. If a new kind of item doesn't find the catch-all l
 **Organization pages** (`/org/<name>`, built by `org.js` from the same API data): one page per parent
 organization (all of Cool Aid's sites share `/org/victoria-cool-aid-society`), with everything it takes by location and
 category, then its Wish List items at the bottom, plus a **Donate money** button (Organizations → **Donate Link**) and its
-**Website**. `/org` lists every charity. Card names and "also takes N other things" link here; Wish List items have a
+**Website**. `/org` lists every charity and is the top bar's **Charities** link (top bar: Search · Wish List · Charities · About; "For charities" is in the footer and at the top of `/org`). Card names and "also takes N other things" link here; Wish List items have a
 Share button that links to the item on this page. **Preferred Name** (e.g. "Cool Aid") is used where space is tight:
 card lines and footers, share messages, tab titles. The full Name stays on the page heading. The page address comes from the organization's name, so renaming
 an organization in Airtable changes its link.
