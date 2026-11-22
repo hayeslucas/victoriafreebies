@@ -26,6 +26,16 @@ Each listing's **Drop off?** field decides how donors reach the charity:
 If the chosen detail is missing on the organization (for example Drop Off Ready but no Address), the card falls back
 to the other one ("Call to arrange a drop-off"), so fill in the matching field.
 
+**Writing listings:** one listing = one kind of item a donor would search for.
+- **Title:** the item, plural, 1–4 words ("Tents and tarps", not "Camping gear is always needed").
+- **Item details:** specifics of that item only: sizes, condition, quantity. Never other kinds of items.
+  If you find yourself listing other things, split it into another listing.
+- **Who will this help?** One sentence about who benefits.
+- **Anything else:** rules for this item only ("New only", "Wholesale quantities only").
+- Split when the parts would be searched for separately, have different rules, or belong in different
+  categories. Broad listings are fine when the charity really takes the whole category (e.g. a thrift store's
+  "Clothing"). Wish List = a specific quantity for a specific purpose; anything always accepted is Ongoing.
+
 **Keeping wording in sync (important):** a request travels Form → Submission Intake → (approved) →
 automation → Donation Listings → website. The approval automation copies select options **by name**, so these
 fields must have *identical* option names in Submission Intake and Donation Listings:
