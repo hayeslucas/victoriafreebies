@@ -30,6 +30,8 @@
   wrap.addEventListener("mouseleave", function () { moveTo(current); });
   wrap.addEventListener("focusout", function (e) { if (!wrap.contains(e.relatedTarget)) moveTo(current); });
   addEventListener("resize", function () { moveTo(current, true); });
+  // The home page switches between Search and Wish List without reloading.
+  document.addEventListener("navchange", function () { current = wrap.querySelector('a[aria-current="page"]'); moveTo(current); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { moveTo(current, true); });
 
   if (!REDUCED) {

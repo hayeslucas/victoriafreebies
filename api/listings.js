@@ -15,6 +15,7 @@ const LISTINGS = {
   title: "fld3CrfSICeY5ohAE",
   org: "fldkWSeFmAttZzkeq",
   dropoff: "fldjV2qVZHJQOuNil", // "Drop off?": decides whether the card shows the address or the phone number
+  wish: "fldZyRvKY1UQN0a6s", // "Specifically Requested?": "Specifically Requested" puts the listing on the Wish List
   category: "fldw2UAbx1pEpptCo",
   items: "fldJhbzWV0Y4ftROz",
   case: "fld50E7eRJq2Vo82e",
@@ -83,6 +84,7 @@ export async function buildData() {
       title,
       org,
       dropoff: dropoffMode(str(f[LISTINGS.dropoff])),
+      wish: (f[LISTINGS.wish] || []).some((v) => /specific/i.test(str(v))),
       category: str(f[LISTINGS.category]),
       items: str(f[LISTINGS.items]),
       case: str(f[LISTINGS.case]),

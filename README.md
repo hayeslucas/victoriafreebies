@@ -26,6 +26,10 @@ Each listing's **Drop off?** field decides how donors reach the charity:
 If the chosen detail is missing on the organization (for example Drop Off Ready but no Address), the card falls back
 to the other one ("Call to arrange a drop-off"), so fill in the matching field.
 
+**Wish List:** listings whose **Specifically Requested?** field includes "Specifically Requested" get a
+"Specifically requested" tag and appear on the Wish List (`/wish-list`, linked from the top bar). Listings marked
+"General" appear in search as usual.
+
 Changes show up within about 10 minutes. Vercel's CDN caches the API response
 (`s-maxage=600`), so Airtable is called about once every 10 minutes no matter how much traffic the site gets.
 

@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="/styles.css">
 </head><body>
 
-<div class="topbar" id="topbar"><nav class="wrap" aria-label="Main"><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="9"/><path d="M16 24s-7.5-4.6-7.5-9.6A4.1 4.1 0 0 1 16 12a4.1 4.1 0 0 1 7.5 2.4C23.5 19.4 16 24 16 24z"/></svg><span>Victoria Freebies</span></a><div class="navlinks"><span class="navpill" aria-hidden="true"></span><a href="/" aria-current="page"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4.5 4.5"/></svg>Search</a><a href="/about"><span class="full">Mission &amp; vision</span><span class="short">Mission</span></a><a href="/charities"><span class="full">For charities</span><span class="short">Charities</span></a></div></nav></div>
+<div class="topbar" id="topbar"><nav class="wrap" aria-label="Main"><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="9"/><path d="M16 24s-7.5-4.6-7.5-9.6A4.1 4.1 0 0 1 16 12a4.1 4.1 0 0 1 7.5 2.4C23.5 19.4 16 24 16 24z"/></svg><span>Victoria Freebies</span></a><div class="navlinks"><span class="navpill" aria-hidden="true"></span><a href="/" aria-current="page"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4.5 4.5"/></svg>Search</a><a href="/wish-list">Wish List<span class="new" aria-label="new">NEW</span></a><a href="/about"><span class="full">Mission &amp; vision</span><span class="short">Mission</span></a><a href="/charities"><span class="full">For charities</span><span class="short">Charities</span></a></div></nav></div>
 <header><div class="wrap">
 <div class="hero">
 <p class="place"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.6 6-10A6 6 0 0 0 4 8c0 4.4 6 10 6 10z"/><circle cx="10" cy="8" r="2.2"/></svg>Victoria, BC</p>
@@ -18,12 +18,13 @@
 <div class="filters">
 <div><label for="cat">Type of item</label><select id="cat"><option value="">All types</option></select></div>
 <div><label class="check"><input type="checkbox" id="droponly"> Drop-off ready</label></div>
+<div><label class="check"><input type="checkbox" id="wishonly"> Wish List <span class="new">NEW</span></label></div>
 </div>
 </div>
 </div></div></header>
 
 <main><div class="wrap">
-<section aria-live="polite"><h2 id="rt">What charities need right now</h2><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
+<section aria-live="polite"><h2 id="rt">What charities need right now</h2><p class="wishintro" id="wishintro" hidden>Specific items local charities have asked for right now. These change often, so check back.</p><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
 
 <section><h2>Why use Victoria Freebies?</h2><div class="steps"><div class="step"><h3>No wasted trips, no wasted time</h3><p>Know what a charity wants before you head out.</p></div><div class="step"><h3>Give to a good cause</h3><p>Your things go to local charities and the people they support.</p></div><div class="step"><h3>Less waste</h3><p>Good items find a new home instead of the landfill.</p></div></div></section>
 
@@ -95,7 +96,7 @@ function spot(x){
   return '<div class="spot none"><p class="k">Contact details coming soon</p></div>';
 }
 function card(x){
-  return '<article class="res"><p class="org">'+esc(x.o.name||"")+(x.o.parent?' · '+esc(x.o.parent):'')+'</p><h3 class="want">'+esc(x.title)+'</h3>'
+  return '<article class="res">'+(x.wish?'<p class="wishtag">Specifically requested</p>':'')+'<p class="org">'+esc(x.o.name||"")+(x.o.parent?' · '+esc(x.o.parent):'')+'</p><h3 class="want">'+esc(x.title)+'</h3>'
    +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
@@ -141,18 +142,19 @@ function mixByCharity(rows){
   }
   return out;
 }
+var WISH_ARRIVAL=false;
 var REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches,lastKey="",lastShown=0;
 function render(){
   if(!READY){$("out").innerHTML='<div class="empty"><p>Loading what local charities need…</p></div>';$("morewrap").hidden=true;return}
-  var q=st.q,cat=$("cat").value,dropOnly=$("droponly").checked;
+  var q=st.q,cat=$("cat").value,dropOnly=$("droponly").checked,wishOnly=$("wishonly").checked;
   var rows=LIST.map(function(x){return {x:x,s:score(x,q)}}).filter(function(r){
-    if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;return true});
+    if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;if(wishOnly&&!r.x.wish)return false;return true});
   rows.sort(function(a,b){return (b.s-a.s)||a.x.title.localeCompare(b.x.title)});
   if(!q)rows=mixByCharity(rows);
   var none=q&&!rows.length,h="";
   /* Matches exist, but only at places that ask you to call first: say so instead of "nothing". */
   if(none&&dropOnly){
-    var callRows=LIST.filter(function(x){return score(x,q)>0&&(!cat||x.category===cat)});
+    var callRows=LIST.filter(function(x){return score(x,q)>0&&(!cat||x.category===cat)&&(!wishOnly||x.wish)});
     var nOrgs=callRows.map(function(x){return x.org}).filter(function(v,i,a){return a.indexOf(v)===i}).length;
     if(callRows.length){
       $("rt").textContent="Call ahead for “"+q+"”";
@@ -162,15 +164,16 @@ function render(){
     }
   }
   if(none){
-    rows=LIST.map(function(x){return {x:x,s:1}}).filter(function(r){if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;return true});
+    rows=LIST.map(function(x){return {x:x,s:1}}).filter(function(r){if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;if(wishOnly&&!r.x.wish)return false;return true});
     rows=mixByCharity(rows);
     h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p><p class="meta">Know a charity that takes this? <a href="/charities#form">Tell us</a> and we’ll add it.</p></div>';
   }
-  $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"):"What charities need right now";
+  $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"):(wishOnly?"Wish List":"What charities need right now");
+  $("wishintro").hidden=!wishOnly;
   h+=rows.slice(0,st.shown).map(function(r){return card(r.x)}).join("");
   $("out").innerHTML=h;
   /* Cards slide up and fade in one after another when the results change. "Show more" only animates the new ones. */
-  var key=q+"|"+cat+"|"+dropOnly,from=(key===lastKey&&st.shown>lastShown)?lastShown:0;
+  var key=q+"|"+cat+"|"+dropOnly+"|"+wishOnly,from=(key===lastKey&&st.shown>lastShown)?lastShown:0;
   if(!REDUCED&&(key!==lastKey||from)){Array.prototype.forEach.call($("out").querySelectorAll(".res,.empty"),function(c,i){if(i<from)return;c.style.animationDelay=Math.min(i-from,10)*45+"ms";c.classList.add("rise")})}
   lastKey=key;lastShown=st.shown;
   $("morewrap").hidden=rows.length<=st.shown;
@@ -209,7 +212,10 @@ function load(d){
   var sel=$("cat").value;
   $("cat").innerHTML='<option value="">All types</option>'+cats.map(function(c){return '<option>'+esc(c)+'</option>'}).join("");
   if(cats.indexOf(sel)>-1)$("cat").value=sel;
-  READY=true;render();return true;
+  READY=true;render();
+  /* Arriving at /wish-list from the top bar: jump straight to the list (only the first time it loads). */
+  if(WISH_ARRIVAL){WISH_ARRIVAL=false;var r=$("rt");if(r&&r.scrollIntoView)r.scrollIntoView({block:"start"})}
+  return true;
 }
 function failed(){
   if(READY)return;
@@ -243,6 +249,16 @@ $("q").addEventListener("keydown",function(e){if(e.key==="Enter")submit()});
 var qt;$("q").addEventListener("input",function(){clearTimeout(qt);qt=setTimeout(function(){var v=$("q").value.trim();if(v!==st.q){st.q=v;st.shown=12;render()}},400)});
 $("cat").addEventListener("change",function(){st.shown=12;render()});
 $("droponly").addEventListener("change",function(){st.shown=12;render()});
+/* The Wish List has its own address (/wish-list) so it can be linked from the top bar and shared.
+   Ticking the box switches the address and the highlighted top-bar link; unticking goes back to Search. */
+function setWishPage(on){
+  try{history.replaceState(null,"",on?"/wish-list":"/")}catch(e){}
+  Array.prototype.forEach.call(document.querySelectorAll(".navlinks a"),function(a){
+    var me=a.getAttribute("href")===(on?"/wish-list":"/");if(me)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  document.dispatchEvent(new Event("navchange"));
+}
+$("wishonly").addEventListener("change",function(){st.shown=12;setWishPage(this.checked);render()});
+if(/^\/wish-list\/?$/.test(location.pathname)){$("wishonly").checked=true;setWishPage(true);WISH_ARRIVAL=true}
 $("more").onclick=function(){st.shown+=12;render()};
 try{load(JSON.parse(localStorage.getItem(CACHE_KEY)))}catch(e){}
 render();
