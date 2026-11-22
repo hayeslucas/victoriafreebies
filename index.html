@@ -24,7 +24,14 @@
 </div></div></header>
 
 <main><div class="wrap">
-<section aria-live="polite"><h2 id="rt">What charities need right now</h2><p class="wishintro" id="wishintro" hidden>Specific items local charities have asked for right now. These change often, so check back.</p><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
+<section aria-live="polite"><h2 id="rt">What charities need right now</h2><div class="wishintro" id="wishintro" hidden>
+<p class="lead"><span class="new">NEW</span> Local charities asked for these items for a specific person or program. These are special requests that are needed right now.</p>
+<ul class="wishpoints">
+<li><b>For someone specific.</b> Not general donations: each request comes from a charity with a real person or program in mind.</li>
+<li><b>Needed today.</b> Charities take items down as soon as they have enough, so everything here is still wanted.</li>
+<li><b>Looking for more?</b> <button type="button" class="linkbtn" id="wishall">See all listings</button></li>
+</ul>
+</div><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
 
 <section><h2>Why use Victoria Freebies?</h2><div class="steps"><div class="step"><h3>No wasted trips, no wasted time</h3><p>Know what a charity wants before you head out.</p></div><div class="step"><h3>Give to a good cause</h3><p>Your things go to local charities and the people they support.</p></div><div class="step"><h3>Less waste</h3><p>Good items find a new home instead of the landfill.</p></div></div></section>
 
@@ -53,10 +60,13 @@ var SYNW=SYN.map(words);
 var NAMESTOP=["victoria","society","the","and","of","for","house","centre","program","store","thrift"];
 function syn(w){var o=[];SYNW.forEach(function(g){if(g.indexOf(w)>-1)o=o.concat(g)});return o}
 /* Each word the donor typed scores its best match: exact word 6, same family (parka -> jacket) 4, item type 3, charity name 5. Listings that match every word get a bonus. */
+/* Item details can include what a charity does NOT take ("No pillows."). Leave those sentences out of search,
+   so searching "pillows" doesn't find a listing that turns pillows away. */
+function wanted(items){return String(items||"").split(/(?<=[.;])\s+/).filter(function(p){return !/^(no|not)\b/i.test(p)}).join(" ")}
 function score(x,q){
   var qw=words(q).filter(function(w){return ["the","and","for","of","my","some","old","used","new"].indexOf(w)<0});
   if(!words(q).length)return 1;if(!qw.length)return 0;
-  var t=words(x.title+" "+x.items),c=words(x.category),n=words((x.o.name||"")+" "+(x.o.parent||"")),s=0,hit=0;
+  var t=words(x.title+" "+wanted(x.items)),c=words(x.category),n=words((x.o.name||"")+" "+(x.o.parent||"")),s=0,hit=0;
   qw.forEach(function(w){
     var b=0;
     if(t.indexOf(w)>-1)b=6;
@@ -83,7 +93,9 @@ function howTo(x){
   if(mode==="ready")return o.address?"drop":o.phone?"arrange":"none";
   return o.phone?"call":o.address?"drop":"none";
 }
-function spot(x){
+/* "Drop-off Instructions" on the organization: standing rules shown under every one of its listings. */
+function spot(x){var o=x.o,b=spotBox(x);return o.notes&&b.indexOf("spot none")<0?b.replace(/<\/div>$/,'<p class="notes">'+esc(o.notes)+'</p></div>'):b}
+function spotBox(x){
   var o=x.o,h=howTo(x);
   if(h==="drop"){
     /* Addresses with a street number link to maps (Apple Maps on Apple devices, Google Maps elsewhere);
@@ -100,7 +112,6 @@ function card(x){
    +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
-   +(x.instructions?'<p class="instr">'+esc(x.instructions)+'</p>':'')
    +(x.o.website?'<p class="site"><a href="'+esc(x.o.website)+'" target="_blank" rel="noopener">Visit their website ↗</a></p>':'')
    +'</article>';
 }
@@ -152,6 +163,23 @@ function render(){
   rows.sort(function(a,b){return (b.s-a.s)||a.x.title.localeCompare(b.x.title)});
   if(!q)rows=mixByCharity(rows);
   var none=q&&!rows.length,h="";
+  /* Matches exist, but a category button or the Wish List box is hiding them: say which, with a one-tap way out. */
+  if(none&&(cat||wishOnly)){
+    var hidden=LIST.filter(function(x){return score(x,q)>0&&(!dropOnly||howTo(x)==="drop")});
+    if(hidden.length){
+      var inCat=cat&&hidden.some(function(x){return x.category!==cat}),n=hidden.length;
+      $("rt").textContent=inCat?"“"+q+"” isn’t in "+cat:"“"+q+"” isn’t on the Wish List";
+      $("out").innerHTML='<div class="empty"><p><b>'+(inCat
+        ?'No “'+esc(q)+'” listings under '+esc(cat)+', but there '+(n>1?'are '+n:'is 1')+' in other categories.'
+        :'Nothing on the Wish List for “'+esc(q)+'”, but '+n+' listing'+(n>1?'s':'')+' accept'+(n>1?'':'s')+' it anytime.')
+        +'</b></p><p><button type="button" class="alt" id="widen">'+(inCat?'Search all categories':'Show them')+'</button></p></div>';
+      $("widen").onclick=function(){
+        if(inCat){st.cat="";Array.prototype.forEach.call($("cats").querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",String(!b.getAttribute("data-cat")))});st.shown=12;render()}
+        else $("wishonly").click();
+      };
+      $("morewrap").hidden=true;return;
+    }
+  }
   /* Matches exist, but only at places that ask you to call first: say so instead of "nothing". */
   if(none&&dropOnly){
     var callRows=LIST.filter(function(x){return score(x,q)>0&&(!cat||x.category===cat)&&(!wishOnly||x.wish)});
@@ -168,7 +196,7 @@ function render(){
     rows=mixByCharity(rows);
     h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p><p class="meta">Know a charity that takes this? <a href="/charities#form">Tell us</a> and we’ll add it.</p></div>';
   }
-  $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"):(wishOnly?"Wish List":"What charities need right now");
+  $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"+(cat?" in "+cat:"")):(wishOnly?"Wish List":"What charities need right now");
   $("wishintro").hidden=!wishOnly;
   h+=rows.slice(0,st.shown).map(function(r){return card(r.x)}).join("");
   $("out").innerHTML=h;
@@ -262,6 +290,7 @@ function setWishPage(on){
     var me=a.getAttribute("href")===(on?"/wish-list":"/");if(me)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
   document.dispatchEvent(new Event("navchange"));
 }
+$("wishall").onclick=function(){$("wishonly").click()};
 $("wishonly").addEventListener("change",function(){st.shown=12;setWishPage(this.checked);render()});
 if(/^\/wish-list\/?$/.test(location.pathname)){$("wishonly").checked=true;setWishPage(true);WISH_ARRIVAL=true}
 $("more").onclick=function(){st.shown+=12;render()};
