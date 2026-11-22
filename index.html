@@ -53,34 +53,66 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){retur
 /* Listings come from /api/listings (Airtable, cached on Vercel's CDN). The last good copy is kept in this browser so repeat visits show results at once and the page still works if the API is down. */
 var D={orgs:{},listings:[]},LIST=[],READY=false,CACHE_KEY="vf-listings-v1";
 
-/* Search: words, synonyms and categories, so "parka" finds "winter jackets" and "couch" finds "furniture". */
+/* Search, in three tiers:
+   1. Direct: the listing names what you typed, or a true synonym of it ("parka" finds "winter jackets").
+   2. Catch-all: a listing that takes the whole category your item belongs to ("Clothing" at a thrift store
+      takes winter coats even though it never says "coat"). Shown after the direct matches.
+   3. Pet items, when you didn't ask for pet things ("coat" also matches "pet coats"): shown last. */
 function words(s){return String(s||"").toLowerCase().replace(/[^a-z\s]/g," ").split(/\s+/).filter(function(w){return w.length>1}).map(function(w){return w.length>2?w.replace(/ies$/,"y").replace(/(ch|sh|x|ss)es$/,"$1").replace(/([^s])s$/,"$1"):w})}
-var SYN=["coat jacket parka outerwear winter rain","couch sofa loveseat chair table bed dresser furniture shelf bookcase desk","towel blanket bedding linen sheet comforter duvet quilt","toiletry soap shampoo conditioner toothpaste toothbrush deodorant hygiene razor tampon pad","baby infant toddler kid child toy game","book novel magazine media dvd","clothe clothing shirt pant jean sweater hoodie dress shoe boot sock underwear toque hat glove mitten scarf","dish kitchenware pot pan plate bowl mug cup cutlery kitchen","wheelchair walker cane crutch scooter mobility commode","food canned tuna pasta rice cereal soup bean grocery","pet dog cat puppy kitten animal litter kibble treat leash collar","tv television electronic computer laptop monitor camera phone audio","appliance fridge stove washer dryer microwave vacuum kettle toaster","tool lumber hammer drill saw garden rake shovel wheelbarrow","tent tarp sleeping bag backpack mattress pad"];
-var SYNW=SYN.map(words);
-var NAMESTOP=["victoria","society","the","and","of","for","house","centre","program","store","thrift"];
-function syn(w){var o=[];SYNW.forEach(function(g){if(g.indexOf(w)>-1)o=o.concat(g)});return o}
-/* Each word the donor typed scores its best match: exact word 6, same family (parka -> jacket) 4, item type 3, charity name 5. Listings that match every word get a bonus. */
+/* True synonyms only: words a donor might use for the same thing. */
+var SYN=["coat jacket parka","couch sofa loveseat","blanket comforter duvet quilt bedding","sheet bedding linen","toiletry toiletries","tv television","computer laptop","kid child children","clothe clothing apparel","pant jean trouser","sweater hoodie sweatshirt","shoe sneaker","hat toque beanie","glove mitten","dish plate","cup mug","dresser drawer","bookcase bookshelf","tampon pad menstrual","walker rollator","toy game","book novel","dvd cd media","food grocery","stroller pram","tool drill saw hammer"].map(words);
+function syn(w){var o=[];SYN.forEach(function(g){if(g.indexOf(w)>-1)o=o.concat(g)});return o}
+/* Which category an item belongs to, so its catch-all listings can be added. Keep these in step with the Airtable categories. */
+var CATOF={"Clothing":"coat jacket parka outerwear winter rain clothe clothing apparel shirt pant jean trouser sweater hoodie dress skirt shoe sneaker boot sock underwear toque hat beanie glove mitten scarf belt purse",
+ "Furniture":"couch sofa loveseat chair table bed dresser furniture shelf shelve bookcase bookshelf desk cabinet",
+ "Household":"towel blanket comforter duvet quilt sheet bedding linen pillow curtain dish plate bowl mug cup cutlery pot pan kitchen kitchenware lamp appliance microwave vacuum kettle toaster",
+ "Hygiene":"toiletry soap shampoo conditioner toothpaste toothbrush deodorant razor tampon pad menstrual",
+ "Family & Kids":"baby infant toddler kid child children toy game stroller",
+ "Food":"food canned tuna pasta rice cereal soup bean grocery",
+ "Electronics":"tv television electronic computer laptop monitor camera phone audio speaker",
+ "Camping Gear":"tent tarp sleeping camping"};
+var CATW={};Object.keys(CATOF).forEach(function(k){words(CATOF[k]).forEach(function(w){CATW[w]=k})});
+/* Listings whose title is the category itself ("Clothing", "Household goods", "Apartment-sized furniture"). */
+var BROAD={"Clothing":["clothing","clothe","apparel"],"Household":["household"],"Furniture":["furniture"],"Electronics":["electronic"],"Food":["food"],"Hygiene":["toiletry","hygiene"],"Family & Kids":["family"],"Camping Gear":["camping"]};
+var PETW=words("pet dog cat puppy kitten animal litter kibble leash collar");
+var STOP=["the","and","for","of","my","some","old","used","new","or","a","to","in","with","need","needed"];
+var NAMESTOP=["victoria","society","the","and","of","for","house","centre","program","store","thrift","food","bank","church","street","pantry","community","cooperative"];
 /* Item details can include what a charity does NOT take ("No pillows."). Leave those sentences out of search,
    so searching "pillows" doesn't find a listing that turns pillows away. */
 function wanted(items){return String(items||"").split(/(?<=[.;])\s+/).filter(function(p){return !/^(no|not)\b/i.test(p)}).join(" ")}
+/* Direct score for one listing: exact word 6, synonym 5, charity name 5, category name 5; a bonus when every word matches. */
 function score(x,q){
-  var qw=words(q).filter(function(w){return ["the","and","for","of","my","some","old","used","new"].indexOf(w)<0});
+  var qw=words(q).filter(function(w){return STOP.indexOf(w)<0});
   if(!words(q).length)return 1;if(!qw.length)return 0;
   var t=words(x.title+" "+wanted(x.items)),c=words(x.category),n=words((x.o.name||"")+" "+(x.o.parent||"")),s=0,hit=0;
   qw.forEach(function(w){
     var b=0;
     if(t.indexOf(w)>-1)b=6;
-    else if(syn(w).some(function(v){return v!==w&&qw.indexOf(v)<0&&t.indexOf(v)>-1}))b=4;
-    else if(c.indexOf(w)>-1)b=3;
-    if(NAMESTOP.indexOf(w)<0&&syn(w).length<2&&n.indexOf(w)>-1)b=Math.max(b,5);
+    else if(syn(w).some(function(v){return v!==w&&t.indexOf(v)>-1}))b=5;
+    else if(c.indexOf(w)>-1||syn(w).some(function(v){return c.indexOf(v)>-1}))b=5; // you typed the category itself ("food", "clothes")
+    if(NAMESTOP.indexOf(w)<0&&n.indexOf(w)>-1)b=Math.max(b,5);
     if(b)hit++;s+=b;
   });
   if(hit&&hit===qw.length&&qw.length>1)s+=5;
-  var PW=syn("pet").concat(["pet"]),isPet=x.category==="Pet Supplies"||t.some(function(v){return PW.indexOf(v)>-1}),wantsPet=qw.some(function(w){return PW.indexOf(w)>-1});
+  var isPet=x.category==="Pet Supplies"||t.some(function(v){return PETW.indexOf(v)>-1}),wantsPet=qw.some(function(w){return PETW.indexOf(w)>-1});
   if(wantsPet&&!isPet)return 0;
   if(wantsPet&&isPet&&s)s+=10;
-  if(s&&x.category==="Pet Supplies"&&!qw.some(function(w){return syn("pet").indexOf(w)>-1||w==="pet"}))s-=3;
+  if(s&&isPet&&!wantsPet)s=1;
   return s;
+}
+var SCORES={q:null,by:{}};
+function scoreOf(x,q){
+  if(SCORES.q!==q){
+    var by={},cats={};
+    if(!words(q).some(function(w){return PETW.indexOf(w)>-1}))words(q).forEach(function(w){if(CATW[w])cats[CATW[w]]=1}); // "dog food" is pet food, not people food
+    LIST.forEach(function(l){by[l.id]=score(l,q)});
+    LIST.forEach(function(l){
+      if(by[l.id]>0||!cats[l.category]||!BROAD[l.category])return;
+      if(words(l.title).some(function(w){return BROAD[l.category].indexOf(w)>-1}))by[l.id]=2;
+    });
+    SCORES={q:q,by:by};
+  }
+  return SCORES.by[x.id]||0;
 }
 var APPLE=/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
 function mapsUrl(a){return APPLE?"https://maps.apple.com/?q="+encodeURIComponent(a):"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(a)}
@@ -158,14 +190,14 @@ var REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").ma
 function render(){
   if(!READY){$("out").innerHTML='<div class="empty"><p>Loading what local charities need…</p></div>';$("morewrap").hidden=true;return}
   var q=st.q,cat=st.cat,dropOnly=$("droponly").checked,wishOnly=$("wishonly").checked;
-  var rows=LIST.map(function(x){return {x:x,s:score(x,q)}}).filter(function(r){
+  var rows=LIST.map(function(x){return {x:x,s:scoreOf(x,q)}}).filter(function(r){
     if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;if(wishOnly&&!r.x.wish)return false;return true});
   rows.sort(function(a,b){return (b.s-a.s)||a.x.title.localeCompare(b.x.title)});
   if(!q)rows=mixByCharity(rows);
   var none=q&&!rows.length,h="";
   /* Matches exist, but a category button or the Wish List box is hiding them: say which, with a one-tap way out. */
   if(none&&(cat||wishOnly)){
-    var hidden=LIST.filter(function(x){return score(x,q)>0&&(!dropOnly||howTo(x)==="drop")});
+    var hidden=LIST.filter(function(x){return scoreOf(x,q)>0&&(!dropOnly||howTo(x)==="drop")});
     if(hidden.length){
       var inCat=cat&&hidden.some(function(x){return x.category!==cat}),n=hidden.length;
       $("rt").textContent=inCat?"“"+q+"” isn’t in "+cat:"“"+q+"” isn’t on the Wish List";
@@ -182,7 +214,7 @@ function render(){
   }
   /* Matches exist, but only at places that ask you to call first: say so instead of "nothing". */
   if(none&&dropOnly){
-    var callRows=LIST.filter(function(x){return score(x,q)>0&&(!cat||x.category===cat)&&(!wishOnly||x.wish)});
+    var callRows=LIST.filter(function(x){return scoreOf(x,q)>0&&(!cat||x.category===cat)&&(!wishOnly||x.wish)});
     var nOrgs=callRows.map(function(x){return x.org}).filter(function(v,i,a){return a.indexOf(v)===i}).length;
     if(callRows.length){
       $("rt").textContent="Call ahead for “"+q+"”";
@@ -235,7 +267,7 @@ function submit(){st.q=$("q").value.trim();st.shown=12;render();if(st.q){var r=$
 function load(d){
   if(!d||!Array.isArray(d.listings))return false;
   var today=new Date().toISOString().slice(0,10),orgs=d.orgs||{};
-  D=d;LIST=d.listings.filter(function(x){return !x.expires||x.expires>=today}).map(function(x){x.o=orgs[x.org]||{};return x});
+  D=d;SCORES.q=null;LIST=d.listings.filter(function(x){return !x.expires||x.expires>=today}).map(function(x){x.o=orgs[x.org]||{};return x});
   var cats=[];LIST.forEach(function(x){if(x.category&&cats.indexOf(x.category)<0)cats.push(x.category)});cats.sort();
   /* Category buttons, built from the categories in Airtable: most common first, "Other" last. */
   cats.sort(function(a,b){return (a==="Other")-(b==="Other")||(COMMON[b]||3)-(COMMON[a]||3)||a.localeCompare(b)});

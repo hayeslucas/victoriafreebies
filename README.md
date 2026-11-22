@@ -45,6 +45,11 @@ to the other one ("Call to arrange a drop-off"), so fill in the matching field.
   categories. Broad listings are fine when the charity really takes the whole category (e.g. a thrift store's
   "Clothing"). Wish List = a specific quantity for a specific purpose; anything always accepted is Ongoing.
 
+**Search** (in `index.html`) ranks results in three tiers: listings that name the item or a true synonym
+(`SYN`, e.g. coat = jacket = parka); then catch-all listings for the item's category (`CATOF` maps items to
+categories, `BROAD` says which titles count as catch-alls, e.g. a thrift store's "Clothing"); then pet items when
+the search wasn't about pets. If a new kind of item doesn't find the catch-all listings it should, add it to `CATOF`.
+
 **Keeping wording in sync (important):** a request travels Form → Submission Intake → (approved) →
 automation → Donation Listings → website. The approval automation copies select options **by name**, so these
 fields must have *identical* option names in Submission Intake and Donation Listings:
