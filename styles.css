@@ -294,3 +294,4 @@ header{position:relative}
 }
 @media (max-width:1439px){.fc-more{position:absolute;top:100%;left:max(20px,env(safe-area-inset-left,0px));width:min(320px,calc(100% - 40px))}}
 @media (prefers-reduced-motion:reduce){.fc-pill,.fc-dot{animation:none}.fc-more,.fc-arr,.fc-pill{transition:none}}
+@media (max-width:767px){.fc{display:none}} /* phones: charities use the top bar instead */
