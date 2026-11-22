@@ -115,7 +115,7 @@ function scoreOf(x,q){
   }
   return SCORES.by[x.id]||0;
 }
-/* How many other things each charity (parent organization) accepts, for the "also takes" link on cards. */
+/* How many needs each charity (parent organization) has, for the "has N other needs" link on cards. */
 var COUNT={};
 function base(id){return String(id).split("-")[0]}
 function card(x){
@@ -124,7 +124,7 @@ function card(x){
    +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
-   +'<p class="cardfoot">'+(more>0?'<a class="also" href="'+esc(url)+'">'+esc(topName)+' also takes '+more+' other thing'+(more>1?'s':'')+' <span aria-hidden="true">→</span></a>':'<a class="also" href="'+esc(url)+'">More about '+esc(topName)+' <span aria-hidden="true">→</span></a>')
+   +'<p class="cardfoot">'+(more>0?'<a class="also" href="'+esc(url)+'">'+esc(topName)+' has '+more+' other need'+(more>1?'s':'')+' <span aria-hidden="true">→</span></a>':'<a class="also" href="'+esc(url)+'">More about '+esc(topName)+' <span aria-hidden="true">→</span></a>')
    +(x.wish?'<button type="button" class="sharebtn" data-share="'+esc(x.id)+'">'+VF.SHARE_ICON+'Share</button>':'')+'</p>'
    +'</article>';
 }
