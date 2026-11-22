@@ -79,6 +79,7 @@ export async function buildData() {
     // A listing linked to several organizations (e.g. two thrift stores) becomes one card per organization.
     for (const org of orgIds) listings.push({
       id: orgIds.length > 1 ? `${r.id}-${org}` : r.id,
+      added: r.createdTime || "", // when the listing was created in Airtable; used to show newer listings first
       title,
       org,
       dropoff: dropoffMode(str(f[LISTINGS.dropoff])),

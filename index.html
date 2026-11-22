@@ -102,6 +102,18 @@ function card(x){
    +'</article>';
 }
 var st={q:"",shown:12};
+/* Before a search: take turns between charities (one listing from each, then a second from each, ...)
+   so the first screen shows many charities instead of one charity's whole list. A charity's sites
+   (e.g. Cool Aid's houses) count as one charity. Within a charity, and between charities in each
+   round, the most recently added listing comes first. */
+function mixByCharity(rows){
+  var newest=function(a,b){return String(b.x.added||"").localeCompare(String(a.x.added||""))||a.x.title.localeCompare(b.x.title)};
+  var groups={},order=[];
+  rows.slice().sort(newest).forEach(function(r){var k=r.x.o.parent||r.x.o.name||r.x.org;if(!groups[k]){groups[k]=[];order.push(k)}groups[k].push(r)});
+  var out=[];
+  for(var round=0;out.length<rows.length;round++)order.forEach(function(k){if(groups[k][round])out.push(groups[k][round])});
+  return out;
+}
 var REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches,lastKey="",lastShown=0;
 function render(){
   if(!READY){$("out").innerHTML='<div class="empty"><p>Loading what local charities need…</p></div>';$("morewrap").hidden=true;return}
@@ -109,7 +121,7 @@ function render(){
   var rows=LIST.map(function(x){return {x:x,s:score(x,q)}}).filter(function(r){
     if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;return true});
   rows.sort(function(a,b){return (b.s-a.s)||a.x.title.localeCompare(b.x.title)});
-  if(!q)rows.sort(function(a,b){return String(a.x.o.name).localeCompare(String(b.x.o.name))||a.x.title.localeCompare(b.x.title)});
+  if(!q)rows=mixByCharity(rows);
   var none=q&&!rows.length,h="";
   /* Matches exist, but only at places that ask you to call first: say so instead of "nothing". */
   if(none&&dropOnly){
@@ -124,7 +136,7 @@ function render(){
   }
   if(none){
     rows=LIST.map(function(x){return {x:x,s:1}}).filter(function(r){if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;return true});
-    rows.sort(function(a,b){return String(a.x.o.name).localeCompare(String(b.x.o.name))||a.x.title.localeCompare(b.x.title)});
+    rows=mixByCharity(rows);
     h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p><p class="meta">Know a charity that takes this? <a href="/charities#form">Tell us</a> and we’ll add it.</p></div>';
   }
   $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"):"What charities need right now";
