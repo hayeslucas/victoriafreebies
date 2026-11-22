@@ -1,4 +1,13 @@
 {
   "cleanUrls": true,
-  "rewrites": [{ "source": "/wish-list", "destination": "/" }]
+  "rewrites": [
+    {
+      "source": "/wish-list",
+      "destination": "/"
+    },
+    {
+      "source": "/org/:slug",
+      "destination": "/org"
+    }
+  ]
 }

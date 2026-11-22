@@ -174,3 +174,36 @@ button.more-link{display:inline-block;background:none;border:0;border-radius:0;p
 .formpick p{margin:0 0 8px}
 .formpick p:last-child{margin-top:auto}
 .formpick .bigbtn{border:2px solid var(--brand)}.formpick .bigbtn.alt{border-color:var(--ink)}
+
+/* Cards: charity name links to its page; footer with "also takes" and Share */
+.res .org a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+.res .org a:hover,.res .org a:focus-visible{border-bottom-color:currentColor}
+.cardfoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 0}
+.cardfoot:empty{display:none}
+.also{font:600 17px system-ui,sans-serif;color:var(--brand)}
+button.sharebtn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;font:700 16px system-ui,sans-serif;border-radius:999px;background:var(--card);color:var(--ink);border:2px solid var(--line);margin-left:auto}
+button.sharebtn:hover{border-color:var(--ink)}
+.ico{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* Organization pages */
+.hero .back{margin:0 0 10px;font:600 17px system-ui,sans-serif}.hero .back a{color:var(--brand)}
+.oactions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}
+.oactions .bigbtn,.oactions button{margin:0;display:inline-flex;align-items:center;gap:8px}
+.oactions button{font-size:18px;padding:12px 20px}
+.owish h2 .new{vertical-align:4px}
+.owish .lead{color:var(--mute);margin:-4px 0 16px;font-size:18px}
+.oloc{margin-top:28px}
+.ophone{margin:6px 0 0;font:600 17px system-ui,sans-serif}
+.ocat{margin:22px 0 4px;font:800 14px system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+.oitems{list-style:none;margin:10px 0 0;padding:0}
+.oitems li{padding:14px 0;border-top:1px solid var(--line)}
+.oitems li:first-child{border-top:0}
+.oitems li>b{display:block;font:700 21px/1.3 system-ui,sans-serif;margin:0 0 4px}
+.oitems .items,.oitems .why{margin:0 0 4px;font-size:17px}
+.callnote{margin:4px 0 0;font:600 16px system-ui,sans-serif;color:var(--req)}
+.orglist{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.orglist a{display:flex;justify-content:space-between;gap:12px;padding:16px 18px;background:var(--card);border:2px solid var(--line);border-radius:14px;color:var(--ink);text-decoration:none}
+.orglist a:hover{border-color:var(--brand)}.orglist span{color:var(--mute);white-space:nowrap}
+.flash{animation:flash 2.4s ease-out 1}
+@keyframes flash{0%,30%{box-shadow:0 0 0 4px var(--focus);background:var(--accbg)}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none;box-shadow:0 0 0 3px var(--focus)}}
