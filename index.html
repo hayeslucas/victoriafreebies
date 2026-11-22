@@ -154,6 +154,23 @@ function render(){
   rows.sort(function(a,b){return (b.s-a.s)||a.x.title.localeCompare(b.x.title)});
   if(!q)rows=mixByCharity(rows);
   var none=q&&!rows.length,h="";
+  /* Matches exist, but a category button or the Wish List box is hiding them: say which, with a one-tap way out. */
+  if(none&&(cat||wishOnly)){
+    var hidden=LIST.filter(function(x){return score(x,q)>0&&(!dropOnly||howTo(x)==="drop")});
+    if(hidden.length){
+      var inCat=cat&&hidden.some(function(x){return x.category!==cat}),n=hidden.length;
+      $("rt").textContent=inCat?"“"+q+"” isn’t in "+cat:"“"+q+"” isn’t on the Wish List";
+      $("out").innerHTML='<div class="empty"><p><b>'+(inCat
+        ?'No “'+esc(q)+'” listings under '+esc(cat)+', but there '+(n>1?'are '+n:'is 1')+' in other categories.'
+        :'Nothing on the Wish List for “'+esc(q)+'”, but '+n+' listing'+(n>1?'s':'')+' accept'+(n>1?'':'s')+' it anytime.')
+        +'</b></p><p><button type="button" class="alt" id="widen">'+(inCat?'Search all categories':'Show them')+'</button></p></div>';
+      $("widen").onclick=function(){
+        if(inCat){st.cat="";Array.prototype.forEach.call($("cats").querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",String(!b.getAttribute("data-cat")))});st.shown=12;render()}
+        else $("wishonly").click();
+      };
+      $("morewrap").hidden=true;return;
+    }
+  }
   /* Matches exist, but only at places that ask you to call first: say so instead of "nothing". */
   if(none&&dropOnly){
     var callRows=LIST.filter(function(x){return score(x,q)>0&&(!cat||x.category===cat)&&(!wishOnly||x.wish)});
@@ -170,7 +187,7 @@ function render(){
     rows=mixByCharity(rows);
     h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p><p class="meta">Know a charity that takes this? <a href="/charities#form">Tell us</a> and we’ll add it.</p></div>';
   }
-  $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"):(wishOnly?"Wish List":"What charities need right now");
+  $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"+(cat?" in "+cat:"")):(wishOnly?"Wish List":"What charities need right now");
   $("wishintro").hidden=!wishOnly;
   h+=rows.slice(0,st.shown).map(function(r){return card(r.x)}).join("");
   $("out").innerHTML=h;
