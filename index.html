@@ -102,16 +102,41 @@ function card(x){
    +'</article>';
 }
 var st={q:"",shown:12};
-/* Before a search: take turns between charities (one listing from each, then a second from each, ...)
-   so the first screen shows many charities instead of one charity's whole list. A charity's sites
-   (e.g. Cool Aid's houses) count as one charity. Within a charity, and between charities in each
-   round, the most recently added listing comes first. */
+/* Before a search: show things most people have at home first, with variety.
+   - Charities take turns: one listing from each, then a second from each, ... (a charity's sites,
+     e.g. Cool Aid's houses, count as one charity).
+   - Each charity leads with its most "common" listing: one many donors could give.
+   - Within each round, the same type of item never appears twice in a row.
+   Tune COMMON to change which types come first (higher = earlier). */
+var COMMON={"Clothing":10,"Household":9,"Baby & Kids":8,"Electronics":7,"Furniture":6,"Hygiene":5,"Food":5,"Pet Supplies":4,"Camping Gear":4,"Other":3};
+function commonness(x){
+  var s=COMMON[x.category]||3,it=String(x.items||"");
+  s+=Math.min(it.split(/[;,\n]/).length,5)*0.4;                       // broad lists: more donors have something on them
+  if(/\bgently used\b|\bused\b|\bany\b/i.test(it))s+=1;            // "gently used clothing" is easy to give
+  if(/\(\s*1\s*\)|\(about \d+|\b\d+-cup\b/i.test(it))s-=3;           // one very specific thing, e.g. a 60-cup coffee urn
+  return s;
+}
 function mixByCharity(rows){
-  var newest=function(a,b){return String(b.x.added||"").localeCompare(String(a.x.added||""))||a.x.title.localeCompare(b.x.title)};
   var groups={},order=[];
-  rows.slice().sort(newest).forEach(function(r){var k=r.x.o.parent||r.x.o.name||r.x.org;if(!groups[k]){groups[k]=[];order.push(k)}groups[k].push(r)});
-  var out=[];
-  for(var round=0;out.length<rows.length;round++)order.forEach(function(k){if(groups[k][round])out.push(groups[k][round])});
+  rows.forEach(function(r){var k=r.x.o.parent||r.x.o.name||r.x.org;if(!groups[k]){groups[k]=[];order.push(k)}groups[k].push(r)});
+  var out=[],recent=[],round={};
+  while(out.length<rows.length){
+    /* Each slot: among charities that haven't had a turn this round, take the listing that is most common,
+       docked for repeating a type shown in the last few cards (and heavily for the type right before it). */
+    var pick=null,best=-1e9;
+    order.forEach(function(k){
+      if(round[k])return;
+      groups[k].forEach(function(r,i){
+        var c=r.x.category,rep=recent.filter(function(v){return v===c}).length;
+        var sc=commonness(r.x)-3*rep-(recent[recent.length-1]===c?6:0)+(r.x.added?Date.parse(r.x.added)/1e13:0);
+        if(sc>best){best=sc;pick={k:k,i:i}}
+      });
+    });
+    if(!pick){round={};continue}                                         // every charity has had a turn: next round
+    var r=groups[pick.k].splice(pick.i,1)[0];out.push(r);
+    round[pick.k]=1;if(!groups[pick.k].length)order.splice(order.indexOf(pick.k),1);
+    recent.push(r.x.category);if(recent.length>5)recent.shift();
+  }
   return out;
 }
 var REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches,lastKey="",lastShown=0;
