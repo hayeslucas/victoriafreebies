@@ -144,3 +144,6 @@ button.more-link{display:inline-block;background:none;border:0;border-radius:0;p
 @media (max-width:560px){.topbar nav{padding-block:8px}.navlinks{width:100%;flex-wrap:nowrap;justify-content:space-between}.navlinks a{padding:8px 14px;font-size:16px}.navlinks .full{display:none}.navlinks .short{display:inline}.logo{font-size:21px}.logo-mark{width:30px;height:30px}}
 @media (prefers-reduced-motion:reduce){.navpill,.topbar{transition:none}.logo:hover .logo-mark path,.logo.beat .logo-mark path{animation:none}}
 .goals{padding-left:22px}.goals li{margin-bottom:8px}
+/* Location label above the home headline */
+.place{display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;padding:5px 12px 5px 9px;border-radius:999px;background:var(--card);border:2px solid var(--line);font:700 15px system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--brand)}
+.place svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
