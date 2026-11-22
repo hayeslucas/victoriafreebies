@@ -23,12 +23,12 @@
   function directory(d) {
     var orgs = d.orgs || {}, count = {}, seen = {};
     live(d).forEach(function (x) { var t = VF.topId(x.org, orgs), k = t + "|" + base(x.id); if (!seen[k]) { seen[k] = 1; count[t] = (count[t] || 0) + 1; } });
-    var ids = Object.keys(count).sort(function (a, b) { return orgs[a].name.localeCompare(orgs[b].name); });
+    var ids = Object.keys(count).sort(function (a, b) { return count[b] - count[a] || orgs[a].name.localeCompare(orgs[b].name); }); // most needs first
     document.title = "Local charities · Victoria Freebies";
     $("oname").textContent = "Local charities";
-    $("osub").textContent = "Every charity on Victoria Freebies, and how many things each is asking for right now.";
+    $("osub").textContent = "Every charity on Victoria Freebies, and how many needs each has posted right now.";
     $("page").innerHTML = '<p class="orgcta">Run a charity? <a href="/charities">Post your requests <span aria-hidden="true">→</span></a></p><ul class="orglist">' + ids.map(function (id) {
-      return '<li><a href="/org/' + VF.slug(orgs[id].name) + '"><b>' + esc(orgs[id].name) + "</b><span>" + count[id] + " thing" + (count[id] > 1 ? "s" : "") + "</span></a></li>";
+      return '<li><a href="/org/' + VF.slug(orgs[id].name) + '"><b>' + esc(orgs[id].name) + "</b><span>" + count[id] + " need" + (count[id] > 1 ? "s" : "") + "</span></a></li>";
     }).join("") + "</ul>";
   }
 
