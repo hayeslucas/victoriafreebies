@@ -35,28 +35,27 @@
     if (!strip || !d || !Array.isArray(d.listings)) return;
     var today = new Date().toISOString().slice(0, 10), orgs = d.orgs || {};
     var live = d.listings.filter(function (x) { return !x.expires || x.expires >= today; });
-    var needs = {}, charities = {}, types = {};
+    var needs = {}, charities = {}, locations = {};
     live.forEach(function (x) {
       needs[String(x.id).split("-")[0]] = 1;              // a listing shared by two locations counts once
       var o = orgs[x.org] || {};
       charities[o.parent || o.name || x.org] = 1;          // Cool Aid's sites count as one charity
-      if (x.category) types[x.category] = 1;
+      locations[x.org] = 1;                                // every site or store counts separately
     });
-    var nums = { needs: Object.keys(needs).length, charities: Object.keys(charities).length, types: Object.keys(types).length };
+    var nums = { needs: Object.keys(needs).length, charities: Object.keys(charities).length, locations: Object.keys(locations).length };
     if (!nums.needs) return;
     strip.hidden = false;
     onView(strip, function () {
       strip.querySelectorAll("[data-stat]").forEach(function (el) { countUp(el, nums[el.getAttribute("data-stat")]); });
     });
   }
-  var cached = null;
-  try { cached = JSON.parse(localStorage.getItem(CACHE_KEY)); } catch (e) {}
-  if (cached) showStats(cached);
-  else fetch("/api/listings").then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-    if (!d) return;
+  // Fresh numbers from the API (cached on Vercel's CDN); the copy saved by the home page is only a fallback.
+  fetch("/api/listings").then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
     showStats(d);
     try { localStorage.setItem(CACHE_KEY, JSON.stringify(d)); } catch (e) {}
-  }).catch(function () {});
+  }).catch(function () {
+    try { showStats(JSON.parse(localStorage.getItem(CACHE_KEY))); } catch (e) {}
+  });
 
   /* ---- Timeline: a green line draws down as you scroll, lighting each step it reaches ---- */
   var tl = document.querySelector(".timeline");
