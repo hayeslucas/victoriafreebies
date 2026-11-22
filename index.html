@@ -69,6 +69,22 @@ function score(x,q){
   if(s&&x.category==="Pet Supplies"&&!qw.some(function(w){return syn("pet").indexOf(w)>-1||w==="pet"}))s-=3;
   return s;
 }
+var APPLE=/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+function mapsUrl(a){return APPLE?"https://maps.apple.com/?q="+encodeURIComponent(a):"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(a)}
+function copyOld(t){
+  return new Promise(function(ok,fail){var ta=document.createElement("textarea");ta.value=t;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.top="0";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,t.length);var done=false;try{done=document.execCommand("copy")}catch(e){}document.body.removeChild(ta);done?ok():fail()});
+}
+/* Try the modern clipboard first; if the browser blocks it, fall back to the older copy command. */
+function copyText(t){
+  if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(t).catch(function(){return copyOld(t)});
+  return copyOld(t);
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest&&e.target.closest("button.copy");if(!b)return;
+  var tip=b.parentNode.querySelector(".copied");
+  copyText(b.getAttribute("data-copy")).then(function(){tip.textContent="Copied!"},function(){tip.textContent="Couldn’t copy"}).then(function(){
+    tip.classList.remove("show");void tip.offsetWidth;tip.classList.add("show");clearTimeout(tip._t);tip._t=setTimeout(function(){tip.classList.remove("show");tip.textContent=""},1600)});
+});
 function linkPhones(p){return esc(p).replace(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g,function(m){return '<a href="tel:'+m.replace(/[^0-9+]/g,"")+'">'+m+'</a>'})}
 /* The listing's "Drop off?" field in Airtable decides what the box shows:
    "ready" = drop it off at the address and hours; "phone" = call first.
@@ -80,7 +96,13 @@ function howTo(x){
 }
 function spot(x){
   var o=x.o,h=howTo(x);
-  if(h==="drop")return '<div class="spot"><p class="k">Drop it off at</p><p class="big">'+esc(o.address)+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')+'</div>';
+  if(h==="drop"){
+    /* Addresses with a street number link to maps (Apple Maps on Apple devices, Google Maps elsewhere), plus a copy button.
+       Text like "Multiple Locations" stays plain. */
+    var mappable=/\d/.test(o.address),maps=mappable?mapsUrl(o.address):"";
+    return '<div class="spot"><p class="k">Drop it off at</p><p class="big">'+(mappable?'<a href="'+esc(maps)+'" target="_blank" rel="noopener">'+esc(o.address)+'</a>':esc(o.address))+'</p>'+(o.hours?'<p class="hrs">'+esc(o.hours)+'</p>':'')
+      +(mappable?'<p class="addr-actions"><a class="act" href="'+esc(maps)+'" target="_blank" rel="noopener">Open in Maps ↗</a><button type="button" class="act copy" data-copy="'+esc(o.address)+'">Copy address</button><span class="copied" role="status" aria-live="polite"></span></p>':'')+'</div>';
+  }
   if(h==="arrange")return '<div class="spot"><p class="k">Call to arrange a drop-off</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
   if(h==="call")return '<div class="spot"><p class="k">Call first</p><p class="big">'+linkPhones(o.phone)+'</p></div>';
   return '<div class="spot none"><p class="k">Contact details coming soon</p></div>';
@@ -95,6 +117,7 @@ function card(x){
    +'</article>';
 }
 var st={q:"",shown:12};
+var REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches,lastKey="",lastShown=0;
 function render(){
   if(!READY){$("out").innerHTML='<div class="empty"><p>Loading what local charities need…</p></div>';$("morewrap").hidden=true;return}
   var q=st.q,cat=$("cat").value,dropOnly=$("droponly").checked;
@@ -122,6 +145,10 @@ function render(){
   $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"):"What charities need right now";
   h+=rows.slice(0,st.shown).map(function(r){return card(r.x)}).join("");
   $("out").innerHTML=h;
+  /* Cards slide up and fade in one after another when the results change. "Show more" only animates the new ones. */
+  var key=q+"|"+cat+"|"+dropOnly,from=(key===lastKey&&st.shown>lastShown)?lastShown:0;
+  if(!REDUCED&&(key!==lastKey||from)){Array.prototype.forEach.call($("out").querySelectorAll(".res,.empty"),function(c,i){if(i<from)return;c.style.animationDelay=Math.min(i-from,10)*45+"ms";c.classList.add("rise")})}
+  lastKey=key;lastShown=st.shown;
   $("morewrap").hidden=rows.length<=st.shown;
   clampItems();
 }
@@ -130,7 +157,19 @@ function clampItems(){
   Array.prototype.forEach.call($("out").querySelectorAll(".items.clamp"),function(p){
     if(p.scrollHeight<=p.clientHeight+2)return;
     var b=document.createElement("button");b.type="button";b.className="more-link";b.textContent="Show all items";b.setAttribute("aria-expanded","false");
-    b.onclick=function(){var open=p.classList.toggle("open");b.textContent=open?"Show fewer":"Show all items";b.setAttribute("aria-expanded",String(open))};
+    b.onclick=function(ev){
+      var opening=!p.classList.contains("open");
+      b.textContent=opening?"Show fewer":"Show all items";b.setAttribute("aria-expanded",String(opening));
+      if(!ev||REDUCED){p.classList.toggle("open",opening);return}
+      /* Slide between the two-line and full height: measure both, animate, then hand control back to CSS. */
+      var from=p.offsetHeight;
+      p.classList.toggle("open",opening);
+      var to=opening?p.scrollHeight:p.offsetHeight;
+      p.classList.add("open");
+      p.style.height=from+"px";void p.offsetHeight;
+      p.classList.add("sliding");p.style.height=to+"px";
+      clearTimeout(p._t);p._t=setTimeout(function(){p.classList.remove("sliding");p.style.height="";p.classList.toggle("open",opening)},300);
+    };
     p.parentNode.insertBefore(b,p.nextSibling);
     /* If the searched word is in this list but not the title, open it so the donor sees why it matched. */
     var t=words(p.parentNode.querySelector(".want").textContent),iw=words(p.textContent);
@@ -161,6 +200,20 @@ function fetchListings(){
   }).catch(failed);
 }
 ["Blankets","Winter coats","Socks","Furniture","Canned food","Pet food","Toys","Books"].forEach(function(t){var b=document.createElement("button");b.className="chip";b.type="button";b.textContent=t;b.onclick=function(){$("q").value=t;submit()};$("chips").appendChild(b)});
+/* The search box types and erases examples until the donor clicks into it or types. Static text if they prefer reduced motion. */
+(function(){
+  var q=$("q"),STATIC="For example: winter coat, couch, towels",ex=["winter coat","couch","dog food","towels","toothpaste","sleeping bag","books","dinner plates"],i=0,n=0,del=false;
+  if(REDUCED)return;
+  function tick(){
+    if(document.activeElement===q||q.value){q.placeholder=STATIC;setTimeout(tick,800);return}
+    var w=ex[i];n+=del?-1:1;q.placeholder="Try “"+w.slice(0,n)+"”";
+    var wait=del?40:85;
+    if(!del&&n===w.length){del=true;wait=1500}
+    else if(del&&n===0){del=false;i=(i+1)%ex.length;wait=350}
+    setTimeout(tick,wait);
+  }
+  tick();
+})();
 $("go").onclick=submit;
 $("q").addEventListener("keydown",function(e){if(e.key==="Enter")submit()});
 var qt;$("q").addEventListener("input",function(){clearTimeout(qt);qt=setTimeout(function(){var v=$("q").value.trim();if(v!==st.q){st.q=v;st.shown=12;render()}},400)});
