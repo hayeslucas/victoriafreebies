@@ -34,8 +34,8 @@ Organization pages still list it under each shop.
 
 **Writing listings:** one listing = one kind of item a donor would search for.
 - **Title:** the item, plural, 1–4 words ("Tents and tarps", not "Camping gear is always needed").
-- **Item details:** optional. Only what the title doesn't already say: which kinds, sizes, condition, quantity,
-  and what's *not* wanted. Leave it blank if it would just repeat the title. Condition is one of **New only** ·
+- **Item details:** always fill in, with what the title doesn't already say: which kinds, sizes, condition, quantity,
+  and what's *not* wanted. Don't just repeat the title. Condition is one of **New only** ·
   **New or gently used** · **Any condition**; quantity goes at the end in words ("about 10 needed", "2 needed"; leave it out for just one). Never leave details blank or just a number. Put exclusions in their own
   sentence starting with "No" or "Not accepted" ("No pillows."): search skips those sentences, so a search for
   "pillows" won't find a listing that turns pillows away. Never other kinds of items: if you find yourself listing
