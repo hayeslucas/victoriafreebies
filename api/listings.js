@@ -20,6 +20,7 @@ const LISTINGS = {
   items: "fldJhbzWV0Y4ftROz",
   case: "fld50E7eRJq2Vo82e",
   expires: "fldUf929jkl9X2adv",
+  kw: "fldRQYxOcSWC7hPTp", // "Search words": hidden extra words search matches (lawn mower, weed eater...); not shown on the site
 };
 const ORGS = {
   table: "tbl5P54dhVqE7yqZM",
@@ -114,6 +115,7 @@ export async function buildData() {
       category: str(f[LISTINGS.category]),
       items: str(f[LISTINGS.items]),
       case: str(f[LISTINGS.case]),
+      kw: str(f[LISTINGS.kw]),
       expires: str(f[LISTINGS.expires]),
     });
   }

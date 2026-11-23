@@ -84,7 +84,7 @@ var D={orgs:{},listings:[]},LIST=[],READY=false,CACHE_KEY="vf-listings-v1";
    3. Pet items, when you didn't ask for pet things ("coat" also matches "pet coats"): shown last. */
 function words(s){return String(s||"").toLowerCase().replace(/[^a-z\s]/g," ").split(/\s+/).filter(function(w){return w.length>1}).map(function(w){return w.length>2?w.replace(/ies$/,"y").replace(/(ch|sh|x|ss)es$/,"$1").replace(/([^s])s$/,"$1"):w})}
 /* True synonyms only: words a donor might use for the same thing. */
-var SYN=["coat jacket parka","couch sofa loveseat","blanket comforter duvet quilt bedding","sheet bedding linen","toiletry toiletries","tv television","computer laptop","kid child children","clothe clothing apparel","pant jean trouser","sweater hoodie sweatshirt","shoe sneaker","hat toque beanie","glove mitten","dish plate","cup mug","dresser drawer","bookcase bookshelf","tampon pad menstrual","walker rollator","toy game","book novel","dvd cd media","food grocery","stroller pram","tool drill saw hammer"].map(words);
+var SYN=["coat jacket parka","couch sofa loveseat","blanket comforter duvet quilt bedding","sheet bedding linen","toiletry toiletries","tv television","computer laptop","kid child children","clothe clothing apparel","pant jean trouser","sweater hoodie sweatshirt","shoe sneaker","hat toque beanie","glove mitten","dish plate","cup mug","dresser drawer","bookcase bookshelf","tampon menstrual period","walker rollator","toy game","book novel","dvd cd media","food grocery","stroller pram","tool drill saw hammer"].map(words);
 function syn(w){var o=[];SYN.forEach(function(g){if(g.indexOf(w)>-1)o=o.concat(g)});return o}
 /* Which category an item belongs to, so its catch-all listings can be added. Keep these in step with the Airtable categories. */
 var CATOF={"Clothing":"coat jacket parka outerwear winter rain clothe clothing apparel shirt pant jean trouser sweater hoodie dress skirt shoe sneaker boot sock underwear toque hat beanie glove mitten scarf belt purse",
@@ -94,10 +94,11 @@ var CATOF={"Clothing":"coat jacket parka outerwear winter rain clothe clothing a
  "Family & Kids":"baby infant toddler kid child children toy game stroller",
  "Food":"food canned tuna pasta rice cereal soup bean grocery",
  "Electronics":"tv television electronic computer laptop monitor camera phone audio speaker",
- "Camping Gear":"tent tarp sleeping camping"};
+ "Camping Gear":"tent tarp sleeping camping",
+ "Garden":"garden gardening yard lawn mower lawnmower trimmer hedge weed whacker eater blower leaf rake shovel spade hoe trowel pruner pruning shear wheelbarrow hose planter"};
 var CATW={};Object.keys(CATOF).forEach(function(k){words(CATOF[k]).forEach(function(w){CATW[w]=k})});
 /* Listings whose title is the category itself ("Clothing", "Household goods", "Apartment-sized furniture"). */
-var BROAD={"Clothing":["clothing","clothe","apparel"],"Household":["household"],"Furniture":["furniture"],"Electronics":["electronic"],"Food":["food"],"Hygiene":["toiletry","hygiene"],"Family & Kids":["family"],"Camping Gear":["camping"]};
+var BROAD={"Clothing":["clothing","clothe","apparel"],"Household":["household"],"Furniture":["furniture"],"Electronics":["electronic"],"Food":["food"],"Hygiene":["toiletry","hygiene"],"Family & Kids":["family"],"Camping Gear":["camping"],"Garden":["garden","gardening","yard"]};
 var PETW=words("pet dog cat puppy kitten animal litter kibble leash collar");
 var STOP=["the","and","for","of","my","some","old","used","new","or","a","to","in","with","need","needed"];
 var NAMESTOP=["victoria","society","the","and","of","for","house","centre","program","store","thrift","food","bank","church","street","pantry","community","cooperative"];
@@ -108,31 +109,41 @@ function wanted(items){return String(items||"").split(/(?<=[.;])\s+/).filter(fun
 function score(x,q){
   var qw=words(q).filter(function(w){return STOP.indexOf(w)<0});
   if(!words(q).length)return 1;if(!qw.length)return 0;
-  var t=words(x.title+" "+wanted(x.items)),c=words(x.category),n=words((x.sites||[x.o]).map(function(o){return [o.name,o.short,o.parent,o.parentShort,o.address].join(" ")}).join(" ")),s=0,hit=0;
+  var t=words(x.title+" "+wanted(x.items)),k=words(x.kw),c=words(x.category),n=words((x.sites||[x.o]).map(function(o){return [o.name,o.short,o.parent,o.parentShort,o.address].join(" ")}).join(" ")),s=0,hit=0;
   qw.forEach(function(w){
     var b=0;
     if(t.indexOf(w)>-1)b=6;
     else if(syn(w).some(function(v){return v!==w&&t.indexOf(v)>-1}))b=5;
+    else if(k.indexOf(w)>-1||syn(w).some(function(v){return k.indexOf(v)>-1}))b=5; // "Search words" in Airtable (hidden), e.g. lawn mower on a garden-tools listing
     else if(c.indexOf(w)>-1||syn(w).some(function(v){return c.indexOf(v)>-1}))b=5; // you typed the category itself ("food", "clothes")
     if(NAMESTOP.indexOf(w)<0&&n.indexOf(w)>-1)b=Math.max(b,5);
     if(b)hit++;s+=b;
   });
   if(hit&&hit===qw.length&&qw.length>1)s+=5;
+  FULL[x.id]=hit===qw.length;
   var isPet=x.category==="Pet Supplies"||t.some(function(v){return PETW.indexOf(v)>-1}),wantsPet=qw.some(function(w){return PETW.indexOf(w)>-1});
   if(wantsPet&&!isPet)return 0;
   if(wantsPet&&isPet&&s)s+=10;
   if(s&&isPet&&!wantsPet)s=1;
   return s;
 }
-var SCORES={q:null,by:{}};
+var SCORES={q:null,by:{}},FULL={};
 function scoreOf(x,q){
   if(SCORES.q!==q){
     var by={},cats={};
     if(!words(q).some(function(w){return PETW.indexOf(w)>-1}))words(q).forEach(function(w){if(CATW[w])cats[CATW[w]]=1}); // "dog food" is pet food, not people food
-    LIST.forEach(function(l){by[l.id]=score(l,q)});
+    FULL={};LIST.forEach(function(l){by[l.id]=score(l,q)});
+    /* Two or more words ("pressure washer", "dog food"): if some listings match every word, drop the ones that only
+       match some of them (a clothes "washer", a "dog" bed). Catch-all listings below are added back separately. */
+    if(LIST.some(function(l){return by[l.id]>1&&FULL[l.id]})&&words(q).filter(function(w){return STOP.indexOf(w)<0}).length>1)
+      LIST.forEach(function(l){if(by[l.id]>1&&!FULL[l.id])by[l.id]=0});
     LIST.forEach(function(l){
-      if(by[l.id]>0||!cats[l.category]||!BROAD[l.category])return;
-      if(words(l.title).some(function(w){return BROAD[l.category].indexOf(w)>-1}))by[l.id]=2;
+      if(by[l.id]>0)return;
+      /* "Garden" isn't an Airtable category (garden listings are under Other), so it matches on the title alone. */
+      Object.keys(cats).forEach(function(k){
+        if(!BROAD[k]||(k!=="Garden"&&l.category!==k))return;
+        if(words(l.title).some(function(w){return BROAD[k].indexOf(w)>-1}))by[l.id]=2;
+      });
     });
     SCORES={q:q,by:by};
   }

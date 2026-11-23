@@ -51,10 +51,17 @@ Organization pages still list it under each shop.
   categories. Broad listings are fine when the charity really takes the whole category (e.g. a thrift store's
   "Clothing"). Wish List = a specific quantity for a specific purpose; anything always accepted is Ongoing.
 
+**Search words** (Donation Listings → **Search words**, hidden on the site): extra words donors might type, separated by
+commas ("lawn mower, weed eater, leaf blower" on Habitat's "Garden and outdoor"). Search treats them almost like the
+title. The Friday scheduled task fills them in for any active listing where they're blank and never overwrites
+words someone typed; add a word any time a search should have found a listing. Only list things the listing really accepts.
+
 **Search** (in `index.html`) ranks results in three tiers: listings that name the item or a true synonym
 (`SYN`, e.g. coat = jacket = parka); then catch-all listings for the item's category (`CATOF` maps items to
 categories, `BROAD` says which titles count as catch-alls, e.g. a thrift store's "Clothing"); then pet items when
-the search wasn't about pets. If a new kind of item doesn't find the catch-all listings it should, add it to `CATOF`.
+the search wasn't about pets. With two or more words, if some listings match every word, listings matching only some
+of them are dropped ("pressure washer" doesn't find a clothes "washer"). "Garden" is a search group even though
+garden listings sit under the Other category: mower, trimmer, wheelbarrow and so on find listings with "garden" or "yard" in the title. If a new kind of item doesn't find the catch-all listings it should, add it to `CATOF`.
 
 **Organization pages** (`/org/<name>`, built by `org.js` from the same API data): one page per parent
 organization (all of Cool Aid's sites share `/org/victoria-cool-aid-society`), with one section per site (Organizations → **Page Order** first, e.g. REES 1 and Rock Bay
