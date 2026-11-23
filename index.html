@@ -43,7 +43,12 @@
 </ul>
 </div><div class="duo" id="duo">
 <div class="mapcard tile" id="mapcard">
-<div class="mapbar"><div class="legend"><p><span class="k-pin" aria-hidden="true"></span><span><b>Drop off</b> during open hours</span></p><p><span class="k-area" aria-hidden="true"></span><span><b>Call or email first:</b> location shown roughly for privacy</span></p></div><button type="button" class="alt mapclose" id="mapclose">Close map ✕</button></div>
+<div class="mapbar">
+<form class="mapsearch" id="mapsearch" role="search"><input type="search" id="mapq" placeholder="Search an item" aria-label="Search an item" autocomplete="off" enterkeyhint="search"><button type="submit">Search</button></form>
+<button type="button" class="alt mapclose" id="mapclose">Close ✕</button>
+<p class="mapstatus" id="mapstatus" aria-live="polite"></p>
+<div class="legend"><p><span class="k-pin" aria-hidden="true"></span><span><b>Drop off</b> during open hours</span></p><p><span class="k-area" aria-hidden="true"></span><span><b>Call or email first:</b> location shown roughly for privacy</span></p></div>
+</div>
 <div class="map" id="map" role="region" aria-label="Map of the places in these results"></div>
 <button type="button" class="tilefoot" id="mapbig" aria-expanded="false"><b id="mapcount">Places to give</b><span>See the map <span aria-hidden="true">→</span></span></button>
 </div>
@@ -244,7 +249,7 @@ function render(){
    visit), so every charity gets its turn near the top. After a search it lists the charities that match, most matches first. */
 var RANK={};
 function tiles(xs,q){
-  $("duo").hidden=!xs.length;
+  $("duo").hidden=!xs.length&&!(window.VFMap&&VFMap.isBig()); // keep the full-screen map open even when a new search finds nothing
   if(window.VFMap)VFMap.show(xs,q);
   var orgs=D.orgs||{},n={},seen={};
   xs.forEach(function(x){var t=VF.topId(x.org,orgs),k=t+"|"+base(x.id);if(!seen[k]){seen[k]=1;n[t]=(n[t]||0)+1}});
@@ -292,6 +297,8 @@ function clampItems(){
 /* The search goes in the address (/?q=couch), so going to a charity's page and pressing Back brings the results back,
    and a search can be shared as a link. */
 function keepQ(){try{history.replaceState(null,"",($("wishonly").checked?"/wish-list":"/")+(st.q?"?q="+encodeURIComponent(st.q):""))}catch(e){}}
+/* A search typed in the full-screen map: same as the main search box, without scrolling the page underneath. */
+window.VFSearch=function(v){$("q").value=v;st.q=v.trim();st.shown=12;keepQ();render()};
 function submit(){st.q=$("q").value.trim();st.shown=12;keepQ();render();if(st.q){var r=$("rt");if(r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"start"})}}
 function load(d){
   if(!d||!Array.isArray(d.listings))return false;

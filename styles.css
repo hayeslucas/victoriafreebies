@@ -333,8 +333,14 @@ header{position:relative}
 .tilefoot[role=button]{cursor:pointer}.tilefoot.note>span{color:var(--mute);font-weight:500;font-size:14px}
 @media (max-width:600px){.duo{gap:10px}.map{height:100px}.tilefoot{padding:8px 12px 10px;font-size:14px}.tilefoot b{font-size:16px}.clist{padding:6px 12px 0;font-size:14px}.clist li:nth-child(n+3){display:none}.clist a{flex-direction:column;gap:0;padding:4px 0}.clist span{white-space:normal}}
 /* Full screen */
-.mapbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px 8px 14px;border-bottom:2px solid var(--line);background:var(--card)}
-.legend{font:15px/1.35 system-ui,sans-serif;color:var(--ink)}.legend p{margin:2px 0;display:flex;align-items:center;gap:8px}
+.mapbar{display:grid;grid-template-columns:1fr auto;gap:8px 10px;align-items:center;padding:10px 12px 10px 14px;border-bottom:2px solid var(--line);background:var(--card)}
+.mapsearch{display:flex;gap:8px;min-width:0;max-width:560px}
+.mapsearch input{font-size:17px;padding:9px 12px;border-radius:10px}
+.mapsearch button{padding:9px 16px;font-size:16px;border-radius:10px;flex:0 0 auto}
+.mapstatus{grid-column:1/-1;margin:0;font:16px/1.35 system-ui,sans-serif}
+.mapstatus .linkbtn{font-size:16px}
+.mapbar .legend{grid-column:1/-1}
+.legend{font:14px/1.35 system-ui,sans-serif;color:var(--mute);display:flex;flex-wrap:wrap;gap:2px 18px}.legend p{margin:2px 0;display:flex;align-items:center;gap:8px}
 .k-pin{width:13px;height:13px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#0b5d57;display:inline-block;flex:0 0 auto}
 .k-area{width:15px;height:15px;border-radius:50%;background:rgba(224,138,0,.25);border:2px solid #c06f00;display:inline-block;flex:0 0 auto}
 button.mapclose{flex:0 0 auto;padding:8px 14px;font-size:15px}

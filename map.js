@@ -10,6 +10,7 @@
   "use strict";
   var esc = VF.esc, box = document.getElementById("mapcard"); if (!box) return;
   var el = document.getElementById("map"), btn = document.getElementById("mapbig"), closeBtn = document.getElementById("mapclose"), countEl = document.getElementById("mapcount");
+  var statusEl = document.getElementById("mapstatus"), form = document.getElementById("mapsearch"), mapq = document.getElementById("mapq");
   var LEAFLET = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
   var CLUSTER = "https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/";
   var map = null, layer = null, pins = null, pending = null, loading = false, fitted = "", HOME = [48.4284, -123.3656];
@@ -84,11 +85,15 @@
   var lastQ = "";
   function draw(rows, q) {
     pending = rows; if (q !== undefined) lastQ = q || "";
-    if (!rows.length) return;
-    /* The box's headline: how many places, before the map itself has even loaded. */
-    var all = places(rows).list.length;
-    countEl.textContent = all + " place" + (all === 1 ? "" : "s") + (lastQ ? " for “" + lastQ + "”" : " to give");
+    /* The box's headline and the full map's status line: how many places, before the map itself has even loaded. */
+    var all = places(rows).list.length, words = all + " place" + (all === 1 ? "" : "s");
+    if (rows.length) countEl.textContent = words + (lastQ ? " for “" + lastQ + "”" : " to give");
+    statusEl.innerHTML = lastQ
+      ? (all ? "Showing <b>" + words + "</b> for “" + esc(lastQ) + "”" : "Nothing on the map for “" + esc(lastQ) + "” right now") + ' · <button type="button" class="linkbtn" id="mapall">Show everything</button>'
+      : "Showing <b>" + words + "</b> to give";
+    var allBtn = document.getElementById("mapall"); if (allBtn) allBtn.onclick = function () { mapq.value = ""; window.VFSearch && VFSearch(""); };
     if (!map) return;
+    if (!rows.length) { layer.clearLayers(); pins.clearLayers(); fitted = ""; return; }
     layer.clearLayers(); pins.clearLayers();
     var r = places(rows), pts = [];
     /* Call-first areas share rounded positions, so several places can land on the same spot (e.g. Cool Aid's
@@ -129,14 +134,17 @@
   /* Full screen and back. The close button or Escape closes it. */
   function setBig(on) {
     box.classList.toggle("big", on); document.documentElement.classList.toggle("mapopen", on);
+    if (on) mapq.value = lastQ;
     btn.setAttribute("aria-expanded", String(on));
     if (map) { touch(on); map.invalidateSize(false); setTimeout(function () { map.invalidateSize(); fitted = ""; draw(pending || []); }, 60); }
     else start();
     (on ? closeBtn : btn).focus();
   }
   box.addEventListener("click", function (e) { if (!box.classList.contains("big")) setBig(true); });
+  /* Search again without leaving the map. */
+  form.onsubmit = function (e) { e.preventDefault(); mapq.blur(); window.VFSearch && VFSearch(mapq.value); };
   closeBtn.onclick = function (e) { e.stopPropagation(); setBig(false); };
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && box.classList.contains("big")) setBig(false); });
 
-  window.VFMap = { show: draw };
+  window.VFMap = { show: draw, isBig: function () { return box.classList.contains("big"); } };
 })();
