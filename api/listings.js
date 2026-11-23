@@ -34,6 +34,8 @@ const ORGS = {
   parent: "fldWQp9IZSi1b8cEX", // "Parent Organization", e.g. Swift House -> Victoria Cool Aid Society
   notes: "fldDYgz4NJJM44ziv", // "Drop-off Instructions": standing rules shown in the drop-off box of every listing for this organization
   donate: "fldHUMhogSdDRKrcP", // "Donate Link": the charity's page for giving money, shown on its organization page
+  lat: "fldEd1ZobpAECdxNI", // "Latitude" / "Longitude": where the pin goes on the home page map (from the address)
+  lng: "fld79kPw5VtX54l3D",
 };
 
 // Only listings that are switched on, active, and not past their expiry date.
@@ -69,7 +71,25 @@ const pick = (spec) => Object.entries(spec).filter(([k]) => k !== "table").map((
 const dropoffMode = (v) => (/email/i.test(v) ? "email" : /\bcall\b|phone/i.test(v) ? "phone" : /drop/i.test(v) ? "ready" : "");
 // "Specifically Requested?" options: the Wish List option must contain "Wish" (or "Specific"); anything else is a general listing.
 const isWish = (v) => /wish|specific/i.test(v);
-const str = (v) => (v == null ? "" : typeof v === "object" && v.name ? v.name : String(v)).trim();
+const str = (v) => (v == null ? "" : typeof v === "object" && v.name ? v.name : String(v)).replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
+
+// Map positions: Organizations -> Latitude / Longitude. If a place has an Address but no position yet
+// (e.g. it was just added), look the address up on OpenStreetMap so it still appears on the map.
+// Remembered while this server instance lives; the CDN cache means this runs about once per 10 minutes at most.
+const GEO = new Map();
+async function geocode(addr) {
+  if (GEO.has(addr)) return GEO.get(addr);
+  const q = /\bBC\b|British Columbia/i.test(addr) ? addr : addr + ", BC";
+  let hit = null;
+  try {
+    const u = "https://nominatim.openstreetmap.org/search?" + new URLSearchParams({ q: q.replace(/^\s*[#\w-]+\s*[-\u2013]\s*(?=\d)/, ""), format: "json", limit: "1", countrycodes: "ca", viewbox: "-123.9,48.8,-123.2,48.25" });
+    const res = await fetch(u, { headers: { "User-Agent": "VictoriaFreebies-map/1.0" }, signal: AbortSignal.timeout(2500) });
+    const d = res.ok ? await res.json() : [];
+    if (d && d[0]) hit = [Number(d[0].lat), Number(d[0].lon)];
+  } catch (e) { /* no position this time; the place is just left off the map */ }
+  GEO.set(addr, hit);
+  return hit;
+}
 
 export async function buildData() {
   const [listingRecs, orgRecs] = await Promise.all([
@@ -108,6 +128,25 @@ export async function buildData() {
   };
   const send = new Set(used);
   for (const id of used) if (byId[id] && parentOf(byId[id])) send.add(parentOf(byId[id]));
+  // Privacy: a place only shows its address if at least one of its listings says "drop it off here"
+  // (same rule as the cards in cards.js). Call-first and email-first places get no address, and the map
+  // gets only a rounded position (about 1 km) so donors can see the area without finding the door.
+  const showsAddress = new Set();
+  for (const l of listings) {
+    const f = byId[l.org] && byId[l.org].fields;
+    if (!f || !str(f[ORGS.address])) continue;
+    const m = l.dropoff, phone = str(f[ORGS.phone]);
+    if (m === "ready" || m === "" || (m === "phone" && !phone)) showsAddress.add(l.org);
+  }
+  const num = (v) => (typeof v === "number" && isFinite(v) ? v : null);
+  const looked = {};
+  let lookups = 0;
+  for (const id of used) {
+    if (lookups >= 3) break; // keep the response quick; the rest are found on later refreshes
+    const f = byId[id] && byId[id].fields, a = f && str(f[ORGS.address]);
+    if (a && (num(f[ORGS.lat]) == null || num(f[ORGS.lng]) == null)) { if (!GEO.has(a)) lookups++; looked[id] = await geocode(a); } // one at a time: OpenStreetMap asks for no more than one lookup a second
+  }
+  const round2 = (v) => Math.round(v * 100) / 100;
   const orgs = {};
   for (const r of orgRecs) {
     if (!send.has(r.id)) continue;
@@ -128,6 +167,14 @@ export async function buildData() {
       notes: str(f[ORGS.notes]),
       donate: str(f[ORGS.donate]),
     };
+    const exact = showsAddress.has(r.id), g = looked[r.id];
+    const lat = num(f[ORGS.lat]) != null ? num(f[ORGS.lat]) : g ? g[0] : null, lng = num(f[ORGS.lng]) != null ? num(f[ORGS.lng]) : g ? g[1] : null;
+    if (!exact && used.has(r.id)) { orgs[r.id].address = ""; orgs[r.id].hours = ""; }
+    if (used.has(r.id) && lat != null && lng != null) {
+      orgs[r.id].lat = exact ? lat : round2(lat);
+      orgs[r.id].lng = exact ? lng : round2(lng);
+      if (!exact) orgs[r.id].approx = true;
+    }
   }
 
   return { synced: new Date().toISOString(), orgs, listings };
