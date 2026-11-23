@@ -310,22 +310,36 @@ header{position:relative}
 .moresites summary::after{content:"";width:8px;height:8px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .2s}
 .moresites[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
 .moresites[open] .sites{animation:rise .3s ease both}
-/* Home page map (map.js): small above the results, full screen with "Open map". */
-.mapcard{position:relative;z-index:0;background:var(--card);border:2px solid var(--line);border-radius:16px;overflow:hidden;margin:0 0 18px}
-.mapbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px 8px 14px;border-bottom:2px solid var(--line)}
-.mapnote{font:600 15px/1.35 system-ui,sans-serif;color:var(--mute);margin:0;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}
-.mapnote span{display:inline-flex;align-items:center;gap:6px}
-.k-pin::before{content:"";width:12px;height:12px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--brand);display:inline-block}
-.k-area::before{content:"";width:14px;height:14px;border-radius:50%;background:rgba(224,138,0,.25);border:2px solid #c06f00;display:inline-block}
-.k-off{font-weight:500}
-button.mapbig{flex:0 0 auto;padding:8px 14px;font-size:15px;border-width:2px;display:inline-flex;align-items:center;gap:6px}
-.mapbig .ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.map{height:280px;background:#e8eef0}
-.leaflet-tile-pane{filter:saturate(.45) brightness(1.06) contrast(.92)}
-@media (max-width:760px){.map{height:170px}.mapnote{font-size:14px;gap:2px 12px}.mapcard:not(.big) .k-off,.mapcard:not(.big) .leaflet-control-zoom{display:none}}
-.mapcard.big{position:fixed;inset:0;z-index:2000;margin:0;border:0;border-radius:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+/* The two boxes above the results: the map (map.js, full screen when tapped) and the charities box. */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 0 20px}
+.tile{min-width:0;background:var(--card);border:2px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .15s}
+.tile:hover,.tile:focus-within{border-color:var(--brand)}
+.tilefoot{display:block;width:100%;text-align:left;background:none;border:0;border-radius:0;padding:10px 16px 12px;margin-top:auto;color:inherit;text-decoration:none;font:600 16px/1.3 system-ui,sans-serif}
+.tilefoot b{display:block;font:700 19px/1.25 system-ui,sans-serif;color:var(--ink)}
+.tilefoot>span{color:var(--brand)}
+.mapcard{position:relative;z-index:0;cursor:pointer}
+.mapcard:not(.big) .map,.mapcard:not(.big) .map *{pointer-events:none!important}
+.mapcard:not(.big) .leaflet-control-attribution{font-size:9px;line-height:1.3;padding:0 4px}
+.mapcard:not(.big) .leaflet-attribution-flag{display:none!important}
+.mapcard:not(.big) .mapbar,.mapcard:not(.big) .leaflet-control-zoom{display:none}
+.map{height:118px;background:#e8eef0}
+.clist{list-style:none;margin:0;padding:8px 16px 0;font:600 16px/1.3 system-ui,sans-serif}
+.clist li{border-bottom:1px solid var(--line)}.clist li:last-child{border:0}
+.clist a{display:flex;justify-content:space-between;gap:10px;padding:6px 0;color:var(--ink);text-decoration:none}
+.clist a:hover span{color:var(--brand);text-decoration:underline}
+.clist span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.clist em{font-style:normal;color:var(--mute);font-weight:500;white-space:nowrap}
+@media (max-width:600px){.duo{gap:10px}.map{height:100px}.tilefoot{padding:8px 12px 10px;font-size:14px}.tilefoot b{font-size:16px}.clist{padding:6px 12px 0;font-size:14px}.clist li:nth-child(n+3){display:none}.clist a{flex-direction:column;gap:0;padding:4px 0}}
+/* Full screen */
+.mapbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px 8px 14px;border-bottom:2px solid var(--line);background:var(--card)}
+.legend{font:15px/1.35 system-ui,sans-serif;color:var(--ink)}.legend p{margin:2px 0;display:flex;align-items:center;gap:8px}
+.k-pin{width:13px;height:13px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#0b5d57;display:inline-block;flex:0 0 auto}
+.k-area{width:15px;height:15px;border-radius:50%;background:rgba(224,138,0,.25);border:2px solid #c06f00;display:inline-block;flex:0 0 auto}
+button.mapclose{flex:0 0 auto;padding:8px 14px;font-size:15px}
+.mapcard.big{position:fixed;inset:0;z-index:2000;margin:0;border:0;border-radius:0;cursor:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .mapcard.big .map{flex:1;height:auto}
+.mapcard.big .tilefoot{display:none}
 html.mapopen,html.mapopen body{overflow:hidden}
+@media (max-width:600px){.legend{font-size:13px}}
 .mpin{background:none;border:0}
 .mpin span{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#0b5d57;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);color:#fff;font:700 14px system-ui,sans-serif}
 .mpin b{transform:rotate(45deg);line-height:1}

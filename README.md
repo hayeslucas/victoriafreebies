@@ -65,8 +65,10 @@ sheet as "More…"). **Preferred Name** (e.g. "Cool Aid") is used where space is
 card lines and footers, share messages, tab titles. The full Name stays on the page heading. The page address comes from the organization's name, so renaming
 an organization in Airtable changes its link.
 
-**Map** (`map.js`, on the home page above the results): shows where the current results are and follows the
-search, category and filters; "Open map" makes it full screen. Positions come from Organizations → **Latitude** /
+**Map and charities boxes** (home page, above the results, side by side): a small map (`map.js`) that opens full
+screen when tapped, and a charities box listing charities with their number of needs (random order each visit, so
+every charity gets a turn near the top; after a search, the matching charities, most matches first). Both follow the
+search, category and filters. Positions come from Organizations → **Latitude** /
 **Longitude**. If those are blank, the site looks the Address up on OpenStreetMap by itself, so new places appear
 without any extra step; fill them in by hand only if a pin lands in the wrong spot. Pins close together group into
 one bubble showing their total needs. Places with a drop-off listing get a pin with their address. Call-first and email-first places get a shaded
