@@ -5,6 +5,7 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   var APPLE = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
   function mapsUrl(a) { return APPLE ? "https://maps.apple.com/?q=" + encodeURIComponent(a) : "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(a); }
+  function emailLink(e) { return '<a href="mailto:' + esc(e) + '">' + esc(e) + "</a>"; }
   function linkPhones(p) { return esc(p).replace(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g, function (m) { return '<a href="tel:' + m.replace(/[^0-9+]/g, "") + '">' + m + "</a>"; }); }
   /* Addresses with a street number link to maps (Apple Maps on Apple devices, Google Maps elsewhere);
      hovering shows "Open in Maps". Text like "Multiple Locations" stays plain. */
@@ -17,6 +18,7 @@
      If the chosen detail is missing, fall back to the other so the donor still has a way to reach them. */
   function howTo(x) {
     var o = x.o, mode = x.dropoff || (o.address ? "ready" : "phone");
+    if (mode === "email") return o.email ? "email" : o.phone ? "call" : "none"; // "Email first": never fall back to the address
     if (mode === "ready") return o.address ? "drop" : o.phone ? "arrange" : "none";
     return o.phone ? "call" : o.address ? "drop" : "none";
   }
@@ -25,10 +27,30 @@
     if (h === "drop") return '<div class="spot"><p class="k">Drop it off at</p><p class="big">' + addressLink(o.address) + "</p>" + (o.hours ? '<p class="hrs">' + esc(o.hours) + "</p>" : "") + "</div>";
     if (h === "arrange") return '<div class="spot"><p class="k">Call to arrange a drop-off</p><p class="big">' + linkPhones(o.phone) + "</p></div>";
     if (h === "call") return '<div class="spot"><p class="k">Call first</p><p class="big">' + linkPhones(o.phone) + "</p></div>";
+    if (h === "email") return '<div class="spot"><p class="k">Email first</p><p class="big">' + emailLink(o.email) + "</p></div>";
     return '<div class="spot none"><p class="k">Contact details coming soon</p></div>';
   }
+  /* One listing at several shops (e.g. Beacon's three thrift shops): one card, the first shop shown in full,
+     the others in a drop-down. Each shop follows the same rule as a single card (call-first shows no address). */
+  function siteLine(x, o) {
+    var h = howTo({ dropoff: x.dropoff, o: o }), name = '<b class="sname">' + esc(short(o)) + "</b>";
+    if (h === "drop") return '<li>' + name + '<span class="saddr">' + addressLink(o.address) + "</span>" + (o.hours ? '<span class="shrs">' + esc(o.hours) + "</span>" : "") + "</li>";
+    if (h === "call" || h === "arrange") return '<li>' + name + '<span class="sphone">' + linkPhones(o.phone) + "</span></li>";
+    if (h === "email") return '<li>' + name + '<span class="sphone">' + emailLink(o.email) + "</span></li>";
+    return '<li>' + name + "<span>Contact details coming soon</span></li>";
+  }
+  function multiSpot(x) {
+    var sites = x.sites, h = howTo({ dropoff: x.dropoff, o: sites[0] }), n = sites.length;
+    var k = h === "drop" ? "Drop it off at any of " + n + " locations" : h === "email" ? "Email first" : "Call first";
+    var notes = sites.every(function (o) { return (o.notes || "") === (sites[0].notes || ""); }) ? sites[0].notes : "";
+    return '<div class="spot multi"><p class="k">' + k + '</p><ul class="sites">' + siteLine(x, sites[0]) + "</ul>" +
+      '<details class="moresites"><summary>' + (n - 1) + " more location" + (n > 2 ? "s" : "") + '</summary><ul class="sites">' +
+      sites.slice(1).map(function (o) { return siteLine(x, o); }).join("") + "</ul></details>" +
+      (notes ? '<p class="notes">' + esc(notes) + "</p>" : "") + "</div>";
+  }
   /* "Drop-off Instructions" on the organization: standing rules shown under every one of its listings. */
-  function spot(x) { var o = x.o, b = spotBox(x); return o.notes && b.indexOf("spot none") < 0 ? b.replace(/<\/div>$/, '<p class="notes">' + esc(o.notes) + "</p></div>") : b; }
+  function spot(x) {
+    if (x.sites && x.sites.length > 1) return multiSpot(x); var o = x.o, b = spotBox(x); return o.notes && b.indexOf("spot none") < 0 ? b.replace(/<\/div>$/, '<p class="notes">' + esc(o.notes) + "</p></div>") : b; }
 
   /* Organization pages are per parent organization: Swift House, Mount Edwards and the rest share
      one Victoria Cool Aid Society page. A charity with no parent gets its own page. */
@@ -84,5 +106,5 @@
   /* "Mount Edwards · Cool Aid" for a site, just "Our Place" for a charity on its own. */
   function where(o) { return short(o) + (o && o.parent ? " · " + (o.parentShort || o.parent) : ""); }
 
-  window.VF = { short: short, where: where, esc: esc, mapsUrl: mapsUrl, linkPhones: linkPhones, addressLink: addressLink, howTo: howTo, spot: spot, topId: topId, slug: slug, orgUrl: orgUrl, share: share, SHARE_ICON: SHARE_ICON };
+  window.VF = { short: short, where: where, emailLink: emailLink, esc: esc, mapsUrl: mapsUrl, linkPhones: linkPhones, addressLink: addressLink, howTo: howTo, spot: spot, topId: topId, slug: slug, orgUrl: orgUrl, share: share, SHARE_ICON: SHARE_ICON };
 })();

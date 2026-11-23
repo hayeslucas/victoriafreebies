@@ -27,6 +27,7 @@ const ORGS = {
   order: "fldTRkRFlBp7G7zls", // "Page Order": position of a site on its parent's organization page (blank = automatic)
   short: "fld2Ze8WffnRgRx9f", // "Preferred Name": short everyday name for tight spots; blank = use Name
   phone: "fldUUNdANQuiEhaRU", // "Public Phone". Never "Contact Phone", which is private.
+  email: "fldNd2FXnHvq8x4Ev", // "Public Email": shown for "Email first" listings. Never the private contact email.
   address: "fldERugbFTWakgFLU",
   hours: "fldn9qsoJgjE793Jn",
   website: "fld8kMmJu0Y9s4RZm",
@@ -65,7 +66,7 @@ async function fetchAll(table, fields, formula) {
 const pick = (spec) => Object.entries(spec).filter(([k]) => k !== "table").map(([, id]) => id);
 // "Drop off?" options are matched by keyword, so the wording can change freely as long as
 // the call-first option contains "Call" (or "phone") and the drop-off option contains "Drop". Blank -> "".
-const dropoffMode = (v) => (/\bcall\b|phone/i.test(v) ? "phone" : /drop/i.test(v) ? "ready" : "");
+const dropoffMode = (v) => (/email/i.test(v) ? "email" : /\bcall\b|phone/i.test(v) ? "phone" : /drop/i.test(v) ? "ready" : "");
 // "Specifically Requested?" options: the Wish List option must contain "Wish" (or "Specific"); anything else is a general listing.
 const isWish = (v) => /wish|specific/i.test(v);
 const str = (v) => (v == null ? "" : typeof v === "object" && v.name ? v.name : String(v)).trim();
@@ -120,6 +121,7 @@ export async function buildData() {
       parentShort: parentId ? str(byId[parentId].fields[ORGS.short]) || str(byId[parentId].fields[ORGS.name]) : "",
       parentId,
       phone: str(f[ORGS.phone]),
+      email: str(f[ORGS.email]),
       address: str(f[ORGS.address]),
       hours: str(f[ORGS.hours]),
       website: str(f[ORGS.website]),
