@@ -5,6 +5,7 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   var APPLE = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
   function mapsUrl(a) { return APPLE ? "https://maps.apple.com/?q=" + encodeURIComponent(a) : "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(a); }
+  function emailLink(e) { return '<a href="mailto:' + esc(e) + '">' + esc(e) + "</a>"; }
   function linkPhones(p) { return esc(p).replace(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g, function (m) { return '<a href="tel:' + m.replace(/[^0-9+]/g, "") + '">' + m + "</a>"; }); }
   /* Addresses with a street number link to maps (Apple Maps on Apple devices, Google Maps elsewhere);
      hovering shows "Open in Maps". Text like "Multiple Locations" stays plain. */
@@ -17,6 +18,7 @@
      If the chosen detail is missing, fall back to the other so the donor still has a way to reach them. */
   function howTo(x) {
     var o = x.o, mode = x.dropoff || (o.address ? "ready" : "phone");
+    if (mode === "email") return o.email ? "email" : o.phone ? "call" : "none"; // "Email first": never fall back to the address
     if (mode === "ready") return o.address ? "drop" : o.phone ? "arrange" : "none";
     return o.phone ? "call" : o.address ? "drop" : "none";
   }
@@ -25,6 +27,7 @@
     if (h === "drop") return '<div class="spot"><p class="k">Drop it off at</p><p class="big">' + addressLink(o.address) + "</p>" + (o.hours ? '<p class="hrs">' + esc(o.hours) + "</p>" : "") + "</div>";
     if (h === "arrange") return '<div class="spot"><p class="k">Call to arrange a drop-off</p><p class="big">' + linkPhones(o.phone) + "</p></div>";
     if (h === "call") return '<div class="spot"><p class="k">Call first</p><p class="big">' + linkPhones(o.phone) + "</p></div>";
+    if (h === "email") return '<div class="spot"><p class="k">Email first</p><p class="big">' + emailLink(o.email) + "</p></div>";
     return '<div class="spot none"><p class="k">Contact details coming soon</p></div>';
   }
   /* "Drop-off Instructions" on the organization: standing rules shown under every one of its listings. */
@@ -84,5 +87,5 @@
   /* "Mount Edwards · Cool Aid" for a site, just "Our Place" for a charity on its own. */
   function where(o) { return short(o) + (o && o.parent ? " · " + (o.parentShort || o.parent) : ""); }
 
-  window.VF = { short: short, where: where, esc: esc, mapsUrl: mapsUrl, linkPhones: linkPhones, addressLink: addressLink, howTo: howTo, spot: spot, topId: topId, slug: slug, orgUrl: orgUrl, share: share, SHARE_ICON: SHARE_ICON };
+  window.VF = { short: short, where: where, emailLink: emailLink, esc: esc, mapsUrl: mapsUrl, linkPhones: linkPhones, addressLink: addressLink, howTo: howTo, spot: spot, topId: topId, slug: slug, orgUrl: orgUrl, share: share, SHARE_ICON: SHARE_ICON };
 })();

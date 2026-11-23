@@ -64,23 +64,26 @@
 
     /* One section per site, with everything that site needs together, so a donor heading to one place
        sees it all in one spot. Sites with the most needs first; a charity with several sites gets a jump list.
-       Same rule as the cards: a "Call first" listing shows the phone number, never the address. */
-    function isCall(x) { return VF.howTo(x) === "call"; }
-    function where(o, call) {
+       Same rule as the cards: a "Call first" or "Email first" listing shows the phone number or email, never the address. */
+    function isCall(x) { var h = VF.howTo(x); return h === "call" || h === "email"; } // contact first: no address shown
+    function siteMode(list) { return list.every(function (x) { return VF.howTo(x) === "email"; }) ? "email" : list.every(isCall) ? "call" : "drop"; }
+    function where(o, mode) {
       var addr = o.address ? VF.addressLink(o.address) + (o.hours ? ' <span class="ohrs">· ' + esc(o.hours) + "</span>" : "") : "";
-      return '<div class="osite' + (call ? " call" : "") + '">' +
-        (call ? '<p><b class="callfirst">Call first</b> ' + VF.linkPhones(o.phone) + "</p>"
+      return '<div class="osite' + (mode !== "drop" ? " call" : "") + '">' +
+        (mode === "email" ? '<p><b class="callfirst">Email first</b> ' + VF.emailLink(o.email) + "</p>"
+        : mode === "call" ? '<p><b class="callfirst">Call first</b> ' + VF.linkPhones(o.phone) + "</p>"
               : (addr ? "<p><b>Drop off</b> " + addr + "</p>" : "") + (o.phone ? "<p><b>Phone</b> " + VF.linkPhones(o.phone) + "</p>" : "")) +
         (o.notes ? '<p class="notes">' + esc(o.notes) + "</p>" : "") + "</div>";
     }
     /* The "who it helps" line goes above the table only when every item there shares it. */
     function common(list) { var c = list[0] && list[0].case; return list.length > 1 && c && list.every(function (x) { return x.case === c; }) ? c : ""; }
     function byTitle(a, b) { return a.title.localeCompare(b.title); }
-    function row(x, o, shared, callNote, tag) {
+    function row(x, o, shared, mode, tag) {
+      var h = VF.howTo(x), note = h === "email" && mode !== "email" ? "Email first: " + VF.emailLink(o.email) : h === "call" && mode === "drop" ? "Call first: " + VF.linkPhones(o.phone) : "";
       var d = details(x).replace('<p class="items">', "").replace("</p>", "");
       return '<tr id="item-' + esc(base(x.id)) + '"' + (x.wish ? ' class="wishrow"' : "") + '><th scope="row">' + esc(x.title) + (x.wish && tag ? ' <span class="wtag">Wish List</span>' : "") + "</th><td>" + d +
         (x.case && x.case !== shared ? '<span class="rowwhy">♥ ' + esc(x.case) + "</span>" : "") +
-        (callNote ? '<span class="rowcall">Call first: ' + VF.linkPhones(o.phone) + "</span>" : "") + "</td>" +
+        (note ? '<span class="rowcall">' + note + "</span>" : "") + "</td>" +
         "</tr>";
     }
     var sites = locs.map(function (loc) { return { o: orgs[loc], id: loc, list: mine.filter(function (x) { return x.org === loc; }) }; })
@@ -94,15 +97,15 @@
       return '<a href="#site-' + esc(st.id) + '">' + esc(VF.short(st.o)) + " <span>" + st.list.length + "</span></a>";
     }).join("") + "</nav>";
     sites.forEach(function (st) {
-      var o = st.o, list = st.list, allCall = list.every(isCall), shared = common(list);
+      var o = st.o, list = st.list, mode = siteMode(list), shared = common(list);
       var allWish = list.every(function (x) { return x.wish; });
       h += '<section class="oloc" id="site-' + esc(st.id) + '"><h2>' + (multi ? esc(VF.short(o)) : "What they need") + ' <span class="cnt">' + list.length + " need" + (list.length > 1 ? "s" : "") + (allWish ? ' <span class="wtag">from Wish List</span>' : "") + "</span>" +
         (multi ? ' <span class="sharewrap"><button type="button" class="sharebtn" data-site="' + esc(st.id) + '" aria-haspopup="menu" aria-expanded="false">' + VF.SHARE_ICON + "Share</button></span>" : "") + "</h2>" +
-        where(o, allCall) + (shared ? '<p class="why">♥ ' + esc(shared) + "</p>" : "") +
+        where(o, mode) + (shared ? '<p class="why">♥ ' + esc(shared) + "</p>" : "") +
         '<table class="otable"><thead><tr><th scope="col">Item</th><th scope="col">Details</th></tr></thead><tbody>';
       /* Drop-off-ready items first, then call-first; everyday before Wish List; then A to Z. */
       list.slice().sort(function (a, b) { return isCall(a) - isCall(b) || a.wish - b.wish || byTitle(a, b); })
-        .forEach(function (x) { h += row(x, o, shared, !allCall && isCall(x), !allWish); });
+        .forEach(function (x) { h += row(x, o, shared, mode, !allWish); });
       h += "</tbody></table></section>";
     });
 

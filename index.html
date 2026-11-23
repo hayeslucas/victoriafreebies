@@ -48,7 +48,7 @@
 <section id="how"><h2>How it works</h2><div class="steps">
 <div class="step"><b class="n">1</b><h3>Search your item</h3><p>Tell us what you have. No account needed.</p></div>
 <div class="step"><b class="n">2</b><h3>See who wants it</h3><p>Each result shows the charity, what they’re asking for and who your donation helps.</p></div>
-<div class="step"><b class="n">3</b><h3>Drop it off or call</h3><p>Go to the address and hours shown, or call first when the listing gives a phone number.</p></div></div></section>
+<div class="step"><b class="n">3</b><h3>Drop it off, or get in touch</h3><p>Go to the address and hours shown, or call or email first when the listing asks you to.</p></div></div></section>
 
 <section id="charities"><div class="panel cta"><h2>Are you a charity?</h2><p>Tell donors exactly what you need, and spend less time sorting donations you can’t use.</p><p><a class="bigbtn" href="/charities">Information for charities</a></p></div></section>
 </div></main>
@@ -203,13 +203,13 @@ function render(){
       $("morewrap").hidden=true;return;
     }
   }
-  /* Matches exist, but only at places that ask you to call first: say so instead of "nothing". */
+  /* Matches exist, but only at places that ask you to call or email first: say so instead of "nothing". */
   if(none&&dropOnly){
     var callRows=LIST.filter(function(x){return scoreOf(x,q)>0&&(!cat||x.category===cat)&&(!wishOnly||x.wish)});
     var nOrgs=callRows.map(function(x){return x.org}).filter(function(v,i,a){return a.indexOf(v)===i}).length;
     if(callRows.length){
-      $("rt").textContent="Call ahead for “"+q+"”";
-      $("out").innerHTML='<div class="empty"><p><b>'+nOrgs+' charit'+(nOrgs>1?'ies want':'y wants')+' “'+esc(q)+'”, but '+(nOrgs>1?'they ask':'it asks')+' you to call first.</b></p><p><button type="button" class="alt" id="showcall">Show them</button></p></div>';
+      $("rt").textContent="Get in touch first for “"+q+"”";
+      $("out").innerHTML='<div class="empty"><p><b>'+nOrgs+' charit'+(nOrgs>1?'ies want':'y wants')+' “'+esc(q)+'”, but '+(nOrgs>1?'they ask':'it asks')+' you to call or email first.</b></p><p><button type="button" class="alt" id="showcall">Show them</button></p></div>';
       $("showcall").onclick=function(){$("droponly").checked=false;st.shown=12;render()};
       $("morewrap").hidden=true;return;
     }

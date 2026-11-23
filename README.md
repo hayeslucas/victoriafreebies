@@ -22,6 +22,8 @@ Each listing's **Drop off?** field decides how donors reach the charity:
 
 - **Drop Off Ready (address and hours)**: the card says "Drop it off at" with the organization's Address and Drop-off Hours.
 - **Phone first**: the card says "Call first" with the organization's Public Phone.
+- **Email first**: the card says "Email first" with the organization's **Public Email**, and never shows an address
+  (for charities that protect residents' privacy, e.g. youth housing). Falls back to the phone, never the address.
 
 If the chosen detail is missing on the organization (for example Drop Off Ready but no Address), the card falls back
 to the other one ("Call to arrange a drop-off"), so fill in the matching field.
@@ -64,7 +66,7 @@ automation → Donation Listings → website. The approval automation copies sel
 fields must have *identical* option names in Submission Intake and Donation Listings:
 "Drop off?", "Specifically Requested?" (What kind of request) and "Category". If you reword an option, reword it
 in both tables. The website reads options by keyword, so it keeps working as long as the call-first option
-contains "Call", the drop-off option contains "Drop" and the wish-list option contains "Wish". Category names
+contains "Call", the email-first option contains "Email", the drop-off option contains "Drop" and the wish-list option contains "Wish". Category names
 appear on the site's category buttons exactly as written.
 
 **Wish List:** listings whose **Specifically Requested?** field includes "Specifically Requested" get a
