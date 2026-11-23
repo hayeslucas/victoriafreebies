@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="/styles.css">
 </head><body>
 
-<div class="topbar" id="topbar"><nav class="wrap" aria-label="Main"><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="9"/><path d="M16 24s-7.5-4.6-7.5-9.6A4.1 4.1 0 0 1 16 12a4.1 4.1 0 0 1 7.5 2.4C23.5 19.4 16 24 16 24z"/></svg><span>Victoria Freebies</span></a><div class="navlinks"><span class="navpill" aria-hidden="true"></span><a href="/" aria-current="page"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4.5 4.5"/></svg>Search</a><a href="/wish-list">Wish List<span class="new" aria-label="new">NEW</span></a><a href="/org"><span class="full">All charities</span><span class="short">Charities</span></a><a href="/about">About</a></div></nav></div>
+<div class="topbar" id="topbar"><nav class="wrap" aria-label="Main"><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="9"/><path d="M16 24s-7.5-4.6-7.5-9.6A4.1 4.1 0 0 1 16 12a4.1 4.1 0 0 1 7.5 2.4C23.5 19.4 16 24 16 24z"/></svg><span>Victoria Freebies</span></a><div class="navlinks"><span class="navpill" aria-hidden="true"></span><a href="/" aria-current="page"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4.5 4.5"/></svg>Search</a><a href="/wish-list">Wish List<span class="new" aria-label="new">NEW</span></a><a href="/org"><span class="full">All Charities</span><span class="short">Charities</span></a><a href="/about">About</a></div></nav></div>
 <header><div class="wrap">
 <div class="hero">
 <p class="place"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.6 6-10A6 6 0 0 0 4 8c0 4.4 6 10 6 10z"/><circle cx="10" cy="8" r="2.2"/></svg>Victoria, BC</p>
@@ -23,7 +23,7 @@
 </div>
 </div>
 <aside class="fc" id="fc" aria-label="For charities">
-<button type="button" class="fc-pill" id="fcpill" aria-expanded="false" aria-controls="fcmore"><span class="fc-dot" aria-hidden="true"></span>Are you a charity?<span class="fc-arr" aria-hidden="true">→</span></button>
+<a class="fc-pill" id="fcpill" href="/charities" aria-describedby="fcmore"><span class="fc-dot" aria-hidden="true"></span>Are you a charity?<span class="fc-arr" aria-hidden="true">→</span></a>
 <div class="fc-more" id="fcmore"><div class="fc-in">
 <p>Tell Victoria donors exactly what you need, and spend less time sorting what you can’t use. It takes a few minutes.</p>
 <a class="fc-go" href="https://airtable.com/appgw8rdpxxxGmWG3/pagYtNiHWxy6HWE64/form" target="_blank" rel="noopener">Post a request <span aria-hidden="true">↗</span></a>
@@ -41,7 +41,19 @@
 <li><b>Needed today.</b> Charities take items down as soon as they have enough, so everything here is still wanted.</li>
 <li><b>Looking for more?</b> <button type="button" class="linkbtn" id="wishall">See all listings</button></li>
 </ul>
-</div><div class="mapcard" id="mapcard"><div class="mapbar"><p class="mapnote" id="mapnote">Loading map…</p><button type="button" class="alt mapbig" id="mapbig" aria-expanded="false" aria-controls="mapcard"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8V3h5M17 8V3h-5M3 12v5h5M17 12v5h-5"/></svg>Open map</button></div><div class="map" id="map" role="region" aria-label="Map of the charities in these results"></div></div><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
+</div><div class="duo" id="duo">
+<div class="mapcard tile" id="mapcard">
+<div class="mapbar">
+<form class="mapsearch" id="mapsearch" role="search"><input type="search" id="mapq" placeholder="Search an item" aria-label="Search an item" autocomplete="off" enterkeyhint="search"><button type="submit">Search</button></form>
+<button type="button" class="alt mapclose" id="mapclose">Close ✕</button>
+<p class="mapstatus" id="mapstatus" aria-live="polite"></p>
+<div class="legend"><p><span class="k-pin" aria-hidden="true"></span><span><b>Drop off</b> during open hours</span></p><p><span class="k-area" aria-hidden="true"></span><span><b>Call or email first:</b> location shown roughly for privacy</span></p></div>
+</div>
+<div class="map" id="map" role="region" aria-label="Map of the places in these results"></div>
+<button type="button" class="tilefoot" id="mapbig" aria-expanded="false"><b id="mapcount">Places to give</b><span>See the map <span aria-hidden="true">→</span></span></button>
+</div>
+<div class="tile orgtile" id="orgtile"><div class="cwin"><ul class="clist" id="clist"></ul></div><a class="tilefoot" id="orgfoot" href="/org"><b id="orgcount">Local charities</b><span id="orglink">See All Charities <span aria-hidden="true">→</span></span></a></div>
+</div><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
 
 <section><h2>Why use Victoria Freebies?</h2><div class="steps"><div class="step"><h3>No wasted trips, no wasted time</h3><p>Know what a charity wants before you head out.</p></div><div class="step"><h3>Give to a good cause</h3><p>Your things go to local charities and the people they support.</p></div><div class="step"><h3>Less waste</h3><p>Good items find a new home instead of the landfill.</p></div></div></section>
 
@@ -201,7 +213,7 @@ function render(){
         if(inCat){st.cat="";Array.prototype.forEach.call($("cats").querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",String(!b.getAttribute("data-cat")))});st.shown=12;render()}
         else $("wishonly").click();
       };
-      $("morewrap").hidden=true;if(window.VFMap)VFMap.show([]);return;
+      $("morewrap").hidden=true;tiles([],q);return;
     }
   }
   /* Matches exist, but only at places that ask you to call or email first: say so instead of "nothing". */
@@ -212,7 +224,7 @@ function render(){
       $("rt").textContent="Get in touch first for “"+q+"”";
       $("out").innerHTML='<div class="empty"><p><b>'+nOrgs+' charit'+(nOrgs>1?'ies want':'y wants')+' “'+esc(q)+'”, but '+(nOrgs>1?'they ask':'it asks')+' you to call or email first.</b></p><p><button type="button" class="alt" id="showcall">Show them</button></p></div>';
       $("showcall").onclick=function(){$("droponly").checked=false;st.shown=12;render()};
-      $("morewrap").hidden=true;if(window.VFMap)VFMap.show([]);return;
+      $("morewrap").hidden=true;tiles([],q);return;
     }
   }
   if(none){
@@ -222,7 +234,7 @@ function render(){
   }
   $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"+(cat?" in "+cat:"")):(wishOnly?"Wish List":"What charities need right now");
   $("wishintro").hidden=!wishOnly;
-  if(window.VFMap)VFMap.show(none?[]:rows.map(function(r){return r.x})); // the map shows every match, not just the cards on screen
+  tiles(none?[]:rows.map(function(r){return r.x}),q); // the map and charities boxes show every match, not just the cards on screen
   h+=rows.slice(0,st.shown).map(function(r){return card(r.x)}).join("");
   $("out").innerHTML=h;
   /* Cards slide up and fade in one after another when the results change. "Show more" only animates the new ones. */
@@ -231,6 +243,32 @@ function render(){
   lastKey=key;lastShown=st.shown;
   $("morewrap").hidden=rows.length<=st.shown;
   clampItems();
+}
+/* The two boxes above the results: the map (map.js) and the charities box. Both follow the search and filters.
+   Before a search the charities box shows charities in a random order that changes each visit (fixed for the
+   visit), so every charity gets its turn near the top. After a search it lists the charities that match, most matches first. */
+var RANK={};
+function tiles(xs,q){
+  $("duo").hidden=!xs.length&&!(window.VFMap&&VFMap.isBig()); // keep the full-screen map open even when a new search finds nothing
+  if(window.VFMap)VFMap.show(xs,q);
+  var orgs=D.orgs||{},n={},seen={};
+  xs.forEach(function(x){var t=VF.topId(x.org,orgs),k=t+"|"+base(x.id);if(!seen[k]){seen[k]=1;n[t]=(n[t]||0)+1}});
+  var ids=Object.keys(n);
+  ids.forEach(function(id){if(RANK[id]==null)RANK[id]=Math.random()});
+  ids.sort(q?function(a,b){return n[b]-n[a]||RANK[a]-RANK[b]}:function(a,b){return RANK[a]-RANK[b]});
+  /* After a search the box stays about the search: "See all 7" opens the full list right here instead of
+     leaving for the All Charities page. Each name goes to that charity's page; Back returns to the search. */
+  var t=$("orgtile"),open=q&&t.getAttribute("data-q")===q&&t.classList.contains("open");
+  t.setAttribute("data-q",q||"");t.classList.toggle("open",!!open);
+  $("orgcount").textContent=q?ids.length+" "+(ids.length===1?"charity needs":"charities need")+" “"+q+"”":ids.length+" charities";
+  var foot=$("orgfoot"),more=q&&ids.length>3&&!open;
+  if(q){foot.removeAttribute("href");foot.setAttribute("role","button");foot.tabIndex=ids.length>3&&!open?0:-1;
+    $("orglink").innerHTML=more?"See all "+ids.length+' <span aria-hidden="true">↓</span>':"Tap a charity to see what else they need";
+    foot.classList.toggle("note",!more)}
+  else{foot.setAttribute("href","/org");foot.removeAttribute("role");foot.removeAttribute("tabindex");foot.classList.remove("note");$("orglink").innerHTML='See All Charities <span aria-hidden="true">→</span>'}
+  foot.onclick=function(e){if(!q)return;e.preventDefault();if(more){t.classList.add("open");tiles(xs,q)}};
+  foot.onkeydown=function(e){if(q&&(e.key==="Enter"||e.key===" ")){e.preventDefault();foot.onclick(e)}};
+  $("clist").innerHTML=ids.slice(0,open?ids.length:3).map(function(id){return '<li><a href="'+esc(VF.orgUrl(id,orgs))+'"><span>'+esc(VF.short(orgs[id]))+'</span><em>'+n[id]+(q?' match':' need')+(n[id]>1?(q?'es':'s'):'')+'</em></a></li>'}).join("");
 }
 /* Long item lists show two lines, with a link to show the rest. The link only appears when the text is cut off. */
 function clampItems(){
@@ -256,7 +294,12 @@ function clampItems(){
     if(words(st.q).some(function(w){return w.length>2&&iw.indexOf(w)>-1&&t.indexOf(w)<0}))b.onclick();
   });
 }
-function submit(){st.q=$("q").value.trim();st.shown=12;render();if(st.q){var r=$("rt");if(r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"start"})}}
+/* The search goes in the address (/?q=couch), so going to a charity's page and pressing Back brings the results back,
+   and a search can be shared as a link. */
+function keepQ(){try{history.replaceState(null,"",($("wishonly").checked?"/wish-list":"/")+(st.q?"?q="+encodeURIComponent(st.q):""))}catch(e){}}
+/* A search typed in the full-screen map: same as the main search box, without scrolling the page underneath. */
+window.VFSearch=function(v){$("q").value=v;st.q=v.trim();st.shown=12;keepQ();render()};
+function submit(){st.q=$("q").value.trim();st.shown=12;keepQ();render();if(st.q){var r=$("rt");if(r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"start"})}}
 function load(d){
   if(!d||!Array.isArray(d.listings))return false;
   var today=new Date().toISOString().slice(0,10),orgs=d.orgs||{};
@@ -316,9 +359,12 @@ $("out").addEventListener("click",function(e){
 });
 /* "Are you a charity?" pill: opens on hover or focus on computers (CSS), and on tap everywhere. */
 (function(){var fc=$("fc"),b=$("fcpill");if(!fc)return;
-  b.addEventListener("click",function(){var o=!fc.classList.contains("open");fc.classList.toggle("open",o);b.setAttribute("aria-expanded",String(o))});
-  document.addEventListener("click",function(e){if(!fc.contains(e.target)&&fc.classList.contains("open")){fc.classList.remove("open");b.setAttribute("aria-expanded","false")}});
-  fc.addEventListener("keydown",function(e){if(e.key==="Escape"){fc.classList.remove("open");b.setAttribute("aria-expanded","false");b.focus()}});
+  /* The pill goes to the For charities page. With a mouse, hovering shows the quick links first; on a touch screen
+     (no hover) the first tap shows them and a second tap on the pill goes to the page. */
+  var HOVER=matchMedia("(hover:hover)");
+  b.addEventListener("click",function(e){if(HOVER.matches||fc.classList.contains("open"))return;e.preventDefault();fc.classList.add("open")});
+  document.addEventListener("click",function(e){if(!fc.contains(e.target)&&fc.classList.contains("open")){fc.classList.remove("open")}});
+  fc.addEventListener("keydown",function(e){if(e.key==="Escape"){fc.classList.remove("open");b.focus()}});
 })();
 $("go").onclick=submit;
 $("q").addEventListener("keydown",function(e){if(e.key==="Enter")submit()});
@@ -333,7 +379,7 @@ $("droponly").addEventListener("change",function(){st.shown=12;render()});
 /* The Wish List has its own address (/wish-list) so it can be linked from the top bar and shared.
    Ticking the box switches the address and the highlighted top-bar link; unticking goes back to Search. */
 function setWishPage(on){
-  try{history.replaceState(null,"",on?"/wish-list":"/")}catch(e){}
+  keepQ();
   Array.prototype.forEach.call(document.querySelectorAll(".navlinks a"),function(a){
     var me=a.getAttribute("href")===(on?"/wish-list":"/");if(me)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
   document.dispatchEvent(new Event("navchange"));
@@ -342,6 +388,7 @@ $("wishall").onclick=function(){$("wishonly").click()};
 $("wishonly").addEventListener("change",function(){st.shown=12;setWishPage(this.checked);render()});
 if(/^\/wish-list\/?$/.test(location.pathname)){$("wishonly").checked=true;setWishPage(true);WISH_ARRIVAL=true}
 $("more").onclick=function(){st.shown+=12;render()};
+(function(){var q=new URLSearchParams(location.search).get("q");if(q){$("q").value=q;st.q=q.trim()}})();
 try{load(JSON.parse(localStorage.getItem(CACHE_KEY)))}catch(e){}
 render();
 fetchListings();
