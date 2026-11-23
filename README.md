@@ -60,8 +60,14 @@ words someone typed; add a word any time a search should have found a listing. O
 (`SYN`, e.g. coat = jacket = parka); then catch-all listings for the item's category (`CATOF` maps items to
 categories, `BROAD` says which titles count as catch-alls, e.g. a thrift store's "Clothing"); then pet items when
 the search wasn't about pets. With two or more words, if some listings match every word, listings matching only some
-of them are dropped ("pressure washer" doesn't find a clothes "washer"). "Garden" is a search group even though
-garden listings sit under the Other category: mower, trimmer, wheelbarrow and so on find listings with "garden" or "yard" in the title. If a new kind of item doesn't find the catch-all listings it should, add it to `CATOF`.
+of them are dropped ("pressure washer" doesn't find a clothes "washer"). If no listing has every word ("kids winter jacket"), listings with the last word (the thing itself) win.
+Two-word names whose first word changes the meaning ("dish soap", "air mattress", "car seat", "coffee table") are
+glued together by `COMP`, so "dishes" doesn't find dish soap and "mattress" doesn't find air mattresses; add a pair
+there when a search finds the wrong thing. `KINDOF` is one-way ("drill" finds a "Tools" listing, not the reverse).
+Searches for car seats, cribs, strollers or mattresses explain that most charities can't take them.
+"Garden" and "Sports" are search groups even though
+those listings sit under the Other category: mower, trimmer, wheelbarrow and so on find listings with "garden" or "yard"
+in the title; skis, weights, golf and so on find "Sports equipment". If a new kind of item doesn't find the catch-all listings it should, add it to `CATOF`.
 
 **Organization pages** (`/org/<name>`, built by `org.js` from the same API data): one page per parent
 organization (all of Cool Aid's sites share `/org/victoria-cool-aid-society`), with one section per site (Organizations → **Page Order** first, e.g. REES 1 and Rock Bay

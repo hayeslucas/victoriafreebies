@@ -84,64 +84,87 @@ var D={orgs:{},listings:[]},LIST=[],READY=false,CACHE_KEY="vf-listings-v1";
    3. Pet items, when you didn't ask for pet things ("coat" also matches "pet coats"): shown last. */
 function words(s){return String(s||"").toLowerCase().replace(/[^a-z\s]/g," ").split(/\s+/).filter(function(w){return w.length>1}).map(function(w){return w.length>2?w.replace(/ies$/,"y").replace(/(ch|sh|x|ss)es$/,"$1").replace(/([^s])s$/,"$1"):w})}
 /* True synonyms only: words a donor might use for the same thing. */
-var SYN=["coat jacket parka","couch sofa loveseat","blanket comforter duvet quilt bedding","sheet bedding linen","toiletry toiletries","tv television","computer laptop","kid child children","clothe clothing apparel","pant jean trouser","sweater hoodie sweatshirt","shoe sneaker","hat toque beanie","glove mitten","dish plate","cup mug","dresser drawer","bookcase bookshelf","tampon menstrual period","walker rollator","toy game","book novel","dvd cd media","food grocery","stroller pram","tool drill saw hammer"].map(words);
+var SYN=["coat jacket parka","couch sofa loveseat","blanket comforter duvet quilt bedding","sheet linen","toiletry toiletries","tv television","computer laptop","kid child children","clothe clothing apparel","pant jean trouser","sweater hoodie sweatshirt","shoe sneaker","hat toque beanie","glove mitten","dish plate","cup mug","dresser drawer","bookcase bookshelf","tampon menstrual period","walker rollator","toy game","bra lingerie","phone smartphone iphone cellphone","tablet ipad","book novel","dvd cd media","food grocery","stroller pram"].map(words);
+/* One-way: a drill is a tool, but not every tool is a drill. A listing for "tools" matches "drill" (a little weaker),
+   while "tools" doesn't match a hedge trimmer just because it's a power tool. */
+var KINDOF={drill:"tool",saw:"tool",hammer:"tool",wrench:"tool",screwdriver:"tool",sander:"tool",toolbox:"tool"};
+/* Two-word names where the first word changes the meaning: "dish soap" isn't dishes, an "air mattress" isn't a bed
+   mattress, a "bath seat" isn't a car seat. They're glued into one word in both the search and the listings, so
+   "mattress" doesn't find air mattresses but "air mattress" still does. Add pairs here when a search finds the wrong thing. */
+var COMP=[[/\bair mattress(es)?\b/g,"airmattress"],[/\bdish soaps?\b/g,"dishsoap"],[/\b(dish|tea) towels?\b/g,"$1towel towel"],
+  [/\bpaper towels?\b/g,"papertowel"],[/\bsleeping pads?\b/g,"sleepingpad"],[/\bsleeping bags?\b/g,"sleepingbag"],[/\b(car|bath|toilet) seats?\b/g,"$1seat"],
+  [/\bshop vacs?\b/g,"shopvac"],[/\b(garbage|freezer) bags?\b/g,"$1bag"],[/\bhanging clothes\b/g,"hangingclothes"],[/\b(hair|nail) clippers?\b/g,"$1clipper clipper"],
+  [/\bcoffee (tables?|makers?|mugs?|urns?)\b/g,"coffee$1 $1"],[/\btable (linens?|cloths?)\b/g,"tablelinen"],[/\btable lamps?\b/g,"tablelamp lamp"],[/\blaminating sheets?\b/g,"laminatingsheet"],[/\b(shower|high|wheel) ?chairs?\b/g,"$1chair"],
+  [/\bbed ?sheets?\b/g,"bedsheet sheet"],[/\bfood (processors?|containers?|storage)\b/g,"food$1 $1"],[/\bgrooming tools?\b/g,"groomingtool"],[/\btable and floor lamps\b/g,"lamps"],[/\bheat lamps?\b/g,"heatlamp"],[/\b(baking|cookie) sheets?\b/g,"bakingsheet"],[/\bvideo ?games?\b/g,"videogame"],[/\b(pet|dog|cat) beds?\b/g,"$1bed"]];
+function comp(s){s=String(s||"").toLowerCase();COMP.forEach(function(c){s=s.replace(c[0],c[1])});return s}
 function syn(w){var o=[];SYN.forEach(function(g){if(g.indexOf(w)>-1)o=o.concat(g)});return o}
 /* Which category an item belongs to, so its catch-all listings can be added. Keep these in step with the Airtable categories. */
-var CATOF={"Clothing":"coat jacket parka outerwear winter rain clothe clothing apparel shirt pant jean trouser sweater hoodie dress skirt shoe sneaker boot sock underwear toque hat beanie glove mitten scarf belt purse",
+var CATOF={"Clothing":"coat jacket parka outerwear winter rain clothe clothing apparel shirt pant jean trouser sweater hoodie dress skirt shoe sneaker boot sock underwear toque hat beanie glove mitten scarf belt purse bra lingerie pajama pyjama short legging blouse suit tie",
  "Furniture":"couch sofa loveseat chair table bed dresser furniture shelf shelve bookcase bookshelf desk cabinet",
- "Household":"towel blanket comforter duvet quilt sheet bedding linen pillow curtain dish plate bowl mug cup cutlery pot pan kitchen kitchenware lamp appliance microwave vacuum kettle toaster",
+ "Household":"towel blanket comforter duvet quilt sheet bedding linen pillow curtain dish plate bowl mug cup cutlery pot pan kitchen kitchenware lamp appliance microwave vacuum kettle toaster vase candle mirror rug ornament decoration",
  "Hygiene":"toiletry soap shampoo conditioner toothpaste toothbrush deodorant razor tampon pad menstrual",
  "Family & Kids":"baby infant toddler kid child children toy game stroller",
  "Food":"food canned tuna pasta rice cereal soup bean grocery",
- "Electronics":"tv television electronic computer laptop monitor camera phone audio speaker",
+ "Electronics":"tv television electronic computer laptop monitor camera phone smartphone iphone cellphone tablet ipad printer console audio speaker headphone",
  "Camping Gear":"tent tarp sleeping camping",
+ "Sports":"sport sports ski skis snowboard skate skates hockey golf tennis racket racquet ball bat helmet weight weights dumbbell yoga exercise fitness",
  "Garden":"garden gardening yard lawn mower lawnmower trimmer hedge weed whacker eater blower leaf rake shovel spade hoe trowel pruner pruning shear wheelbarrow hose planter"};
 var CATW={};Object.keys(CATOF).forEach(function(k){words(CATOF[k]).forEach(function(w){CATW[w]=k})});
 /* Listings whose title is the category itself ("Clothing", "Household goods", "Apartment-sized furniture"). */
-var BROAD={"Clothing":["clothing","clothe","apparel"],"Household":["household"],"Furniture":["furniture"],"Electronics":["electronic"],"Food":["food"],"Hygiene":["toiletry","hygiene"],"Family & Kids":["family"],"Camping Gear":["camping"],"Garden":["garden","gardening","yard"]};
+var BROAD={"Clothing":["clothing","clothe","apparel"],"Household":["household"],"Furniture":["furniture"],"Electronics":["electronic"],"Food":["food"],"Hygiene":["toiletry","hygiene"],"Family & Kids":["family"],"Camping Gear":["camping"],"Garden":["garden","gardening","yard"],"Sports":["sport"]};
 var PETW=words("pet dog cat puppy kitten animal litter kibble leash collar");
 var STOP=["the","and","for","of","my","some","old","used","new","or","a","to","in","with","need","needed"];
 var NAMESTOP=["victoria","society","the","and","of","for","house","centre","program","store","thrift","food","bank","church","street","pantry","community","cooperative"];
 /* Item details can include what a charity does NOT take ("No pillows."). Leave those sentences out of search,
    so searching "pillows" doesn't find a listing that turns pillows away. */
 function wanted(items){return String(items||"").split(/(?<=[.;])\s+/).filter(function(p){return !/^(no|not)\b/i.test(p)}).join(" ")}
-/* Direct score for one listing: exact word 6, synonym 5, charity name 5, category name 5; a bonus when every word matches. */
+/* Direct score for one listing: word in the title 7, in the details 6, synonym 5, charity name 5, category name 5; a bonus when every word matches. */
 function score(x,q){
-  var qw=words(q).filter(function(w){return STOP.indexOf(w)<0});
+  var qw=words(comp(q)).filter(function(w){return STOP.indexOf(w)<0});
   if(!words(q).length)return 1;if(!qw.length)return 0;
-  var t=words(x.title+" "+wanted(x.items)),k=words(x.kw),c=words(x.category),n=words((x.sites||[x.o]).map(function(o){return [o.name,o.short,o.parent,o.parentShort,o.address].join(" ")}).join(" ")),s=0,hit=0;
-  qw.forEach(function(w){
+  var t=words(comp(x.title+" "+wanted(x.items))),k=words(comp(x.kw)),c=words(x.category),n=words((x.sites||[x.o]).map(function(o){return [o.name,o.short,o.parent,o.parentShort,o.address].join(" ")}).join(" ")),s=0,hit=0;
+  var lastHit=false,tt=words(comp(x.title));
+  qw.forEach(function(w,i){
     var b=0;
-    if(t.indexOf(w)>-1)b=6;
+    if(tt.indexOf(w)>-1)b=7; // in the title itself: "Lamps" before a "Housewares" listing that mentions lamps
+    else if(t.indexOf(w)>-1)b=6;
     else if(syn(w).some(function(v){return v!==w&&t.indexOf(v)>-1}))b=5;
     else if(k.indexOf(w)>-1||syn(w).some(function(v){return k.indexOf(v)>-1}))b=5; // "Search words" in Airtable (hidden), e.g. lawn mower on a garden-tools listing
-    else if(c.indexOf(w)>-1||syn(w).some(function(v){return c.indexOf(v)>-1}))b=5; // you typed the category itself ("food", "clothes")
+    else if(KINDOF[w]&&new RegExp("(^|[^a-z])(?<!(garden|gardening|yard) )"+KINDOF[w]+"s?\\b").test(comp(x.title+" "+wanted(x.items)+" "+x.kw)))b=4; // "tools" or "power tools", not "garden tools"
+    else if(c.indexOf(w)>-1||syn(w).some(function(v){return c.indexOf(v)>-1}))b=3; // you typed the category itself ("food", "clothes"): below listings that name the item
     if(NAMESTOP.indexOf(w)<0&&n.indexOf(w)>-1)b=Math.max(b,5);
     if(b)hit++;s+=b;
+    if(i===qw.length-1)lastHit=b>0;
   });
   if(hit&&hit===qw.length&&qw.length>1)s+=5;
-  FULL[x.id]=hit===qw.length;
+  /* "baby clothes": when not every word matches, the last word is usually the thing itself, so it counts for more. */
+  if(qw.length>1&&hit<qw.length&&lastHit)s+=3;
+  FULL[x.id]=hit===qw.length;LAST[x.id]=lastHit;
   var isPet=x.category==="Pet Supplies"||t.some(function(v){return PETW.indexOf(v)>-1}),wantsPet=qw.some(function(w){return PETW.indexOf(w)>-1});
   if(wantsPet&&!isPet)return 0;
   if(wantsPet&&isPet&&s)s+=10;
   if(s&&isPet&&!wantsPet)s=1;
   return s;
 }
-var SCORES={q:null,by:{}},FULL={};
+var SCORES={q:null,by:{}},FULL={},LAST={};
 function scoreOf(x,q){
   if(SCORES.q!==q){
     var by={},cats={};
-    if(!words(q).some(function(w){return PETW.indexOf(w)>-1}))words(q).forEach(function(w){if(CATW[w])cats[CATW[w]]=1}); // "dog food" is pet food, not people food
-    FULL={};LIST.forEach(function(l){by[l.id]=score(l,q)});
+    if(!words(q).some(function(w){return PETW.indexOf(w)>-1}))words(comp(q)).forEach(function(w){if(CATW[w])cats[CATW[w]]=1}); // "dog food" is pet food, not people food
+    FULL={};LAST={};LIST.forEach(function(l){by[l.id]=score(l,q)});
     /* Two or more words ("pressure washer", "dog food"): if some listings match every word, drop the ones that only
        match some of them (a clothes "washer", a "dog" bed). Catch-all listings below are added back separately. */
-    if(LIST.some(function(l){return by[l.id]>1&&FULL[l.id]})&&words(q).filter(function(w){return STOP.indexOf(w)<0}).length>1)
+    if(LIST.some(function(l){return by[l.id]>1&&FULL[l.id]})&&words(comp(q)).filter(function(w){return STOP.indexOf(w)<0}).length>1)
       LIST.forEach(function(l){if(by[l.id]>1&&!FULL[l.id])by[l.id]=0});
+    /* No listing has every word ("kids winter jacket"): keep the ones that have the last word, the thing itself
+       (jackets), and drop ones that only share a describing word (kids' toys). */
+    else if(LIST.some(function(l){return by[l.id]>1&&LAST[l.id]}))
+      LIST.forEach(function(l){if(by[l.id]>1&&!LAST[l.id])by[l.id]=0});
     LIST.forEach(function(l){
       if(by[l.id]>0)return;
-      /* "Garden" isn't an Airtable category (garden listings are under Other), so it matches on the title alone. */
+      /* "Garden" and "Sports" aren't Airtable categories (those listings are under Other), so they match on the title alone. */
       Object.keys(cats).forEach(function(k){
-        if(!BROAD[k]||(k!=="Garden"&&l.category!==k))return;
+        if(!BROAD[k]||(k!=="Garden"&&k!=="Sports"&&l.category!==k))return;
         if(words(l.title).some(function(w){return BROAD[k].indexOf(w)>-1}))by[l.id]=2;
       });
     });
@@ -241,7 +264,7 @@ function render(){
   if(none){
     rows=LIST.map(function(x){return {x:x,s:1}}).filter(function(r){if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;if(wishOnly&&!r.x.wish)return false;return true});
     rows=mixByCharity(rows);
-    h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p><p class="meta">Know a charity that takes this? <a href="/charities#form">Tell us</a> and we’ll add it.</p></div>';
+    h='<div class="empty"><p><b>Sorry, no charity is asking for “'+esc(q)+'” at the moment.</b></p><p>Here are some things local charities need right now.</p>'+(/car ?seat|crib|stroller|mattress|box ?spring|playpen|high ?chair/i.test(q)?'<p class="meta">Most charities can’t take used car seats, cribs, strollers or mattresses, for safety and hygiene reasons.</p>':'')+'<p class="meta">Know a charity that takes this? <a href="/charities#form">Tell us</a> and we’ll add it.</p></div>';
   }
   $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"+(cat?" in "+cat:"")):(wishOnly?"Wish List":"What charities need right now");
   $("wishintro").hidden=!wishOnly;
