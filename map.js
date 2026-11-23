@@ -86,20 +86,26 @@
     if (!map || !rows.length) return;
     layer.clearLayers(); pins.clearLayers();
     var r = places(rows), pts = [];
+    /* Call-first areas share rounded positions, so several places can land on the same spot (e.g. Cool Aid's
+       downtown houses): draw one circle there and list every place in its popup. */
+    var areas = {};
     r.list.forEach(function (p) {
-      var ll = [p.o.lat, p.o.lng], m;
-      if (p.drop) {
-        m = L.marker(ll, { icon: L.divIcon({ className: "mpin", html: "<span><b>" + p.items.length + "</b></span>", iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30] }), title: VF.short(p.o), keyboard: true, riseOnHover: true, needs: p.items.length });
-      } else {
-        m = L.circle(ll, { radius: 800, className: "marea", weight: 1.5 });
-      }
+      var ll = [p.o.lat, p.o.lng];
+      pts.push(ll);
+      if (!p.drop) { var k = ll.join(","); (areas[k] = areas[k] || []).push(p); return; }
+      var m = L.marker(ll, { icon: L.divIcon({ className: "mpin", html: "<span><b>" + p.items.length + "</b></span>", iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30] }), title: VF.short(p.o), keyboard: true, riseOnHover: true, needs: p.items.length });
       m.bindPopup(popup(p), { maxWidth: 280, autoPanPaddingTopLeft: [10, 60] });
-      (p.drop ? pins : layer).addLayer(m); pts.push(ll);
+      pins.addLayer(m);
     });
-    var drops = r.list.filter(function (p) { return p.drop; }).length, areas = r.list.length - drops;
+    Object.keys(areas).forEach(function (k) {
+      var group = areas[k], c = L.circle(k.split(",").map(Number), { radius: 800, className: "marea", weight: 1.5 });
+      c.bindPopup(group.map(popup).join('<hr class="mp-sep">'), { maxWidth: 280, maxHeight: 340, autoPanPaddingTopLeft: [10, 60] });
+      layer.addLayer(c);
+    });
+    var drops = r.list.filter(function (p) { return p.drop; }).length, nAreas = r.list.length - drops;
     note.innerHTML = r.list.length
       ? (drops ? '<span class="k-pin">' + drops + " drop-off spot" + (drops > 1 ? "s" : "") + "</span>" : "") +
-        (areas ? '<span class="k-area">' + areas + " call first (rough area)</span>" : "") +
+        (nAreas ? '<span class="k-area">' + nAreas + " call or email first (rough area)</span>" : "") +
         (r.off ? '<span class="k-off">+' + r.off + " need" + (r.off > 1 ? "s" : "") + " with no public location</span>" : "")
       : "None of these charities share a location.";
     /* Zoom to fit the results, but only when the results change, so a donor's own panning isn't undone. */

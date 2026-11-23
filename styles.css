@@ -332,6 +332,7 @@ html.mapopen,html.mapopen body{overflow:hidden}
 .leaflet-interactive.marea{fill:#e08a00;fill-opacity:.2;stroke:#c06f00}
 .mp{font:15px/1.4 system-ui,sans-serif;color:#1d2b2a}
 .mp p{margin:0 0 6px}
+.mp-sep{border:0;border-top:1px solid #c9d3d0;margin:10px 0}
 .mp-name{font-weight:700;font-size:17px}.mp-name a{color:#0b5d57}
 .mp-addr span,.mp-area{color:#4a5a58;font-size:13px}
 .mp-addr span{white-space:pre-line}
