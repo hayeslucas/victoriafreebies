@@ -35,12 +35,8 @@
 
 <main><div class="wrap">
 <section aria-live="polite"><h2 id="rt">What charities need right now</h2><div class="wishintro" id="wishintro" hidden>
-<p class="lead"><span class="new">NEW</span> Local charities asked for these items for a specific person or program. These are special requests that are needed right now.</p>
-<ul class="wishpoints">
-<li><b>For someone specific.</b> Not general donations: each request comes from a charity with a real person or program in mind.</li>
-<li><b>Needed today.</b> Charities take items down as soon as they have enough, so everything here is still wanted.</li>
-<li><b>Looking for more?</b> <button type="button" class="linkbtn" id="wishall">See all listings</button></li>
-</ul>
+<p class="lead"><span class="new">NEW</span> Specific items local charities need right now, for a person or program they’re helping. Requests come down as soon as they’re filled, so everything here is still wanted.</p>
+<p class="wishmore">Looking for more? <button type="button" class="linkbtn" id="wishall">See all listings</button></p>
 </div><div class="duo" id="duo">
 <div class="mapcard tile" id="mapcard">
 <div class="mapbar">
@@ -294,7 +290,7 @@ function tiles(xs,q){
      leaving for the All Charities page. Each name goes to that charity's page; Back returns to the search. */
   var t=$("orgtile"),open=q&&t.getAttribute("data-q")===q&&t.classList.contains("open");
   t.setAttribute("data-q",q||"");t.classList.toggle("open",!!open);
-  $("orgcount").textContent=q?ids.length+" "+(ids.length===1?"charity needs":"charities need")+" “"+q+"”":ids.length+" charities";
+  $("orgcount").textContent=q?ids.length+" "+(ids.length===1?"charity needs":"charities need")+" “"+q+"”":ids.length+(ids.length===1?" charity":" charities");
   var foot=$("orgfoot"),more=q&&ids.length>3&&!open;
   if(q){foot.removeAttribute("href");foot.setAttribute("role","button");foot.tabIndex=ids.length>3&&!open?0:-1;
     $("orglink").innerHTML=more?"See all "+ids.length+' <span aria-hidden="true">↓</span>':"Tap a charity to see what else they need";
