@@ -28,6 +28,10 @@ Each listing's **Drop off?** field decides how donors reach the charity:
 If the chosen detail is missing on the organization (for example Drop Off Ready but no Address), the card falls back
 to the other one ("Call to arrange a drop-off"), so fill in the matching field.
 
+**One listing, several shops:** link a listing to several organizations (e.g. Beacon's three thrift shops) and the
+search shows **one** card: the first shop in full (Page Order decides which), the rest under "N more locations".
+Organization pages still list it under each shop.
+
 **Writing listings:** one listing = one kind of item a donor would search for.
 - **Title:** the item, plural, 1–4 words ("Tents and tarps", not "Camping gear is always needed").
 - **Item details:** optional. Only what the title doesn't already say: which kinds, sizes, condition, quantity,

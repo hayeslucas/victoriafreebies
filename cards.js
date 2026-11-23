@@ -30,8 +30,27 @@
     if (h === "email") return '<div class="spot"><p class="k">Email first</p><p class="big">' + emailLink(o.email) + "</p></div>";
     return '<div class="spot none"><p class="k">Contact details coming soon</p></div>';
   }
+  /* One listing at several shops (e.g. Beacon's three thrift shops): one card, the first shop shown in full,
+     the others in a drop-down. Each shop follows the same rule as a single card (call-first shows no address). */
+  function siteLine(x, o) {
+    var h = howTo({ dropoff: x.dropoff, o: o }), name = '<b class="sname">' + esc(short(o)) + "</b>";
+    if (h === "drop") return '<li>' + name + '<span class="saddr">' + addressLink(o.address) + "</span>" + (o.hours ? '<span class="shrs">' + esc(o.hours) + "</span>" : "") + "</li>";
+    if (h === "call" || h === "arrange") return '<li>' + name + '<span class="sphone">' + linkPhones(o.phone) + "</span></li>";
+    if (h === "email") return '<li>' + name + '<span class="sphone">' + emailLink(o.email) + "</span></li>";
+    return '<li>' + name + "<span>Contact details coming soon</span></li>";
+  }
+  function multiSpot(x) {
+    var sites = x.sites, h = howTo({ dropoff: x.dropoff, o: sites[0] }), n = sites.length;
+    var k = h === "drop" ? "Drop it off at any of " + n + " locations" : h === "email" ? "Email first" : "Call first";
+    var notes = sites.every(function (o) { return (o.notes || "") === (sites[0].notes || ""); }) ? sites[0].notes : "";
+    return '<div class="spot multi"><p class="k">' + k + '</p><ul class="sites">' + siteLine(x, sites[0]) + "</ul>" +
+      '<details class="moresites"><summary>' + (n - 1) + " more location" + (n > 2 ? "s" : "") + '</summary><ul class="sites">' +
+      sites.slice(1).map(function (o) { return siteLine(x, o); }).join("") + "</ul></details>" +
+      (notes ? '<p class="notes">' + esc(notes) + "</p>" : "") + "</div>";
+  }
   /* "Drop-off Instructions" on the organization: standing rules shown under every one of its listings. */
-  function spot(x) { var o = x.o, b = spotBox(x); return o.notes && b.indexOf("spot none") < 0 ? b.replace(/<\/div>$/, '<p class="notes">' + esc(o.notes) + "</p></div>") : b; }
+  function spot(x) {
+    if (x.sites && x.sites.length > 1) return multiSpot(x); var o = x.o, b = spotBox(x); return o.notes && b.indexOf("spot none") < 0 ? b.replace(/<\/div>$/, '<p class="notes">' + esc(o.notes) + "</p></div>") : b; }
 
   /* Organization pages are per parent organization: Swift House, Mount Edwards and the rest share
      one Victoria Cool Aid Society page. A charity with no parent gets its own page. */

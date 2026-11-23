@@ -95,7 +95,7 @@ function wanted(items){return String(items||"").split(/(?<=[.;])\s+/).filter(fun
 function score(x,q){
   var qw=words(q).filter(function(w){return STOP.indexOf(w)<0});
   if(!words(q).length)return 1;if(!qw.length)return 0;
-  var t=words(x.title+" "+wanted(x.items)),c=words(x.category),n=words([x.o.name,x.o.short,x.o.parent,x.o.parentShort].join(" ")),s=0,hit=0;
+  var t=words(x.title+" "+wanted(x.items)),c=words(x.category),n=words((x.sites||[x.o]).map(function(o){return [o.name,o.short,o.parent,o.parentShort,o.address].join(" ")}).join(" ")),s=0,hit=0;
   qw.forEach(function(w){
     var b=0;
     if(t.indexOf(w)>-1)b=6;
@@ -130,7 +130,7 @@ var COUNT={};
 function base(id){return String(id).split("-")[0]}
 function card(x){
   var orgs=D.orgs||{},top=VF.topId(x.org,orgs),url=VF.orgUrl(x.org,orgs),topName=VF.short(orgs[top]||x.o),more=(COUNT[top]||1)-1;
-  return '<article class="res">'+(x.wish?'<p class="wishtag">Specifically requested</p>':'')+'<p class="org"><a href="'+esc(url)+'">'+esc(VF.where(x.o))+'</a></p><h3 class="want">'+esc(x.title)+'</h3>'
+  return '<article class="res">'+(x.wish?'<p class="wishtag">Specifically requested</p>':'')+'<p class="org"><a href="'+esc(url)+'">'+esc(x.sites&&x.sites.length>1?VF.short(orgs[top]||x.o)+' · '+x.sites.length+' locations':VF.where(x.o))+'</a></p><h3 class="want">'+esc(x.title)+'</h3>'
    +(x.items&&x.items.toLowerCase()!==x.title.toLowerCase()?'<p class="items clamp">'+esc(x.items)+'</p>':'')
    +(x.case?'<p class="why">♥ '+esc(x.case)+'</p>':'')
    +spot(x)
@@ -258,7 +258,16 @@ function submit(){st.q=$("q").value.trim();st.shown=12;render();if(st.q){var r=$
 function load(d){
   if(!d||!Array.isArray(d.listings))return false;
   var today=new Date().toISOString().slice(0,10),orgs=d.orgs||{};
-  D=d;SCORES.q=null;LIST=d.listings.filter(function(x){return !x.expires||x.expires>=today}).map(function(x){x.o=orgs[x.org]||{};return x});
+  D=d;SCORES.q=null;
+  /* A listing linked to several shops arrives once per shop; show it as one card with all the shops on it.
+     Shops with a Page Order come first (lowest first), otherwise the order they're linked in Airtable. */
+  var seenIds={};LIST=[];
+  d.listings.filter(function(x){return !x.expires||x.expires>=today}).forEach(function(x){
+    var o=orgs[x.org]||{},k=base(x.id);
+    if(seenIds[k]){seenIds[k].sites.push(o);return}
+    x.o=o;x.sites=[o];seenIds[k]=x;LIST.push(x);
+  });
+  LIST.forEach(function(x){if(x.sites.length>1){x.sites.sort(function(a,b){return (a.order==null?1e9:a.order)-(b.order==null?1e9:b.order)});x.o=x.sites[0]}});
   var cats=[];LIST.forEach(function(x){if(x.category&&cats.indexOf(x.category)<0)cats.push(x.category)});cats.sort();
   /* Category buttons, built from the categories in Airtable: most common first, "Other" last. */
   cats.sort(function(a,b){return (a==="Other")-(b==="Other")||(COMMON[b]||3)-(COMMON[a]||3)||a.localeCompare(b)});
