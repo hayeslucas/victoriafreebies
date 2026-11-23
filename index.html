@@ -47,7 +47,7 @@
 <div class="map" id="map" role="region" aria-label="Map of the places in these results"></div>
 <button type="button" class="tilefoot" id="mapbig" aria-expanded="false"><b id="mapcount">Places to give</b><span>See the map <span aria-hidden="true">→</span></span></button>
 </div>
-<div class="tile orgtile" id="orgtile"><div class="cwin"><ul class="clist" id="clist"></ul></div><a class="tilefoot" href="/org"><b id="orgcount">Local charities</b><span>See All Charities <span aria-hidden="true">→</span></span></a></div>
+<div class="tile orgtile" id="orgtile"><div class="cwin"><ul class="clist" id="clist"></ul></div><a class="tilefoot" id="orgfoot" href="/org"><b id="orgcount">Local charities</b><span id="orglink">See All Charities <span aria-hidden="true">→</span></span></a></div>
 </div><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
 
 <section><h2>Why use Victoria Freebies?</h2><div class="steps"><div class="step"><h3>No wasted trips, no wasted time</h3><p>Know what a charity wants before you head out.</p></div><div class="step"><h3>Give to a good cause</h3><p>Your things go to local charities and the people they support.</p></div><div class="step"><h3>Less waste</h3><p>Good items find a new home instead of the landfill.</p></div></div></section>
@@ -251,8 +251,19 @@ function tiles(xs,q){
   var ids=Object.keys(n);
   ids.forEach(function(id){if(RANK[id]==null)RANK[id]=Math.random()});
   ids.sort(q?function(a,b){return n[b]-n[a]||RANK[a]-RANK[b]}:function(a,b){return RANK[a]-RANK[b]});
-  $("orgcount").textContent=ids.length+" "+(ids.length===1?"charity":"charities")+(q?" for “"+q+"”":"");
-  $("clist").innerHTML=ids.slice(0,3).map(function(id){return '<li><a href="'+esc(VF.orgUrl(id,orgs))+'"><span>'+esc(VF.short(orgs[id]))+'</span><em>'+n[id]+' need'+(n[id]>1?'s':'')+'</em></a></li>'}).join("");
+  /* After a search the box stays about the search: "See all 7" opens the full list right here instead of
+     leaving for the All Charities page. Each name goes to that charity's page; Back returns to the search. */
+  var t=$("orgtile"),open=q&&t.getAttribute("data-q")===q&&t.classList.contains("open");
+  t.setAttribute("data-q",q||"");t.classList.toggle("open",!!open);
+  $("orgcount").textContent=q?ids.length+" "+(ids.length===1?"charity needs":"charities need")+" “"+q+"”":ids.length+" charities";
+  var foot=$("orgfoot"),more=q&&ids.length>3&&!open;
+  if(q){foot.removeAttribute("href");foot.setAttribute("role","button");foot.tabIndex=ids.length>3&&!open?0:-1;
+    $("orglink").innerHTML=more?"See all "+ids.length+' <span aria-hidden="true">↓</span>':"Tap a charity to see what else they need";
+    foot.classList.toggle("note",!more)}
+  else{foot.setAttribute("href","/org");foot.removeAttribute("role");foot.removeAttribute("tabindex");foot.classList.remove("note");$("orglink").innerHTML='See All Charities <span aria-hidden="true">→</span>'}
+  foot.onclick=function(e){if(!q)return;e.preventDefault();if(more){t.classList.add("open");tiles(xs,q)}};
+  foot.onkeydown=function(e){if(q&&(e.key==="Enter"||e.key===" ")){e.preventDefault();foot.onclick(e)}};
+  $("clist").innerHTML=ids.slice(0,open?ids.length:3).map(function(id){return '<li><a href="'+esc(VF.orgUrl(id,orgs))+'"><span>'+esc(VF.short(orgs[id]))+'</span><em>'+n[id]+(q?' match':' need')+(n[id]>1?(q?'es':'s'):'')+'</em></a></li>'}).join("");
 }
 /* Long item lists show two lines, with a link to show the rest. The link only appears when the text is cut off. */
 function clampItems(){
@@ -278,7 +289,10 @@ function clampItems(){
     if(words(st.q).some(function(w){return w.length>2&&iw.indexOf(w)>-1&&t.indexOf(w)<0}))b.onclick();
   });
 }
-function submit(){st.q=$("q").value.trim();st.shown=12;render();if(st.q){var r=$("rt");if(r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"start"})}}
+/* The search goes in the address (/?q=couch), so going to a charity's page and pressing Back brings the results back,
+   and a search can be shared as a link. */
+function keepQ(){try{history.replaceState(null,"",($("wishonly").checked?"/wish-list":"/")+(st.q?"?q="+encodeURIComponent(st.q):""))}catch(e){}}
+function submit(){st.q=$("q").value.trim();st.shown=12;keepQ();render();if(st.q){var r=$("rt");if(r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"start"})}}
 function load(d){
   if(!d||!Array.isArray(d.listings))return false;
   var today=new Date().toISOString().slice(0,10),orgs=d.orgs||{};
@@ -355,7 +369,7 @@ $("droponly").addEventListener("change",function(){st.shown=12;render()});
 /* The Wish List has its own address (/wish-list) so it can be linked from the top bar and shared.
    Ticking the box switches the address and the highlighted top-bar link; unticking goes back to Search. */
 function setWishPage(on){
-  try{history.replaceState(null,"",on?"/wish-list":"/")}catch(e){}
+  keepQ();
   Array.prototype.forEach.call(document.querySelectorAll(".navlinks a"),function(a){
     var me=a.getAttribute("href")===(on?"/wish-list":"/");if(me)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
   document.dispatchEvent(new Event("navchange"));
@@ -364,6 +378,7 @@ $("wishall").onclick=function(){$("wishonly").click()};
 $("wishonly").addEventListener("change",function(){st.shown=12;setWishPage(this.checked);render()});
 if(/^\/wish-list\/?$/.test(location.pathname)){$("wishonly").checked=true;setWishPage(true);WISH_ARRIVAL=true}
 $("more").onclick=function(){st.shown+=12;render()};
+(function(){var q=new URLSearchParams(location.search).get("q");if(q){$("q").value=q;st.q=q.trim()}})();
 try{load(JSON.parse(localStorage.getItem(CACHE_KEY)))}catch(e){}
 render();
 fetchListings();
