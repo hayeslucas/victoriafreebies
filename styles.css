@@ -316,12 +316,12 @@ header{position:relative}
 .mapnote{font:600 15px/1.35 system-ui,sans-serif;color:var(--mute);margin:0;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}
 .mapnote span{display:inline-flex;align-items:center;gap:6px}
 .k-pin::before{content:"";width:12px;height:12px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--brand);display:inline-block}
-.k-area::before{content:"";width:14px;height:14px;border-radius:50%;background:rgba(224,138,0,.25);border:2px dashed #c06f00;display:inline-block}
+.k-area::before{content:"";width:14px;height:14px;border-radius:50%;background:rgba(224,138,0,.25);border:2px solid #c06f00;display:inline-block}
 .k-off{font-weight:500}
 button.mapbig{flex:0 0 auto;padding:8px 14px;font-size:15px;border-width:2px;display:inline-flex;align-items:center;gap:6px}
 .mapbig .ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .map{height:280px;background:#e8eef0}
-.leaflet-tile-pane{filter:saturate(.75)}
+.leaflet-tile-pane{filter:saturate(.45) brightness(1.06) contrast(.92)}
 @media (max-width:760px){.map{height:170px}.mapnote{font-size:14px;gap:2px 12px}.mapcard:not(.big) .k-off,.mapcard:not(.big) .leaflet-control-zoom{display:none}}
 .mapcard.big{position:fixed;inset:0;z-index:2000;margin:0;border:0;border-radius:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .mapcard.big .map{flex:1;height:auto}
@@ -334,6 +334,10 @@ html.mapopen,html.mapopen body{overflow:hidden}
 .mp p{margin:0 0 6px}
 .mp-name{font-weight:700;font-size:17px}.mp-name a{color:#0b5d57}
 .mp-addr span,.mp-area{color:#4a5a58;font-size:13px}
+.mp-addr span{white-space:pre-line}
+.mclus{background:none;border:0}
+.mclus span{display:flex;flex-direction:column;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#0b5d57;color:#fff;border:3px solid #fff;box-shadow:0 0 0 5px rgba(11,93,87,.25),0 2px 6px rgba(0,0,0,.3);font:700 17px/1 system-ui,sans-serif}
+.mclus small{font:600 9px/1.1 system-ui,sans-serif;opacity:.9;margin-top:2px}
 .mp-how b{color:#9a3b00}
 .mp-k{font:700 12px system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#0b5d57;margin-top:8px!important}
 .mp-items{margin:0 0 8px;padding-left:18px}

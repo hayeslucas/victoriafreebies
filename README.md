@@ -67,8 +67,9 @@ an organization in Airtable changes its link.
 
 **Map** (`map.js`, on the home page above the results): shows where the current results are and follows the
 search, category and filters; "Open map" makes it full screen. Positions come from Organizations → **Latitude** /
-**Longitude** (fill these in when you add an organization with an address; any geocoder or Google Maps "What's here?"
-works). Places with a drop-off listing get a pin with their address. Call-first and email-first places get a shaded
+**Longitude**. If those are blank, the site looks the Address up on OpenStreetMap by itself, so new places appear
+without any extra step; fill them in by hand only if a pin lands in the wrong spot. Pins close together group into
+one bubble showing their total needs. Places with a drop-off listing get a pin with their address. Call-first and email-first places get a shaded
 circle about 1 km wide: the API sends only a rounded position and **no address** for them, so the exact spot never
 reaches the browser. Places with no Latitude/Longitude aren't on the map. Map tiles: OpenStreetMap; library: Leaflet.
 
