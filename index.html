@@ -41,7 +41,7 @@
 <li><b>Needed today.</b> Charities take items down as soon as they have enough, so everything here is still wanted.</li>
 <li><b>Looking for more?</b> <button type="button" class="linkbtn" id="wishall">See all listings</button></li>
 </ul>
-</div><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
+</div><div class="mapcard" id="mapcard"><div class="mapbar"><p class="mapnote" id="mapnote">Loading map…</p><button type="button" class="alt mapbig" id="mapbig" aria-expanded="false" aria-controls="mapcard"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8V3h5M17 8V3h-5M3 12v5h5M17 12v5h-5"/></svg>Open map</button></div><div class="map" id="map" role="region" aria-label="Map of the charities in these results"></div></div><div id="out"></div><p class="more" id="morewrap" hidden><button class="alt" id="more" type="button">Show more</button></p></section>
 
 <section><h2>Why use Victoria Freebies?</h2><div class="steps"><div class="step"><h3>No wasted trips, no wasted time</h3><p>Know what a charity wants before you head out.</p></div><div class="step"><h3>Give to a good cause</h3><p>Your things go to local charities and the people they support.</p></div><div class="step"><h3>Less waste</h3><p>Good items find a new home instead of the landfill.</p></div></div></section>
 
@@ -55,6 +55,7 @@
 <footer><div class="wrap">Victoria Freebies is a community project. Spot something out of date? <a href="/charities#form">Let us know</a>. · <a href="/charities">For charities</a> · <a href="/about">About</a></div></footer>
 
 <script src="/cards.js"></script>
+<script src="/map.js"></script>
 <script>
 (function(){
 "use strict";
@@ -200,7 +201,7 @@ function render(){
         if(inCat){st.cat="";Array.prototype.forEach.call($("cats").querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",String(!b.getAttribute("data-cat")))});st.shown=12;render()}
         else $("wishonly").click();
       };
-      $("morewrap").hidden=true;return;
+      $("morewrap").hidden=true;if(window.VFMap)VFMap.show([]);return;
     }
   }
   /* Matches exist, but only at places that ask you to call or email first: say so instead of "nothing". */
@@ -211,7 +212,7 @@ function render(){
       $("rt").textContent="Get in touch first for “"+q+"”";
       $("out").innerHTML='<div class="empty"><p><b>'+nOrgs+' charit'+(nOrgs>1?'ies want':'y wants')+' “'+esc(q)+'”, but '+(nOrgs>1?'they ask':'it asks')+' you to call or email first.</b></p><p><button type="button" class="alt" id="showcall">Show them</button></p></div>';
       $("showcall").onclick=function(){$("droponly").checked=false;st.shown=12;render()};
-      $("morewrap").hidden=true;return;
+      $("morewrap").hidden=true;if(window.VFMap)VFMap.show([]);return;
     }
   }
   if(none){
@@ -221,6 +222,7 @@ function render(){
   }
   $("rt").textContent=q?(none?"Nothing for “"+q+"” right now":rows.length+" match"+(rows.length>1?"es":"")+" for “"+q+"”"+(cat?" in "+cat:"")):(wishOnly?"Wish List":"What charities need right now");
   $("wishintro").hidden=!wishOnly;
+  if(window.VFMap)VFMap.show(none?[]:rows.map(function(r){return r.x})); // the map shows every match, not just the cards on screen
   h+=rows.slice(0,st.shown).map(function(r){return card(r.x)}).join("");
   $("out").innerHTML=h;
   /* Cards slide up and fade in one after another when the results change. "Show more" only animates the new ones. */
@@ -258,7 +260,8 @@ function submit(){st.q=$("q").value.trim();st.shown=12;render();if(st.q){var r=$
 function load(d){
   if(!d||!Array.isArray(d.listings))return false;
   var today=new Date().toISOString().slice(0,10),orgs=d.orgs||{};
-  D=d;SCORES.q=null;
+  Object.keys(orgs).forEach(function(k){orgs[k].id=k}); // the map links each place to its section on the organization page
+  window.VF_DATA=D=d;SCORES.q=null;
   /* A listing linked to several shops arrives once per shop; show it as one card with all the shops on it.
      Shops with a Page Order come first (lowest first), otherwise the order they're linked in Airtable. */
   var seenIds={};LIST=[];
