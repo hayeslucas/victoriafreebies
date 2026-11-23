@@ -9,7 +9,7 @@
 <header><div class="wrap">
 <div class="hero">
 <p class="place"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.6 6-10A6 6 0 0 0 4 8c0 4.4 6 10 6 10z"/><circle cx="10" cy="8" r="2.2"/></svg>Victoria, BC</p>
-<h1>Got something to donate? Find out exactly who needs it.</h1>
+<h1>Have something to donate? Find out exactly who needs it.</h1>
 <p class="sub">Search an item to see which Victoria charities are asking for it right now, who you’re helping, and where to drop it off.</p>
 <div class="panel" style="margin-top:8px">
 <label for="q">Search an item</label>
@@ -23,7 +23,7 @@
 </div>
 </div>
 <aside class="fc" id="fc" aria-label="For charities">
-<button type="button" class="fc-pill" id="fcpill" aria-expanded="false" aria-controls="fcmore"><span class="fc-dot" aria-hidden="true"></span>Run a charity?<span class="fc-arr" aria-hidden="true">→</span></button>
+<button type="button" class="fc-pill" id="fcpill" aria-expanded="false" aria-controls="fcmore"><span class="fc-dot" aria-hidden="true"></span>Are you a charity?<span class="fc-arr" aria-hidden="true">→</span></button>
 <div class="fc-more" id="fcmore"><div class="fc-in">
 <p>Tell Victoria donors exactly what you need, and spend less time sorting what you can’t use. It takes a few minutes.</p>
 <a class="fc-go" href="https://airtable.com/appgw8rdpxxxGmWG3/pagYtNiHWxy6HWE64/form" target="_blank" rel="noopener">Post a request <span aria-hidden="true">↗</span></a>
@@ -50,7 +50,7 @@
 <div class="step"><b class="n">2</b><h3>See who wants it</h3><p>Each result shows the charity, what they’re asking for and who your donation helps.</p></div>
 <div class="step"><b class="n">3</b><h3>Drop it off or call</h3><p>Go to the address and hours shown, or call first when the listing gives a phone number.</p></div></div></section>
 
-<section id="charities"><div class="panel cta"><h2>Run a charity?</h2><p>Tell donors exactly what you need, and spend less time sorting donations you can’t use.</p><p><a class="bigbtn" href="/charities">Information for charities</a></p></div></section>
+<section id="charities"><div class="panel cta"><h2>Are you a charity?</h2><p>Tell donors exactly what you need, and spend less time sorting donations you can’t use.</p><p><a class="bigbtn" href="/charities">Information for charities</a></p></div></section>
 </div></main>
 <footer><div class="wrap">Victoria Freebies is a community project. Spot something out of date? <a href="/charities#form">Let us know</a>. · <a href="/charities">For charities</a> · <a href="/about">About</a></div></footer>
 
@@ -302,7 +302,7 @@ $("out").addEventListener("click",function(e){
   var x=LIST.filter(function(l){return l.id===b.getAttribute("data-share")})[0];if(!x)return;
   VF.share(b,x.title+" for "+VF.short(x.o),(VF.short(x.o)||"A local charity")+" is asking for "+x.title.toLowerCase()+". Can you help?",VF.orgUrl(x.org,D.orgs||{})+"#item-"+base(x.id));
 });
-/* "Run a charity?" pill: opens on hover or focus on computers (CSS), and on tap everywhere. */
+/* "Are you a charity?" pill: opens on hover or focus on computers (CSS), and on tap everywhere. */
 (function(){var fc=$("fc"),b=$("fcpill");if(!fc)return;
   b.addEventListener("click",function(){var o=!fc.classList.contains("open");fc.classList.toggle("open",o);b.setAttribute("aria-expanded",String(o))});
   document.addEventListener("click",function(e){if(!fc.contains(e.target)&&fc.classList.contains("open")){fc.classList.remove("open");b.setAttribute("aria-expanded","false")}});
