@@ -109,6 +109,11 @@ https://airtable.com/appgw8rdpxxxGmWG3/pagYtNiHWxy6HWE64/form
 Only these organization fields are sent to the site: name, **Public Phone**, address, drop-off hours,
 website, **Drop-off Instructions**, **Donate Link** and **Preferred Name**. Contact name, email and Contact Phone stay private.
 
+## Analytics
+
+Every page loads Vercel Web Analytics (`/_vercel/insights/script.js`): page views, visitors, top pages and referrers,
+with no cookies. Searches show up as page views with `?q=…` in the address. See it in the Vercel project → Analytics.
+
 ## Setup on Vercel
 
 1. In Airtable, create a personal access token (https://airtable.com/create/tokens) with the
