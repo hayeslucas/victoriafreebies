@@ -125,9 +125,11 @@ function unwanted(items){return String(items||"").split(/(?<=[.;])\s+/).filter(f
 /* A listing (or its charity's drop-off instructions) that says "No beds or mattresses" is left out of a search for
    beds entirely, even if it would otherwise match through Search words or as a catch-all (e.g. a thrift store's "Furniture"). */
 var EXCL={};
+/* "No mattresses" also rules a place out for someone searching beds (most people giving a bed bring the mattress). */
+var EXREL={bed:["mattress","mattresses"],beds:["mattress","mattresses"],mattress:["bed","beds"],mattresses:["bed","beds"]};
 function excludes(x,qw){
   var no=words(comp(unwanted(x.items)+" "+(x.sites||[x.o]).map(function(o){return unwanted(o.notes)}).join(" ")));
-  return no.length&&qw.some(function(w){return no.indexOf(w)>-1});
+  return no.length&&qw.some(function(w){return no.indexOf(w)>-1||(EXREL[w]||[]).some(function(r){return no.indexOf(r)>-1})});
 }
 function wanted(items){return String(items||"").split(/(?<=[.;])\s+/).filter(function(p){return !/^(no|not)\b/i.test(p)}).join(" ")}
 /* Direct score for one listing: word in the title 7, in the details 6, synonym 5, charity name 5, category name 5; a bonus when every word matches. */

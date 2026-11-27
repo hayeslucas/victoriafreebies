@@ -58,7 +58,7 @@ words someone typed; add a word any time a search should have found a listing. O
 
 **"No …" sentences count.** If a listing's Items, or the charity's Drop-off Instructions, has a sentence starting
 "No" or "Not" ("No beds or mattresses."), a search for any word in it leaves that listing out entirely, even as a
-catch-all. So write exclusions as their own "No …" sentence.
+catch-all. "No mattresses" also counts for a search for beds (`EXREL` in `index.html`). So write exclusions as their own "No …" sentence.
 
 **Search** (in `index.html`) ranks results in three tiers: listings that name the item or a true synonym
 (`SYN`, e.g. coat = jacket = parka); then catch-all listings for the item's category (`CATOF` maps items to
