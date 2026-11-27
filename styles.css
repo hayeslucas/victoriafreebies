@@ -375,3 +375,10 @@ html.mapopen,html.mapopen body{overflow:hidden}
 .orglist small.dircause{display:block;font:500 14px/1.35 system-ui,sans-serif;color:var(--mute);margin-top:2px}
 .orglist .dirnone{padding:16px 18px;background:var(--card);border:2px dashed var(--line);border-radius:14px;font:17px system-ui,sans-serif}
 @media (max-width:600px){.dirtools select{flex:1 1 100%}}
+/* /post and /update: the Airtable form embedded in our own page */
+.crumb{margin:0 0 6px;font-size:.95rem}.crumb a{color:inherit;opacity:.85}
+.formbox{margin-top:16px;background:var(--card);border:2px solid var(--line);border-radius:16px;overflow:hidden}
+.airform{display:block;width:100%;border:0;background:transparent}
+.af-post{height:2120px}.af-up{height:1220px}
+.formhelp{margin-top:12px;font-size:.95rem}
+@media (max-width:600px){.af-post{height:2820px}.af-up{height:1440px}}
