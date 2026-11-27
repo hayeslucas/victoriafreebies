@@ -17,17 +17,49 @@
   }
   function details(x) { return x.items && x.items.toLowerCase() !== x.title.toLowerCase() ? '<p class="items">' + esc(x.items) + "</p>" : ""; }
 
-  /* Every charity, for /org on its own. */
+  /* Every charity, for /org on its own: a search box (charity names and what they need) and cause buttons
+     (Airtable: Organizations → Cause; a site with no causes of its own uses its parent's). */
+  var DIR = { q: "", cause: "" };
   function directory(d) {
-    var orgs = d.orgs || {}, count = {}, seen = {};
-    live(d).forEach(function (x) { var t = VF.topId(x.org, orgs), k = t + "|" + base(x.id); if (!seen[k]) { seen[k] = 1; count[t] = (count[t] || 0) + 1; } });
-    var ids = Object.keys(count).sort(function (a, b) { return count[b] - count[a] || orgs[a].name.localeCompare(orgs[b].name); }); // most needs first
+    var orgs = d.orgs || {}, count = {}, seen = {}, text = {}, causes = {};
+    Object.keys(orgs).forEach(function (id) { if (!orgs[id].parentId) (orgs[id].cause || []).forEach(function (c) { (causes[id] = causes[id] || {})[c] = 1; }); }); // the charity's own causes first, then its sites'
+    live(d).forEach(function (x) {
+      var t = VF.topId(x.org, orgs), k = t + "|" + base(x.id);
+      text[t] = (text[t] || "") + " " + x.title + " " + x.items + " " + (x.kw || "") + " " + (x.o.name || "") + " " + (x.o.short || "");
+      if (!seen[k]) { seen[k] = 1; count[t] = (count[t] || 0) + 1; }
+      (x.o.cause || []).forEach(function (c) { (causes[t] = causes[t] || {})[c] = 1; });
+    });
+    var ids = Object.keys(count);
+    ids.sort(function (a, b) { return count[b] - count[a] || orgs[a].name.localeCompare(orgs[b].name); }); // most needs first
+    var all = {}; ids.forEach(function (id) { Object.keys(causes[id] || {}).forEach(function (c) { all[c] = (all[c] || 0) + 1; }); });
+    var causeList = Object.keys(all).sort(function (a, b) { return all[b] - all[a] || a.localeCompare(b); });
     document.title = "Local charities · Victoria Freebies";
     $("oname").textContent = "Local charities";
     $("osub").textContent = "Every charity on Victoria Freebies, and how many needs each has posted right now.";
-    $("page").innerHTML = '<p class="orgcta">Are you a charity? <a href="/charities">Post your needs <span aria-hidden="true">→</span></a></p><ul class="orglist">' + ids.map(function (id) {
-      return '<li><a href="/org/' + VF.slug(orgs[id].name) + '"><b>' + esc(orgs[id].name) + "</b><span>" + count[id] + " need" + (count[id] > 1 ? "s" : "") + "</span></a></li>";
-    }).join("") + "</ul>";
+    $("page").innerHTML = '<p class="orgcta">Are you a charity? <a href="/charities">Post your needs <span aria-hidden="true">→</span></a></p>' +
+      '<div class="dirtools"><label class="sr" for="dirq">Search charities</label><input id="dirq" type="search" placeholder="Search charities or items" autocomplete="off" value="' + esc(DIR.q) + '">' +
+      (causeList.length ? '<div class="chips dircauses" role="group" aria-label="Filter by cause">' + [""].concat(causeList).map(function (c) {
+        return '<button type="button" class="chip" data-cause="' + esc(c) + '" aria-pressed="' + (c === DIR.cause) + '">' + (c ? esc(c) : "All") + "</button>";
+      }).join("") + "</div>" : "") + '</div><p class="dircount" id="dircount" aria-live="polite"></p><ul class="orglist" id="dirlist"></ul>';
+    function words(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(Boolean); }
+    function draw() {
+      var qw = words(DIR.q), shown = ids.filter(function (id) {
+        if (DIR.cause && !(causes[id] || {})[DIR.cause]) return false;
+        if (!qw.length) return true;
+        var hay = words(orgs[id].name + " " + (orgs[id].short || "") + " " + text[id]).join(" ");
+        return qw.every(function (w) { return hay.indexOf(w.replace(/s$/, "")) > -1; }); // "towels" finds "towel"
+      });
+      $("dirlist").innerHTML = shown.map(function (id) {
+        var cs = Object.keys(causes[id] || {});
+        return '<li><a href="/org/' + VF.slug(orgs[id].name) + '"><b>' + esc(orgs[id].name) + (cs.length ? '<small class="dircause">' + esc(cs.join(" · ")) + "</small>" : "") + "</b><span>" + count[id] + " need" + (count[id] > 1 ? "s" : "") + "</span></a></li>";
+      }).join("") || '<li class="dirnone">No charities match. <button type="button" class="linkbtn" id="dirclear">Show all charities</button></li>';
+      $("dircount").textContent = DIR.q || DIR.cause ? shown.length + " of " + ids.length + " charities" : ids.length + " charities";
+      var c = $("dirclear"); if (c) c.onclick = function () { DIR.q = ""; DIR.cause = ""; $("dirq").value = ""; pressed(); draw(); };
+    }
+    function pressed() { Array.prototype.forEach.call($("page").querySelectorAll("[data-cause]"), function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-cause") === DIR.cause)); }); }
+    $("dirq").oninput = function () { DIR.q = this.value; draw(); };
+    $("page").onclick = function (e) { var b = e.target.closest && e.target.closest("[data-cause]"); if (!b) return; DIR.cause = b.getAttribute("data-cause"); pressed(); draw(); };
+    draw();
   }
 
   function notFound() {

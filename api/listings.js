@@ -37,6 +37,7 @@ const ORGS = {
   donate: "fldHUMhogSdDRKrcP", // "Donate Link": the charity's page for giving money, shown on its organization page
   lat: "fldEd1ZobpAECdxNI", // "Latitude" / "Longitude": where the pin goes on the home page map (from the address)
   lng: "fld79kPw5VtX54l3D",
+  cause: "fldcaBH9vOsfphheZ", // "Cause": who the charity helps (Women, Youth...), for browsing All Charities by cause
 };
 
 // Only listings that are switched on, active, and not past their expiry date.
@@ -168,6 +169,7 @@ export async function buildData() {
       website: str(f[ORGS.website]),
       notes: str(f[ORGS.notes]),
       donate: str(f[ORGS.donate]),
+      cause: (f[ORGS.cause] || []).map(str).filter(Boolean),
     };
     const exact = showsAddress.has(r.id), g = looked[r.id];
     const lat = num(f[ORGS.lat]) != null ? num(f[ORGS.lat]) : g ? g[0] : null, lng = num(f[ORGS.lng]) != null ? num(f[ORGS.lng]) : g ? g[1] : null;
