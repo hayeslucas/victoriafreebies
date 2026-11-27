@@ -109,8 +109,10 @@ appear on the site's category buttons exactly as written.
 Changes show up within about 10 minutes. Vercel's CDN caches the API response
 (`s-maxage=600`), so Airtable is called about once every 10 minutes no matter how much traffic the site gets.
 
-Charities submit new listings through the Airtable form:
-https://airtable.com/appgw8rdpxxxGmWG3/pagYtNiHWxy6HWE64/form
+Charities submit new listings at **victoriafreebies.ca/post** and changes at **/update** (`post.html`, `update.html`).
+Each page embeds an Airtable form (Donation Request Form `pagYtNiHWxy6HWE64`, Update or remove a request `pagHqujgGW1WxH8uR`),
+so the address bar stays on our domain. Both forms must be shared as "Anyone with the link" in Airtable or the embed won't load.
+The embed doesn't resize itself: if a form gets much longer, raise `.af-post`/`.af-up` heights in `styles.css`.
 
 Only these organization fields are sent to the site: name, **Public Phone**, address, drop-off hours,
 website, **Drop-off Instructions**, **Donate Link** and **Preferred Name**. Contact name, email and Contact Phone stay private.
