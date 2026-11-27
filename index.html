@@ -21,7 +21,7 @@
 <p class="lbl" id="catlbl">Type of item</p>
 <div class="chips cats" id="cats" role="group" aria-labelledby="catlbl"></div>
 <div class="filters">
-<div><label class="check"><input type="checkbox" id="droponly"> Drop-off ready</label></div>
+<div><label class="check"><input type="checkbox" id="droponly"> No need to call first</label></div>
 <div><label class="check"><input type="checkbox" id="wishonly"> Wish List <span class="new">NEW</span></label></div>
 </div>
 </div>
@@ -121,11 +121,20 @@ var STOP=["the","and","for","of","my","some","old","used","new","or","a","to","i
 var NAMESTOP=["victoria","society","the","and","of","for","house","centre","program","store","thrift","food","bank","church","street","pantry","community","cooperative"];
 /* Item details can include what a charity does NOT take ("No pillows."). Leave those sentences out of search,
    so searching "pillows" doesn't find a listing that turns pillows away. */
+function unwanted(items){return String(items||"").split(/(?<=[.;])\s+/).filter(function(p){return /^(no|not)\b/i.test(p)}).join(" ")}
+/* A listing (or its charity's drop-off instructions) that says "No beds or mattresses" is left out of a search for
+   beds entirely, even if it would otherwise match through Search words or as a catch-all (e.g. a thrift store's "Furniture"). */
+var EXCL={};
+function excludes(x,qw){
+  var no=words(comp(unwanted(x.items)+" "+(x.sites||[x.o]).map(function(o){return unwanted(o.notes)}).join(" ")));
+  return no.length&&qw.some(function(w){return no.indexOf(w)>-1});
+}
 function wanted(items){return String(items||"").split(/(?<=[.;])\s+/).filter(function(p){return !/^(no|not)\b/i.test(p)}).join(" ")}
 /* Direct score for one listing: word in the title 7, in the details 6, synonym 5, charity name 5, category name 5; a bonus when every word matches. */
 function score(x,q){
   var qw=words(comp(q)).filter(function(w){return STOP.indexOf(w)<0});
   if(!words(q).length)return 1;if(!qw.length)return 0;
+  if(excludes(x,qw)){EXCL[x.id]=1;return 0}
   var t=words(comp(x.title+" "+wanted(x.items))),k=words(comp(x.kw)),c=words(x.category),n=words((x.sites||[x.o]).map(function(o){return [o.name,o.short,o.parent,o.parentShort,o.address].join(" ")}).join(" ")),s=0,hit=0;
   var lastHit=false,tt=words(comp(x.title));
   qw.forEach(function(w,i){
@@ -155,7 +164,7 @@ function scoreOf(x,q){
   if(SCORES.q!==q){
     var by={},cats={};
     if(!words(q).some(function(w){return PETW.indexOf(w)>-1}))words(comp(q)).forEach(function(w){if(CATW[w])cats[CATW[w]]=1}); // "dog food" is pet food, not people food
-    FULL={};LAST={};LIST.forEach(function(l){by[l.id]=score(l,q)});
+    FULL={};LAST={};EXCL={};LIST.forEach(function(l){by[l.id]=score(l,q)});
     /* Two or more words ("pressure washer", "dog food"): if some listings match every word, drop the ones that only
        match some of them (a clothes "washer", a "dog" bed). Catch-all listings below are added back separately. */
     if(LIST.some(function(l){return by[l.id]>1&&FULL[l.id]})&&words(comp(q)).filter(function(w){return STOP.indexOf(w)<0}).length>1)
@@ -165,7 +174,7 @@ function scoreOf(x,q){
     else if(LIST.some(function(l){return by[l.id]>1&&LAST[l.id]}))
       LIST.forEach(function(l){if(by[l.id]>1&&!LAST[l.id])by[l.id]=0});
     LIST.forEach(function(l){
-      if(by[l.id]>0)return;
+      if(by[l.id]>0||EXCL[l.id])return;
       /* "Garden" and "Sports" aren't Airtable categories (those listings are under Other), so they match on the title alone. */
       Object.keys(cats).forEach(function(k){
         if(!BROAD[k]||(k!=="Garden"&&k!=="Sports"&&l.category!==k))return;
