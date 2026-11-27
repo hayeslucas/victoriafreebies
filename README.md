@@ -74,7 +74,7 @@ organization (all of Cool Aid's sites share `/org/victoria-cool-aid-society`), w
 Landing 2 on Cool Aid's page; then drop-off sites before call-first ones, then most needs), each a compact table with drop-off-ready items first and Wish List items tagged, plus a **Donate money** button (Organizations → **Donate Link**) and its
 **Website**. `/org` lists every charity and is the top bar's **Charities** link (top bar: Search · Wish List · Charities · About; "For charities" is in the footer and at the top of `/org`). Card names and "has N other needs" link here; Every search card, each organization page and each
 site on a parent's page (e.g. Mount Edwards) have a Share menu (Facebook, X, WhatsApp, Bluesky, Email, Copy link, and the phone's own share
-sheet as "More…"). `/org` has a search box (charity names and what they need) and cause buttons from Organizations → **Cause**
+sheet as "More…"). `/org` has a search box (charity names and what they need) and a cause drop-down from Organizations → **Cause**
 (a charity shows its own causes plus any its sites have, e.g. Cool Aid gets Women from Sandy Merriman House).
 **Preferred Name** (e.g. "Cool Aid") is used where space is tight:
 card lines and footers, share messages, tab titles. The full Name stays on the page heading. The page address comes from the organization's name, so renaming

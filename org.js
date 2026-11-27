@@ -18,7 +18,7 @@
   function details(x) { return x.items && x.items.toLowerCase() !== x.title.toLowerCase() ? '<p class="items">' + esc(x.items) + "</p>" : ""; }
 
   /* Every charity, for /org on its own: a search box (charity names and what they need) and cause buttons
-     (Airtable: Organizations → Cause; a site with no causes of its own uses its parent's). */
+     (a drop-down from Airtable: Organizations → Cause; a site with no causes of its own uses its parent's). */
   var DIR = { q: "", cause: "" };
   function directory(d) {
     var orgs = d.orgs || {}, count = {}, seen = {}, text = {}, causes = {};
@@ -38,9 +38,9 @@
     $("osub").textContent = "Every charity on Victoria Freebies, and how many needs each has posted right now.";
     $("page").innerHTML = '<p class="orgcta">Are you a charity? <a href="/charities">Post your needs <span aria-hidden="true">→</span></a></p>' +
       '<div class="dirtools"><label class="sr" for="dirq">Search charities</label><input id="dirq" type="search" placeholder="Search charities or items" autocomplete="off" value="' + esc(DIR.q) + '">' +
-      (causeList.length ? '<div class="chips dircauses" role="group" aria-label="Filter by cause">' + [""].concat(causeList).map(function (c) {
-        return '<button type="button" class="chip" data-cause="' + esc(c) + '" aria-pressed="' + (c === DIR.cause) + '">' + (c ? esc(c) : "All") + "</button>";
-      }).join("") + "</div>" : "") + '</div><p class="dircount" id="dircount" aria-live="polite"></p><ul class="orglist" id="dirlist"></ul>';
+      (causeList.length ? '<label class="sr" for="dircause">Cause</label><select id="dircause"><option value="">All causes</option>' + causeList.map(function (c) {
+        return '<option value="' + esc(c) + '"' + (c === DIR.cause ? " selected" : "") + ">" + esc(c) + "</option>";
+      }).join("") + "</select>" : "") + '</div><p class="dircount" id="dircount" aria-live="polite"></p><ul class="orglist" id="dirlist"></ul>';
     function words(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(Boolean); }
     function draw() {
       var qw = words(DIR.q), shown = ids.filter(function (id) {
@@ -54,11 +54,10 @@
         return '<li><a href="/org/' + VF.slug(orgs[id].name) + '"><b>' + esc(orgs[id].name) + (cs.length ? '<small class="dircause">' + esc(cs.join(" · ")) + "</small>" : "") + "</b><span>" + count[id] + " need" + (count[id] > 1 ? "s" : "") + "</span></a></li>";
       }).join("") || '<li class="dirnone">No charities match. <button type="button" class="linkbtn" id="dirclear">Show all charities</button></li>';
       $("dircount").textContent = DIR.q || DIR.cause ? shown.length + " of " + ids.length + " charities" : ids.length + " charities";
-      var c = $("dirclear"); if (c) c.onclick = function () { DIR.q = ""; DIR.cause = ""; $("dirq").value = ""; pressed(); draw(); };
+      var c = $("dirclear"); if (c) c.onclick = function () { DIR.q = ""; DIR.cause = ""; $("dirq").value = ""; if ($("dircause")) $("dircause").value = ""; draw(); };
     }
-    function pressed() { Array.prototype.forEach.call($("page").querySelectorAll("[data-cause]"), function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-cause") === DIR.cause)); }); }
     $("dirq").oninput = function () { DIR.q = this.value; draw(); };
-    $("page").onclick = function (e) { var b = e.target.closest && e.target.closest("[data-cause]"); if (!b) return; DIR.cause = b.getAttribute("data-cause"); pressed(); draw(); };
+    if ($("dircause")) $("dircause").onchange = function () { DIR.cause = this.value; draw(); };
     draw();
   }
 
