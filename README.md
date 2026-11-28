@@ -149,3 +149,10 @@ npm i -g vercel
 vercel env pull   # copies AIRTABLE_TOKEN into .env.local
 vercel dev
 ```
+
+## Share image (link previews)
+
+Every page's `og:image` points to `icons/og.png` (the year-round image). From Nov 28, 2026 until early January
+it points to `icons/og-holiday.png` ("Give what's needed this season", with snowflakes). To switch back, replace
+`og-holiday.png` with `og.png` in all six HTML pages and restore the `og:image:alt` text
+("Victoria Freebies: Have something to donate? Find out exactly who needs it.").
