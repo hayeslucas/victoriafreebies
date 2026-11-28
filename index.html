@@ -238,6 +238,21 @@ function mixByCharity(rows){
   }
   return out;
 }
+/* Search log: once someone stops typing for a few seconds, send what they searched and how many results it found
+   to /api/search, which adds a row to the Searches table in Airtable. Each search is sent once per visit, and
+   only from the live site. Nothing about the person is sent. */
+var LOGGED={},logT;
+function logSearch(q,rows){
+  clearTimeout(logT);
+  if(!q||location.hostname.indexOf("victoriafreebies.ca")<0)return;
+  logT=setTimeout(function(){
+    var k=q.toLowerCase().trim();if(k.length<2||LOGGED[k])return;LOGGED[k]=1;
+    var orgs={};rows.forEach(function(r){orgs[r.x.o.parent||r.x.o.name||r.x.org]=1});
+    var where=window.VFMap&&VFMap.isBig()?"Map":$("wishonly").checked?"Wish List":"Search";
+    var body=JSON.stringify({search:k,results:rows.length,charities:Object.keys(orgs).length,where:where});
+    try{if(!(navigator.sendBeacon&&navigator.sendBeacon("/api/search",new Blob([body],{type:"application/json"}))))fetch("/api/search",{method:"POST",headers:{"Content-Type":"application/json"},body:body,keepalive:true})}catch(e){}
+  },2500);
+}
 var WISH_ARRIVAL=false;
 var REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches,lastKey="",lastShown=0;
 function render(){
@@ -247,6 +262,7 @@ function render(){
     if(r.s<=0)return false;if(cat&&r.x.category!==cat)return false;if(dropOnly&&howTo(r.x)!=="drop")return false;if(wishOnly&&!r.x.wish)return false;return true});
   rows.sort(function(a,b){return (b.s-a.s)||a.x.title.localeCompare(b.x.title)});
   if(!q)rows=mixByCharity(rows);
+  logSearch(q,rows);
   var none=q&&!rows.length,h="";
   /* Matches exist, but a category button or the Wish List box is hiding them: say which, with a one-tap way out. */
   if(none&&(cat||wishOnly)){

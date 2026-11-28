@@ -122,6 +122,14 @@ website, **Drop-off Instructions**, **Donate Link** and **Preferred Name**. Cont
 Every page loads Vercel Web Analytics (`/_vercel/insights/script.js`): page views, visitors, top pages and referrers,
 with no cookies. Searches show up as page views with `?q=…` in the address. See it in the Vercel project → Analytics.
 
+
+**Search log.** Vercel's analytics doesn't keep the search words, so the site logs them itself. When someone stops
+typing for 2.5 seconds, `index.html` (`logSearch`) sends the words, how many listings and charities matched, and
+where (Search, Wish List or Map) to `/api/search`. That forwards them to the Airtable automation **Log a search**,
+which adds a row to the **Searches** table. Each search is sent once per visit, and only from victoriafreebies.ca
+(not local testing). Nothing about the person is sent. The webhook address is the Vercel environment variable
+`AIRTABLE_SEARCH_HOOK`; without it, nothing is logged. Each search uses one Airtable automation run.
+
 ## Setup on Vercel
 
 1. In Airtable, create a personal access token (https://airtable.com/create/tokens) with the
